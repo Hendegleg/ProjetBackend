@@ -1,10 +1,11 @@
 const express = require("express");
 const mongoose = require("mongoose");
+const oeuvreRoutes= require ("./routes/oeuvre")
 
 
 mongoose
 .connect(
-     "mongodb://127.0.0.1:27017/DS",
+     "mongodb://127.0.0.1:27017/database",
    { useNewUrlParser: true, useUnifiedTopology: true}
 )
 .then(()=>console.log("connexion a mongoDB reussite"))
@@ -25,6 +26,7 @@ app.use((req, res, next) => {
 
 app.use(express.json());
 
+app.use("/api/oeuvres", oeuvreRoutes)
 
 
 
