@@ -1,28 +1,28 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-const userSchema = new Schema({
-    email: {
-        type: String,
-        required: true,
-        unique: true,
-        validate: {
-            validator: function (v) {
-                return /\S+@\S+\.\S+/.test(v);
-            },
-            message: 'L\'adresse e-mail doit contenir le caractère "@".',
-        },
-    },
-    password: { type: String, required: true },
-    firstName: { type: String, required: true },
-    lastName: { type: String, required: true },
-    role: {
-        type: String,
-        enum: ["admin", "user"],
-    }
+const candidatSchema = new Schema({
+    Nom: { type: String, required: true },
+    Nom_jeune_fille: { type: String, required: true },
+    Sexe:{ type: String, required: true },
+    Nationalite : { type: String, required: true },
+    Taille_en_m :  { type: String, required: true },
+    Telephone : { type: Number, required: true, unique: true},
+    CINPassport :{ type: String, required: true },
+    situationProfessionnelle: { type: String, required: true },
+    connaissances :  { type: String, required: true },
+    parraine : { type: String, required: true },
+    activite : { type: String, required: true },
+    choeuramateur : { type: String, required: true },
+    extraitChante : { type: String, required: true },
+    tessiture: { type: String, required: true },
+    evaluation : { type: String, required: true },
+    decisioneventuelle :{ type: String, required: true },
+    remarque : { type: String, required: true },
+
 });
 
 
-const User = mongoose.model('User', userSchema);
+const Candidat = mongoose.model('Candidat', candidatSchema);
 
-module.exports = User;
+module.exports = Candidat;
