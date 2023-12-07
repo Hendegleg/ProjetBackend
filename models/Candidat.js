@@ -2,18 +2,19 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const candidatSchema = new Schema({
-    Nom: { type: String, required: true },
-    Nom_jeune_fille: { type: String, required: true },
-    Sexe:{ type: String, required: true },
-    Nationalite : { type: String, required: true },
-    Taille_en_m :  { type: String, required: true },
-    Telephone : { type: Number, required: true, unique: true},
-    CINPassport :{ type: String, required: true },
+    nom: { type: String, required: true },
+    nom_jeune_fille: { type: String, required: true },
+    sexe:{ type: String, required: true },
+    nationalite : { type: String, required: true },
+    taille_en_m :  { type: String, required: true },
+    telephone : { type: Number, required: true, unique: true},
+    cinpassport :{ type: String, required: true },
     situationProfessionnelle: { type: String, required: true },
     connaissances :  { type: String, required: true },
     parraine : { type: String, required: true },
     activite : { type: String, required: true },
-    choeuramateur : { type: String, required: true }
+    choeuramateur : { type: String, required: true },
+    estRetenu: { type: Boolean, default: false }
    
 });
 
