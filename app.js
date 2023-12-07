@@ -1,19 +1,15 @@
 const express = require("express");
 const mongoose = require("mongoose");
-const oeuvreRoutes= require ("./routes/oeuvre")
+const auditionRoutes = require("./routes/audition");
 
 
-mongoose
-.connect(
-     "mongodb://127.0.0.1:27017/database",
-   { useNewUrlParser: true, useUnifiedTopology: true}
-)
-.then(()=>console.log("connexion a mongoDB reussite"))
-.catch((e) =>console.log("connexion a mongoDB echouée", e))
+
+
 
 const app = express();
 
 
+app.use(express.json());
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader(
@@ -24,7 +20,9 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use(express.json());
+app.use('/api/auditions', auditionRoutes);
+
+
 
 app.use("/api/oeuvres", oeuvreRoutes)
 

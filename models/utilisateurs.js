@@ -16,6 +16,7 @@ const UserSchema = new Schema({
         },
     },
     password:  { type: String, required: true },
+    
 });
 userSchema.virtual('name').get(function() {
     return `${this.firstName} ${this.lastName}`;

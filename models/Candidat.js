@@ -13,13 +13,8 @@ const candidatSchema = new Schema({
     connaissances :  { type: String, required: true },
     parraine : { type: String, required: true },
     activite : { type: String, required: true },
-    choeuramateur : { type: String, required: true },
-    extraitChante : { type: String, required: true },
-    tessiture: { type: String, required: true },
-    evaluation : { type: String, required: true },
-    decisioneventuelle :{ type: String, required: true },
-    remarque : { type: String, required: true },
-
+    choeuramateur : { type: String, required: true }
+   
 });
 
 
