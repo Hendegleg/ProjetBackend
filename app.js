@@ -1,8 +1,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
+const oeuvreRoutes= require ("./routes/oeuvre")
 const auditionRoutes = require("./routes/audition");
-
-
 mongoose
   .connect("mongodb://localhost:27017/database", {
     //useNewUrlParser: true,
@@ -12,7 +11,6 @@ mongoose
   .catch((e) => console.log("Connexion à MongoDB échouée", e));
 
 const app = express();
-
 
 app.use(express.json());
 app.use((req, res, next) => {
@@ -26,9 +24,7 @@ app.use((req, res, next) => {
 });
 
 app.use('/api/auditions', auditionRoutes);
-
-
-
+app.use("/api/oeuvres", oeuvreRoutes)
 
 
 
