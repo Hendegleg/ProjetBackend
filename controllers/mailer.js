@@ -1,6 +1,6 @@
 const nodemailer = require('nodemailer');
 require('dotenv').config();
-const Candidat = require('../models/candidat')
+const Candidat = require('../models/candidat');
 const Audition = require('../models/audition')
 const path = require('path');
 const transporter = nodemailer.createTransport({
@@ -36,7 +36,7 @@ exports.envoyerEmailAcceptation = async (req, res) => {
                 await transporter.sendMail(mailOptions);
                 console.log(`Email envoyé à ${candidat.email}`);
 
-                await Candidat.findByIdAndUpdate(id, { retenu: true, dateEnvoiEmail: Date.now() });
+                await Candidat.findByIdAndUpdate(id, { estretenu: true, dateEnvoiEmail: Date.now() });
             } catch (error) {
                 console.error('Erreur lors de l\'envoi de l\'email ou de la mise à jour du statut du candidat :', error);
             }
