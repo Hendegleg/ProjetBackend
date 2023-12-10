@@ -2,7 +2,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const auditionRoutes = require("./routes/audition");
 const repetitionRoutes = require("./routes/repetition");
-const mailerRoutes = require("./routes/mailer");
+/*const mailerRoutes = require("./routes/mailer");*/
 
 
 mongoose
@@ -29,7 +29,7 @@ app.use('/api/auditions', auditionRoutes);
 
 app.use("/api/oeuvres", oeuvreRoutes)
 app.use("/api/repetitions", repetitionRoutes)
-app.use('/mailer', mailerRoutes);
+/*app.use('/mailer', mailerRoutes);*/
 
 
 module.exports = app;
