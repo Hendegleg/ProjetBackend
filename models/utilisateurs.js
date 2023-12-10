@@ -16,6 +16,15 @@ const UserSchema = new Schema({
         },
     },
     password:  { type: String, required: true },
+
+    statusHistory: {type: mongoose.Schema.Types.ObjectId, ref: 'StatusSchema' },
+
+    active: { type: Boolean, default: true }, 
+    dateEntreeChoeur: { type: Date }, 
+    dateSortieChoeur: { type: Date },
+    role: { type: String,
+         enum: ['user', 'admin'],
+         default: 'user' }
     
 });
 userSchema.virtual('name').get(function() {
