@@ -17,6 +17,8 @@ const candidatSchema = new Schema({
     choeuramateur : { type: String, required: true },
     estretenu : {type: Boolean, default : false },
     estConfirme : {type: Boolean, default : false },
+    signature : {type: Boolean, default : false },
+    estEngage: {type: Boolean, default : false },
    
 });
 
