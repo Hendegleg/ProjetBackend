@@ -17,7 +17,7 @@ const UserSchema = new Schema({
     },
     password:  { type: String, required: true },
 
-    statusHistory: {type: mongoose.Schema.Types.ObjectId, ref: 'StatusSchema' },
+    statusHistory: {type: mongoose.Schema.Types.ObjectId, ref: 'status' },
 
     active: { type: Boolean, default: true }, 
     dateEntreeChoeur: { type: Date }, 
