@@ -1,6 +1,6 @@
 const nodemailer = require('nodemailer');
 require('dotenv').config();
-const Candidat = require('../models/candidat');
+const Candidat = require('../models/Candidat');
 const Audition = require('../models/audition');
 const User = require('../models/utilisateurs');
 
@@ -166,21 +166,12 @@ exports.sauvegarderEngagementFinal = async (req, res) => {
     return res.status(500).json({ error: 'Erreur lors de la sauvegarde de l\'engagement final' });
   }
 };
-exports.sauvegarderTousLesCandidats = async (req, res) => {
+exports.getListeCandidats = async (req, res) => {
     try {
-      // Récupérer les candidats de la BD
-      const candidats = await Candidat.find({});
-  
-      if (!candidats ) {
-        return res.status(404).json({ message: 'Aucun candidat trouvé' });
-      }
-
-      const fs = require('fs');
-      fs.writeFileSync('candidats.json', JSON.stringify(candidats));
-  
-      return res.status(200).json({ message: 'Tous les candidats ont été sauvegardés avec succès' });
+        const listeCandidats = await Candidat.find({});
+        res.status(200).json(listeCandidats);
     } catch (error) {
-      console.error('Erreur lors de la sauvegarde de tous les candidats :', error);
-      return res.status(500).json({ error: 'Erreur lors de la sauvegarde de tous les candidats' });
+        console.error('Erreur lors de la récupération de la liste des candidats :', error);
+        res.status(500).json({ message: 'Erreur lors de la récupération de la liste des candidats' });
     }
-  };
+};

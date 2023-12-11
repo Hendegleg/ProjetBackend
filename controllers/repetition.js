@@ -93,7 +93,34 @@ const deleteRepetition = (req, res) => {
             return res.status(500).json({ error: error.message });
         });
 };
+const generatePupitreList = async (req, res) => {
+  const { numPupitre, pourcentage } = req.body;
 
+  try {
+    const repetitions = await Repetition.find();
+    const pupitreList = [];
+
+    repetitions.forEach((repetition) => {
+      repetition.pourcentagesPupitres.forEach((pupitre) => {
+        if (pupitre.num_pupitre === numPupitre && pupitre.pourcentage === pourcentage) {
+          const repetitionInfo = {
+            repetitionId: repetition._id,
+            date: repetition.date,
+            lieu: repetition.lieu,
+            heureDebut: repetition.heureDebut,
+            heureFin: repetition.heureFin,
+            repetitionPercentage: pupitre.pourcentage,
+          };
+          pupitreList.push(repetitionInfo);
+        }
+      });
+    });
+
+    res.status(200).json(pupitreList);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
 
 module.exports = {
   fetchRepetitions: fetchRepetitions,
@@ -101,4 +128,5 @@ module.exports = {
   getRepetitionById: getRepetitionById,
   updateRepetition: updateRepetition,
   deleteRepetition: deleteRepetition,
+  generatePupitreList: generatePupitreList,
 };

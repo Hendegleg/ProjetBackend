@@ -15,8 +15,16 @@ const UserSchema = new Schema({
             message: 'L\'adresse e-mail doit contenir le caractère "@".',
         },
     },
-    password: { type: String, required: true },
-    role: { type: String, enum: ['admin', 'choriste'],}
+    password:  { type: String, required: true },
+
+    statusHistory: {type: mongoose.Schema.Types.ObjectId, ref: 'StatusSchema' },
+    active: { type: Boolean, default: true }, 
+    dateEntreeChoeur: { type: Date }, 
+    dateSortieChoeur: { type: Date },
+    role: { type: String,
+         enum: ['user', 'admin', 'choriste'],
+         default: 'user' }
+    
 });
 
 UserSchema.virtual('name').get(function () {
