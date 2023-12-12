@@ -2,9 +2,10 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const pupitreSchema = new Schema({
-    num_pupitre : { type : number , required : true}
+    num_pupitre : { type : Number , required : true},
+    besoin: { type: Number, required: true },
+    candidats: [{ type: Schema.Types.ObjectId, ref: 'Candidat' }]
 });
 
 const Pupitre = mongoose.model('Pupitre', pupitreSchema);
-
 module.exports = Pupitre;

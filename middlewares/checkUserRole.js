@@ -1,7 +1,12 @@
+
+const user=require("../models/utilisateur")
+
+
+
 const checkUserRole = (req, res, next) => {
-    const userRole = req.userRole; 
-  
-    if (userRole === 'choriste' || userRole === 'admin') {
+    const userRole = req.user.role; 
+    const statusHistory = user.statusHistory 
+    if (statusHistory === 'choriste' || userRole === 'admin') {
       return next(); 
     }
   

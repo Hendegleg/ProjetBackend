@@ -10,7 +10,8 @@ const StatusSchema = new Schema({
     
 
     
-})
+});
+
 const status = mongoose.model("status", StatusSchema);
 
 module.exports= status;
