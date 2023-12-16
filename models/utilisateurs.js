@@ -18,6 +18,9 @@ const UserSchema = new Schema({
     password:  { type: String, required: true },
 
     statusHistory: {type: mongoose.Schema.Types.ObjectId, ref: 'status' },
+    estEnConge: { type: Boolean, default: false }, 
+    dateDebutConge: { type: Date }, 
+    dateFinConge: { type: Date }, 
 
     active: { type: Boolean, default: true }, 
     dateEntreeChoeur: { type: Date }, 

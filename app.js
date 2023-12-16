@@ -6,6 +6,7 @@ const mailerRoutes = require("./routes/gerercandidat");
 const oeuvreRoutes= require ("./routes/oeuvre");
 const candidatRoutes=require ("./routes/candidat");
 const formulaireRoutes = require ("./routes/formulaire")
+const congeRoutes = require('./routes/conge');
 mongoose
 .connect(
      "mongodb://127.0.0.1:27017/DS",
@@ -31,9 +32,11 @@ app.use('/api/auditions', auditionRoutes);
 
 app.use("/api/candidats", candidatRoutes);
 app.use("/api/formulaires", formulaireRoutes);
-app.use("/api/oeuvres", oeuvreRoutes)
-app.use("/api/repetitions", repetitionRoutes)
+app.use("/api/oeuvres", oeuvreRoutes);
+app.use("/api/repetitions", repetitionRoutes);
 app.use('/api/mailer', mailerRoutes);
+app.use('/api/conge', congeRoutes);
+
 
 
 module.exports = app;
