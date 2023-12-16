@@ -1,16 +1,16 @@
 const User = require('../models/utilisateurs');
 const Notification = require('../models/notifications');
-const CronJob = require('cron').CronJob;
+const cron = require('node-cron');
+const { CronJob } = require('cron');
 
 exports.declareLeave = async (req, res) => {
   try {
-    const { userId, startDate, endDate } = req.body; //je vais mettre les infos en req.bode 
+    const { userId, startDate, endDate } = req.body;
     const user = await User.findById(userId);
     if (!user) {
       return res.status(404).json({ message: 'Utilisateur non trouvé' }); 
     }
 
-   
     user.estEnConge = true;
     user.dateDebutConge = startDate;
     user.dateFinConge = endDate;
@@ -22,7 +22,6 @@ exports.declareLeave = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
-
 
 exports.sendNotification = async (req, res) => {
   try {
@@ -44,7 +43,9 @@ exports.sendNotification = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
-const job = new CronJob('0 0 * * *', async () => {
+
+
+const terminateLeaveJob = new CronJob('0 0 * * *', async () => {
   try {
     const users = await User.find({ estEnConge: true });
     
@@ -56,7 +57,6 @@ const job = new CronJob('0 0 * * *', async () => {
         user.estEnConge = false;
         await user.save();
 
-        //notif fin congé
         const notification = new Notification({
           userId: user._id,
           message: 'Votre congé est terminé.'
@@ -68,4 +68,25 @@ const job = new CronJob('0 0 * * *', async () => {
     console.error('Erreur dans le job cron :', error.message);
   }
 });
-job.start(); 
+terminateLeaveJob.start();
+
+const changeLeaveStatusJob = new CronJob('0 0 * * *', async () => {
+  try {
+    const usersWithLeaveChanged = await User.find({ estEnConge: true, statusChanged: true });
+
+    usersWithLeaveChanged.forEach(async (user) => {
+      const notification = new Notification({
+        userId: user._id,
+        message: `Votre statut de congé a été modifié.`,
+      });
+      
+      await notification.save();
+      
+      user.statusChanged = false;
+      await user.save();
+    });
+  } catch (error) {
+    console.error('Erreur lors de la vérification des modifications du statut de congé :', error);
+  }
+});
+changeLeaveStatusJob.start();
