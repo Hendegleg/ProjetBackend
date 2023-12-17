@@ -7,7 +7,11 @@ const AuditionSchema = new Schema({
     dureeAudition: { type : String , required : true},
     candidat: { type: mongoose.Schema.Types.ObjectId, ref: 'Candidat' },
     extraitChante : { type: String, required: true },
-    tessiture: { type: String, required: true },
+    tessiture: {
+        type: String,
+        enum: ['Soprano', 'Alto', 'Ténor','Basse','Autre'],
+        required: true
+    },
     evaluation : { 
         type : String,
         enum: ["A","B","C"] , 

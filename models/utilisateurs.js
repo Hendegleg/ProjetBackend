@@ -17,18 +17,18 @@ const UserSchema = new Schema({
     },
     password:  { type: String, required: true },
     statusHistory: {type: mongoose.Schema.Types.ObjectId, ref: 'status' },
+    demandeConge: {type: Boolean, enum :['enconge','enattente']},
     estEnConge: { type: Boolean, default: false }, 
     dateDebutConge: { type: Date }, 
     dateFinConge: { type: Date }, 
     statusChanged: { type: Boolean , default: false },
-
     active: { type: Boolean, default: true }, 
-    statusChanged: { type: Boolean, default: false },
     dateEntreeChoeur: { type: Date }, 
     dateSortieChoeur: { type: Date },
     role: { type: String,
-         enum: ['user', 'admin'],
-         default: 'user' }
+         enum: ['choriste','manager de choeur','chef de pupitre', 'admin'],
+         default: 'user' },
+    tessiture: {type : String }
     
 });
 

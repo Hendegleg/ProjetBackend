@@ -1,6 +1,6 @@
 const nodemailer = require('nodemailer');
 require('dotenv').config();
-const Candidat = require('../models/Candidat');
+const Candidat = require('../models/candidat');
 const Audition = require('../models/audition');
 const User = require('../models/utilisateurs');
 
@@ -84,7 +84,7 @@ exports.envoyerEmailConfirmation = async (candidat) => {
     try {
         const motDePasse = genererMotDePasse(candidat._id);
         const motDePasseHache = await bcrypt.hash(motDePasse, 10);
-        const lienConfirmation = `http://localhost:5000/candidats/confirmation/${candidat._id}?confirmation=true`;
+        const lienConfirmation = `http://localhost:5000/api/candidats/confirmation/${candidat._id}?confirmation=true`;
 
         candidat.motDePasse = motDePasseHache;
         await candidat.save();
@@ -98,7 +98,7 @@ exports.envoyerEmailConfirmation = async (candidat) => {
 
         await transporter.sendMail(mailOptions);
         console.log(`Email de confirmation envoyé à ${candidat.email}`);
-        await ajouterChoriste(candidat); //ajout de choriste
+        await ajouterChoriste(candidat, audition.tessiture);
         if (candidat.signature==true){
         candidat.estConfirme = true;
         await sauvegarderEngagementFinal(candidat)}
@@ -131,15 +131,15 @@ async function genererMotDePasse(candidatId) {
 }
 
 
-exports.ajouterChoriste = async (candidat) => {
+exports.ajouterChoriste = async (candidat, tessiture) => {
     try {
         const nouveauChoriste = new User({
             nom: candidat.nom,
             prenom: candidat.prenom,
             email: candidat.email,
             password: candidat.motDePasse,
-            role: 'choriste'
-           
+            role: 'choriste',
+            tessiture: tessiture, // Utilisation de la tessiture fournie
         });
 
         await nouveauChoriste.save();
