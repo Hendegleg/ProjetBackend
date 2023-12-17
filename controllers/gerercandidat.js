@@ -1,6 +1,6 @@
 const nodemailer = require('nodemailer');
 require('dotenv').config();
-const Candidat = require('../models/Candidat');
+const Candidat = require('../models/candidat');
 const Audition = require('../models/audition');
 const User = require('../models/utilisateurs');
 

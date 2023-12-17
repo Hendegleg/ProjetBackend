@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
+const Verifmail = require('./verifmail');
 
 const candidatSchema = new Schema({
     nom: { type: String, required: true },
