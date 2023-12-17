@@ -21,13 +21,11 @@ const UserSchema = new Schema({
     dateDebutConge: { type: Date }, 
     dateFinConge: { type: Date }, 
     statusChanged: { type: Boolean , default: false },
-
     active: { type: Boolean, default: true }, 
-    statusChanged: { type: Boolean, default: false },
     dateEntreeChoeur: { type: Date }, 
     dateSortieChoeur: { type: Date },
     role: { type: String,
-         enum: ['user', 'admin'],
+         enum: ['choriste','manager de choeur' ,'chef de pupitre','admin'],
          default: 'user' }
     
 });

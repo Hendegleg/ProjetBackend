@@ -5,8 +5,8 @@ const user=require("../models/utilisateur")
 
 const checkUserRole = (req, res, next) => {
     const userRole = req.user.role; 
-    const statusHistory = user.statusHistory 
-    if (statusHistory === 'choriste' || userRole === 'admin') {
+    
+    if (userRole === 'choriste' || userRole === 'admin') {
       return next(); 
     }
   

@@ -30,7 +30,14 @@ exports.createAudition = async (req, res) => {
       res.status(400).json({ message: err.message });
     }
   };
-
+  exports.getAudition = async (req, res) => {
+    try {
+      const audition = await Audition.find(req.params).populate('candidat');
+      res.json(audition);
+    } catch (err) {
+      res.status(500).json({ message: err.message });
+    }
+  };
   // Lire les informations d'une audition spécifique par son ID
 exports.getAuditionById = async (req, res) => {
     try {
