@@ -28,7 +28,9 @@ const UserSchema = new Schema({
     role: { type: String,
          enum: ['choriste','manager de choeur','chef de pupitre', 'admin'],
          default: 'user' },
-    tessiture: {type : String }
+    tessiture: {type : String }, 
+    taille_en_m  : {type: String}, 
+    
     
 });
 

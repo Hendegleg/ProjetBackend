@@ -3,6 +3,8 @@ require('dotenv').config();
 const Candidat = require('../models/candidat');
 const Audition = require('../models/audition');
 const User = require('../models/utilisateurs');
+const bcrypt = require('bcrypt');
+
 
 const path = require('path');
 const transporter = nodemailer.createTransport({
@@ -59,19 +61,17 @@ exports.confirmerEngagement = async (req, res) => {
             return res.status(404).json({ message: 'Candidat non trouvé' });
         }
 
-        const confirmation = req.query.confirmation;
+        const confirmation = req.body.confirmation;
 
-        if (confirmation !== 'true' && confirmation !== 'false') {
+        if (confirmation === 'false') {
+            candidat.estConfirme = false; // Si la confirmation est 'false', estConfime faux
+        } else if (confirmation === 'true') {
+            candidat.estConfirme = true; // Si la confirmation est 'true', estConfime vrai
+        } else {
             return res.status(400).json({ message: 'Confirmation invalide' });
         }
 
-        candidat.estConfirme = (confirmation === 'true');
-
         await candidat.save();
-
-        if (candidat.estConfirme) {
-            await envoyerEmailConfirmation(candidat);
-        }
 
         return res.status(200).json({ message: 'Réponse enregistrée avec succès' });
     } catch (error) {
@@ -80,35 +80,45 @@ exports.confirmerEngagement = async (req, res) => {
     }
 };
 
-exports.envoyerEmailConfirmation = async (candidat) => {
+exports.envoyerEmailConfirmation = async (req, res) => {
     try {
-        const motDePasse = genererMotDePasse(candidat._id);
-        const motDePasseHache = await bcrypt.hash(motDePasse, 10);
-        const lienConfirmation = `http://localhost:5000/api/candidats/confirmation/${candidat._id}?confirmation=true`;
+        const candidatId = req.params.id;
+        const candidat = await Candidat.findById(candidatId);
 
-        candidat.motDePasse = motDePasseHache;
+        if (!candidat) {
+            throw new Error('Candidat non trouvé');
+        }
+
+        const generatedPassword = await genererMotDePasse(candidatId);
+        const hashedPassword = await bcrypt.hash(generatedPassword, 10);
+        const confirmationLink = `http://localhost:5000/api/candidats/confirmation/${candidatId}?confirmation=true`;
+
+        candidat.motDePasse = hashedPassword;
         await candidat.save();
 
         const mailOptions = {
             from: 'hendlegleg1@gmail.com',
             to: candidat.email,
             subject: 'Confirmation d\'inscription',
-            text: `Bonjour ${candidat.nom}, cliquez sur ce lien pour confirmer votre inscription : ${lienConfirmation}.Voici votre login : ${candidat.email} et voici votre mot de passe pour accéder à la plateforme : ${motDePasse}. Vous devez signer la charte du choeur!`,
+            text: `Bonjour ${candidat.nom}, cliquez sur ce lien pour confirmer votre inscription : ${confirmationLink}. Voici votre login : ${candidat.email} et voici votre mot de passe pour accéder à la plateforme : ${generatedPassword}. Vous devez aussi signer la charte du choeur!`,
         };
 
-        await transporter.sendMail(mailOptions);
-        console.log(`Email de confirmation envoyé à ${candidat.email}`);
-        await ajouterChoriste(candidat, audition.tessiture);
-        if (candidat.signature==true){
-        candidat.estConfirme = true;
-        await sauvegarderEngagementFinal(candidat)}
+        if (candidat.estConfirme === true) {
+            await transporter.sendMail(mailOptions);
+            console.log(`Email de confirmation envoyé à ${candidat.email}`);
+          /*  await exports.ajouterChoriste(candidat);*/
+        }
 
-       
+        if (candidat.signature === true) {
+            candidat.estEngage = true;
+            await candidat.save(); // Sauvegarder l'état de candidat après engagement
+        }
+
+        res.status(200).json({ message: 'Email de confirmation envoyé avec succès' });
     } catch (error) {
         console.error('Erreur lors de l\'envoi de l\'email de confirmation :', error);
-        throw new Error('Erreur lors de l\'envoi de l\'email de confirmation');
+        res.status(500).json({ error: 'Erreur lors de l\'envoi de l\'email de confirmation' });
     }
-
 };
 
 async function genererMotDePasse(candidatId) {
@@ -119,11 +129,11 @@ async function genererMotDePasse(candidatId) {
             throw new Error('Candidat non trouvé');
         }
 
-        const numeroCandidat = candidat.telephone;
-        const initialeNom = candidat.nom.charAt(0);
+        const phoneNumber = candidat.telephone;
+        const initialName = candidat.nom.charAt(0);
 
-        const motDePasse = `${numeroCandidat}${initialeNom}`;
-        return motDePasse;
+        const generatedPassword = `${phoneNumber}${initialName}`;
+        return generatedPassword;
     } catch (error) {
         console.error('Erreur lors de la génération du mot de passe :', error);
         throw new Error('Erreur lors de la génération du mot de passe');
@@ -133,22 +143,28 @@ async function genererMotDePasse(candidatId) {
 
 exports.ajouterChoriste = async (candidat, tessiture) => {
     try {
-        const nouveauChoriste = new User({
-            nom: candidat.nom,
-            prenom: candidat.prenom,
-            email: candidat.email,
-            password: candidat.motDePasse,
-            role: 'choriste',
-            tessiture: tessiture, // Utilisation de la tessiture fournie
-        });
+        if (candidat.estConfirme === true) {
+            const nouveauChoriste = new User({
+                nom: candidat.nom,
+                prenom: candidat.prenom,
+                email: candidat.email,
+                password: candidat.motDePasse,
+                role: 'choriste',
+                tessiture: tessiture, // Utilisation de la tessiture fournie
+                taille_en_m: candidat.taille_en_m,
+            });
 
-        await nouveauChoriste.save();
-        console.log('Nouveau choriste ajouté avec succès.');
+            await nouveauChoriste.save();
+            console.log('Nouveau choriste ajouté avec succès.');
+        } else {
+            console.log('Le candidat n\'est pas confirmé. Le choriste ne sera pas ajouté.');
+        }
     } catch (error) {
         console.error('Erreur lors de l\'ajout du choriste :', error);
         throw new Error('Erreur lors de l\'ajout du choriste');
     }
 };
+
 
 exports.sauvegarderEngagementFinal = async (req, res) => {
   try {
@@ -170,6 +186,7 @@ exports.getListeCandidats = async (req, res) => {
     try {
         const listeCandidats = await Candidat.find({});
         res.status(200).json(listeCandidats);
+        console.log("liste:", listeCandidats)
     } catch (error) {
         console.error('Erreur lors de la récupération de la liste des candidats :', error);
         res.status(500).json({ message: 'Erreur lors de la récupération de la liste des candidats' });
