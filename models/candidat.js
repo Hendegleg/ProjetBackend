@@ -10,7 +10,7 @@ const candidatSchema = new Schema({
     nationalite : { type: String, required: true },
     taille_en_m :  { type: String, required: true },
     email : {type: String, required:true},
-    telephone : { type: Number, required: true, unique: true},
+    telephone : { type: Number, required: true},
     cinpassport :{ type: String, required: true },
     situationProfessionnelle: { type: String, required: true },
     connaissances :  { type: String, required: true },

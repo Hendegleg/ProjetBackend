@@ -2,20 +2,25 @@ const express = require('express');
 const router = express.Router();
 const candidatController = require('../controllers/candidat');
 
-// // Route pour obtenir tous les candidats
+//getAll
  router.get('/', candidatController.getAllCandidats);
+//create without verif
+ router.post('/', candidatController.create);
 
-// // Route pour obtenir un candidat par ID
+
+// get By Id
  router.get('/:id', candidatController.getCandidatById);
 
-// // Route pour mettre à jour un candidat par ID
+// Update
  router.put('/:id', candidatController.updateCandidatById);
 
-// // Route pour supprimer un candidat par ID
+// delete
  router.delete('/:id', candidatController.deleteCandidatById);
 
-// // Route pour ajouter un email candidat
+// create with verif
+router.get("/:id/verify/:token/", candidatController.verifyEmailToken);
 router.post('/addEmailCandidat', candidatController.addEmailCandidat);
+router.post("/:id",candidatController.createCandidat)
 
 
 module.exports = router;
