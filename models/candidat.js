@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
+
 const candidatSchema = new Schema({
     nom: { type: String, required: true },
     nom_jeune_fille: { type: String, required: true },

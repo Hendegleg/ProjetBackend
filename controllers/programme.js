@@ -1,5 +1,36 @@
 const Excel = require('exceljs');
 const Programme = require('../models/programme');
+const OeuvreModel = require('../models/oeuvres');
+
+
+
+const addProgram=async(req,res)=>{
+  try {
+    const nouveauProgramme = new Programme(req.body);
+    await nouveauProgramme.save();
+    const oeuvresDetails = await Promise.all(
+      nouveauProgramme.oeuvres.map(async (oeuvreId) => {
+        
+        const details = await OeuvreModel.findById(oeuvreId);
+        return details;
+        
+      })
+    );
+
+    
+    nouveauProgramme.oeuvres = oeuvresDetails;
+    res.status(201).json({
+      model: nouveauProgramme,
+      message: 'Programme créé avec succès',
+    });
+  } catch (error) {
+    res.status(500).json({
+      error: error.message,
+      message: 'Erreur lors de la création du programme',
+    });
+  }
+};
+
 
 const addProgramFromExcel = async (req, res) => {
   try {
@@ -31,4 +62,8 @@ const addProgramFromExcel = async (req, res) => {
   }
 };
 
-module.exports = addProgramFromExcel;
+module.exports = 
+{addProgramFromExcel,
+  addProgram
+
+};

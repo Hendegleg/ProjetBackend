@@ -1,5 +1,5 @@
 const nodemailer = require('nodemailer');
-const Candidat = require('../models/Candidat');
+const Candidat = require('../models/candidat');
 
 // create
 exports.createCandidat = async (req, res) => {

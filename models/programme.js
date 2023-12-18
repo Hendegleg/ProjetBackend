@@ -8,4 +8,4 @@ const programmeSchema = new Schema({
 
 const Programme = mongoose.model('Programme', programmeSchema);
 
-module.exports = { Programme };
+module.exports = Programme ;

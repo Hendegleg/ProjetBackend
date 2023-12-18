@@ -7,8 +7,11 @@ const oeuvreRoutes= require ("./routes/oeuvre");
 const candidatRoutes=require ("./routes/candidat");
 const formulaireRoutes = require ("./routes/formulaire")
 const congeRoutes = require('./routes/conge');
+const authRoutes = require ('./routes/auth');
+const AbsenceRoutes = require ('./routes/absenceRequest')
 const concertRoutes=require('./routes/concert');
 const programmeRoutes=require('./routes/programme')
+
 mongoose
 .connect(
      "mongodb://127.0.0.1:27017/database",
@@ -37,9 +40,9 @@ app.use("/api/oeuvres", oeuvreRoutes);
 app.use("/api/repetitions", repetitionRoutes);
 app.use('/api/mailer', mailerRoutes);
 app.use('/api/conge', congeRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/absence', AbsenceRoutes)
 app.use("/api/concerts",concertRoutes)
 app.use("/api/programme",programmeRoutes)
-
-
 
 module.exports = app;

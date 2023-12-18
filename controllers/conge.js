@@ -7,21 +7,25 @@ exports.declareLeave = async (req, res) => {
   try {
     const { userId, startDate, endDate } = req.body;
     const user = await User.findById(userId);
+    
     if (!user) {
       return res.status(404).json({ message: 'Utilisateur non trouvé' }); 
     }
 
-    user.estEnConge = true;
+    // Mettre à jour l'attribut demandeConge
+    user.demandeConge = true;
+    user.estEnConge = "enattente"
     user.dateDebutConge = startDate;
     user.dateFinConge = endDate;
     
     await user.save();
 
-    res.status(200).json({ message: 'Congé déclaré avec succès pour l\'utilisateur.', user });
+    res.status(200).json({ message: 'Demande de congé enregistrée avec succès pour l\'utilisateur.', user });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
+
 
 exports.sendNotification = async (req, res) => {
   try {
@@ -47,7 +51,7 @@ exports.sendNotification = async (req, res) => {
 
 const terminateLeaveJob = new CronJob('0 0 * * *', async () => {
   try {
-    const users = await User.find({ estEnConge: true });
+    const users = await User.find({ estEnConge: "enconge" });
     
     users.forEach(async (user) => {
       const currentDate = new Date();
@@ -72,7 +76,7 @@ terminateLeaveJob.start();
 
 const changeLeaveStatusJob = new CronJob('0 0 * * *', async () => {
   try {
-    const usersWithLeaveChanged = await User.find({ estEnConge: true, statusChanged: true });
+    const usersWithLeaveChanged = await User.find({ demandeConge: true, statusChanged: true });
 
     usersWithLeaveChanged.forEach(async (user) => {
       const notification = new Notification({

@@ -17,6 +17,7 @@ const UserSchema = new Schema({
     },
     password:  { type: String, required: true },
     statusHistory: {type: mongoose.Schema.Types.ObjectId, ref: 'status' },
+    demandeConge: {type: Boolean, enum :['enconge','enattente']},
     estEnConge: { type: Boolean, default: false }, 
     dateDebutConge: { type: Date }, 
     dateFinConge: { type: Date }, 
@@ -25,8 +26,9 @@ const UserSchema = new Schema({
     dateEntreeChoeur: { type: Date }, 
     dateSortieChoeur: { type: Date },
     role: { type: String,
-         enum: ['choriste','manager de choeur' ,'chef de pupitre','admin'],
-         default: 'user' }
+        enum: ['choriste','manager de choeur','chef de pupitre', 'admin'],
+         default: 'user' },
+    tessiture: {type : String }
     
 });
 

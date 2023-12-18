@@ -5,7 +5,7 @@ const concertController = {
   
   createConcert: async (req, res) => {
     try {
-      const newConcert = await Concert.create(req.body); // Créer un nouveau concert en utilisant les données reçues dans le corps de la requête
+      const newConcert = await Concert.create(req.body); 
       res.status(201).json({  data: newConcert });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
