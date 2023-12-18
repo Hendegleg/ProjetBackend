@@ -3,7 +3,7 @@ const Schema = mongoose.Schema;
 
 const StatusSchema = new Schema({
     status: { type: String,
-         enum: [ 'Choriste Junior', 'Choriste Senior', 'Veteran'],
+         enum: [ 'inactif','Choriste Junior', 'Choriste Senior', 'Veteran'],
          required:true,
          },
     saison: { type: Number }, 

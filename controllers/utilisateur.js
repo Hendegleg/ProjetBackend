@@ -1,7 +1,7 @@
 const User = require('../models/utilisateurs');
 
-const userController = {
-    getProfileAndStatusHistory: async (req, res) => {
+const 
+    getProfileAndStatusHistory= async (req, res) => {
       try {
         const userId = req.params.id; // ID de l'utilisateur à consulter
         
@@ -48,7 +48,8 @@ const userController = {
       } catch (error) {
         res.status(500).json({ success: false, error: error.message });
       }
-    },
-  };
+    };
+  
 
-  module.exports = {userController};
+  module.exports = {
+    getProfileAndStatusHistory};

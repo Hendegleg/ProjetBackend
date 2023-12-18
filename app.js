@@ -11,6 +11,7 @@ const authRoutes = require ('./routes/auth');
 const AbsenceRoutes = require ('./routes/absenceRequest')
 const concertRoutes=require('./routes/concert');
 const programmeRoutes=require('./routes/programme')
+const userRoutes=require('./routes/utilisateur')
 
 mongoose
 .connect(
@@ -44,5 +45,6 @@ app.use('/api/auth', authRoutes);
 app.use('/api/absence', AbsenceRoutes)
 app.use("/api/concerts",concertRoutes)
 app.use("/api/programme",programmeRoutes)
+app.use("/api/users",userRoutes)
 
 module.exports = app;

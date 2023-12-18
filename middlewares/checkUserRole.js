@@ -1,16 +1,15 @@
-
-const user=require("../models/utilisateur")
-
+const user =require("../models/utilisateurs")
 
 
 const checkUserRole = (req, res, next) => {
-    const userRole = req.user.role; 
-    
-    if (userRole === 'choriste' || userRole === 'admin') {
-      return next(); 
-    }
   
-    return res.status(403).json({ success: false, message: 'Accès non autorisé.' });
-  };
-  
-  module.exports = checkUserRole;
+  const userRole = req.userRole;
+
+  if (userRole === 'choriste' || userRole === 'admin') {
+    return next(); 
+  }
+
+  return res.status(403).json({ success: false, message: 'Accès non autorisé.' });
+};
+
+module.exports = checkUserRole;
