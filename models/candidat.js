@@ -4,6 +4,7 @@ const Schema = mongoose.Schema;
 
 const candidatSchema = new Schema({
     nom: { type: String, required: true },
+    prenom: { type: String, required: true },
     nom_jeune_fille: { type: String, required: true },
     sexe:{ type: String, required: true },
     nationalite : { type: String, },

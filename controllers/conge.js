@@ -47,8 +47,6 @@ exports.sendNotificationForLeaveRequest = async (userId) => {
     throw new Error('Erreur lors de l\'envoi de la notification pour la demande de congé');
   }
 };
-
-
 exports.sendNotification = async (req, res) => {
   try {
     const { userId, message } = req.body; 
@@ -71,7 +69,7 @@ exports.sendNotification = async (req, res) => {
 };
 
 
-const terminateLeaveJob = new CronJob('0 0 * * *', async () => {
+const terminateLeaveJob = new CronJob('52 20 * * *', async () => {
   try {
     const users = await User.find({ estEnConge: "enconge" });
     
@@ -134,6 +132,8 @@ exports.sendNotificationForLeaveRequest = async (req, res) => {
       
 
       await notification.save();
+      user.demandeConge= false; 
+      await user.save();
 
       res.status(200).json({ message: 'Notification envoyée pour la demande de congé.' });
     } else {
