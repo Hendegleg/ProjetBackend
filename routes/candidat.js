@@ -20,4 +20,8 @@ router.delete('/:id', candidatController.deleteCandidatById);
 // Route pour envoyer le code de vérification par e-mail
 router.post('/send-code', candidatController.sendCodeByEmail);
 
+// Route pour filtrer les condidat
+router.get('/filter', candidatController.getCandidats);
+
+
 module.exports = router;
