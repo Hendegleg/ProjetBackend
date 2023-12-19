@@ -1,9 +1,14 @@
+const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
 require('dotenv').config();
-const Candidat = require('../models/candidat');
+const Candidat = require('../models/candidat')
 const Audition = require('../models/audition');
 const User = require('../models/utilisateurs');
 const bcrypt = require('bcrypt');
+const uuid = require('uuid');
+function generateUniqueToken() {
+    return uuid.v4(); // Génère un identifiant UUID v4 aléatoire
+}
 
 
 const path = require('path');
@@ -15,7 +20,80 @@ const transporter = nodemailer.createTransport({
     }
 });
 
+exports.confirmerPresence = async (req, res) => {
+    const { token } = req.query;
+
+    try {
+        // Recherche du candidat correspondant à ce token unique
+        const candidat = await Candidat.findOne({ token });
+
+        if (!candidat) {
+            return res.status(404).send('Token invalide ou expiré.');
+        }
+
+        // Mise à jour de la valeur estConfirme pour le candidat correspondant dans la base de données
+        candidat.estConfirme = true;
+        await candidat.save();
+
+        res.send('Confirmation réussie !');
+    } catch (error) {
+        res.status(500).send('Erreur lors de la confirmation.');
+    }
+};
+
 exports.envoyerEmailAcceptation = async (req, res) => {
+    try {
+        const auditions = await Audition.find({ decisioneventuelle: "retenu" });
+        const candidatsRetenusIds = auditions.map(audition => audition.candidat);
+
+        for (const id of candidatsRetenusIds) {
+            try {
+                const candidat = await Candidat.findById(id);
+
+                console.log("Candidat trouvé : ", candidat);
+
+                if (!candidat.token) {
+                    const token = generateUniqueToken();
+                    candidat.token = token;
+                    await candidat.save();
+
+                    console.log("Token enregistré pour le candidat : ", candidat);
+
+                    const confirmationLink = `http://votre-domaine.com/confirmation-presence?token=${token}&decision=confirm`;
+
+                    const mailOptions = {
+                        from: 'hendlegleg1@gmail.com',
+                        to: candidat.email,
+                        subject: 'Votre acceptation dans le chœur',
+                        text: `Cher ${candidat.nom}, Félicitations! Vous avez été retenu pour rejoindre le chœur. Veuillez confirmer votre présence en cliquant sur ce lien : ${confirmationLink}. Cordialement.`,
+                        attachments: [
+                            {
+                                filename: 'charte_du_choeur.pdf',
+                                path: path.join(__dirname, '../charte_du_choeur.pdf')
+                            }
+                        ]
+                    };
+
+                    await transporter.sendMail(mailOptions);
+                    console.log(`Email envoyé à ${candidat.email}`);
+
+                    // Mise à jour des informations du candidat
+                    await Candidat.findByIdAndUpdate(id, { estretenu: true, dateEnvoiEmail: Date.now() });
+                }
+            } catch (error) {
+                console.error('Erreur lors du traitement pour le candidat :', error);
+            }
+        }
+
+        return res.status(200).json({ message: 'le mail et token sont envoyé au candidat ' });
+    } catch (error) {
+        console.error('Erreur lors de l\'enregistrement des candidats retenus :', error);
+        return res.status(500).json({ message: 'Erreur lors de l\'enregistrement des candidats retenus.' });
+    }
+};
+
+
+exports.envoyerEmailAcceptationn = async (req, res) => {
     try {
         const auditions = await Audition.find({ decisioneventuelle: true });
         const candidatsRetenusIds = auditions.map(audition => audition.candidat);
@@ -24,11 +102,14 @@ exports.envoyerEmailAcceptation = async (req, res) => {
             try {
                 const candidat = await Candidat.findById(id);
 
+                const token = jwt.sign({ candidatId: id }, process.env.TOKEN_SECRET, { expiresIn: '24h' });
+                const confirmationLink = `http://votre-domaine.com/confirmation-presence?token=${token}&decision=confirm`;
+                
                 const mailOptions = {
                     from: 'hendlegleg1@gmail.com',
                     to: candidat.email,
                     subject: 'Votre acceptation dans le chœur',
-                    text: `Cher ${candidat.nom}, Félicitations! Vous avez été retenu pour rejoindre le chœur. Veuillez confirmer votre présence. Cordialement.`,
+                    text: `Cher ${candidat.nom}, Félicitations! Vous avez été retenu pour rejoindre le chœur. Veuillez confirmer votre présence en cliquant sur ce lien : ${confirmationLink}. Cordialement.`,
                     attachments: [
                         {
                             filename: 'charte_du_choeur.pdf',
@@ -52,6 +133,7 @@ exports.envoyerEmailAcceptation = async (req, res) => {
         return res.status(500).json({ message: 'Erreur lors de l\'enregistrement des candidats retenus.' });
     }
 };
+
 
 exports.confirmerEngagement = async (req, res) => {
     try {
