@@ -14,7 +14,6 @@ router.patch('/:id', auditionController.updateAudition);
 
 // Supprimer une audition spécifique par son ID
 router.delete('/:id', auditionController.deleteAudition);
-// Route pour générer le planning d'auditions
-router.post('/generer-planning', auditionController.genererPlanification);
+router.post('/lancerEvenementAudition', auditionController.lancerEvenementAudition);
 
 module.exports = router;

@@ -1,14 +1,16 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
+const Verifmail = require('./verifmail');
 
 const candidatSchema = new Schema({
     nom: { type: String, required: true },
+    prenom : { type: String, required: true },
     nom_jeune_fille: { type: String, required: true },
     sexe:{ type: String, required: true },
     nationalite : { type: String, required: true },
     taille_en_m :  { type: String, required: true },
     email : {type: String, required:true},
-    telephone : { type: Number, required: true, unique: true},
+    telephone : { type: Number, required: true},
     cinpassport :{ type: String, required: true },
     situationProfessionnelle: { type: String, required: true },
     connaissances :  { type: String, required: true },

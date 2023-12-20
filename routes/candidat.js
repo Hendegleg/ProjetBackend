@@ -2,23 +2,26 @@ const express = require('express');
 const router = express.Router();
 const candidatController = require('../controllers/candidat');
 
-// Route pour créer un candidat
-router.post('/', candidatController.createCandidat);
+//getAll
+ router.get('/', candidatController.getAllCandidats);
+//create without verif
+ router.post('/', candidatController.create);
 
-// Route pour obtenir tous les candidats
-router.get('/', candidatController.getAllCandidats);
 
-// Route pour obtenir un candidat par ID
-router.get('/:id', candidatController.getCandidatById);
+// get By Id
+ router.get('/:id', candidatController.getCandidatById);
 
-// Route pour mettre à jour un candidat par ID
-router.put('/:id', candidatController.updateCandidatById);
+// Update
+ router.put('/:id', candidatController.updateCandidatById);
 
-// Route pour supprimer un candidat par ID
-router.delete('/:id', candidatController.deleteCandidatById);
+// delete
+ router.delete('/:id', candidatController.deleteCandidatById);
 
-// Route pour envoyer le code de vérification par e-mail
-router.post('/send-code', candidatController.sendCodeByEmail);
+// create with verif
+router.get("/:id/verify/:token/", candidatController.verifyEmailToken);
+router.post('/addEmailCandidat', candidatController.addEmailCandidat);
+router.post("/:id",candidatController.createCandidat)
+
 
 
 
