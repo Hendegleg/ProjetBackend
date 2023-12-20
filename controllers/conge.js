@@ -2,6 +2,7 @@ const User = require('../models/utilisateurs');
 const Notification = require('../models/notifications');
 const cron = require('node-cron');
 const { CronJob } = require('cron');
+const socketIo = require('socket.io');
 
 exports.declareLeave = async (req, res) => {
   try {
@@ -11,8 +12,6 @@ exports.declareLeave = async (req, res) => {
     if (!user) {
       return res.status(404).json({ message: 'Utilisateur non trouvé' }); 
     }
-
-    // Mettre à jour l'attribut demandeConge
     user.demandeConge = true;
     user.estEnConge = "enattente"
     user.dateDebutConge = startDate;
@@ -20,13 +19,34 @@ exports.declareLeave = async (req, res) => {
     
     await user.save();
 
+  
+    await sendNotificationForLeaveRequest(userId);
+
     res.status(200).json({ message: 'Demande de congé enregistrée avec succès pour l\'utilisateur.', user });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
+exports.sendNotificationForLeaveRequest = async (userId) => {
+  try {
+    const user = await User.findById(userId);
+    if (!user) {
+      throw new Error('Utilisateur non trouvé');
+    }
 
+    if (user.demandeConge === true) {
+      const notification = new Notification({
+        userId: user._id,
+        message: 'Notification pour la demande de congé.'
+      });
 
+      await notification.save();
+    }
+  } catch (error) {
+    console.error('Erreur lors de l\'envoi de la notification pour la demande de congé :', error);
+    throw new Error('Erreur lors de l\'envoi de la notification pour la demande de congé');
+  }
+};
 exports.sendNotification = async (req, res) => {
   try {
     const { userId, message } = req.body; 
@@ -49,7 +69,7 @@ exports.sendNotification = async (req, res) => {
 };
 
 
-const terminateLeaveJob = new CronJob('0 0 * * *', async () => {
+const terminateLeaveJob = new CronJob('52 20 * * *', async () => {
   try {
     const users = await User.find({ estEnConge: "enconge" });
     
@@ -94,3 +114,56 @@ const changeLeaveStatusJob = new CronJob('0 0 * * *', async () => {
   }
 });
 changeLeaveStatusJob.start();
+
+exports.sendNotificationForLeaveRequest = async (req, res) => {
+  try {
+    const { userId } = req.body;
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: 'Utilisateur non trouvé' });
+    }
+
+    if (user.demandeConge === true) {
+      const notification = new Notification({
+        userId: user._id,
+        message: 'Notification pour la demande de congé.'
+      });
+      
+
+      await notification.save();
+      user.demandeConge= false; 
+      await user.save();
+
+      res.status(200).json({ message: 'Notification envoyée pour la demande de congé.' });
+    } else {
+      res.status(200).json({ message: 'Aucune notification envoyée pour la demande de congé.' });
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+exports.getLeaveNotifications = async (req, res) => {
+  try {
+    // Récupérer les utilisateurs en congé
+    const usersEnConge = await User.find({ estEnConge: "enconge" });
+
+    const leaveNotifications = [];
+    // Parcourir les utilisateurs en congé pour créer les notifications
+    for (const user of usersEnConge) {
+      const notification = new Notification({
+        userId: user._id,
+        message: 'Vous êtes en congé.'
+      });
+
+      await notification.save();
+      leaveNotifications.push(notification);
+    }
+
+    res.status(200).json({ message: 'Liste des congés sous forme de notifications', leaveNotifications });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+

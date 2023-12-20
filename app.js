@@ -4,7 +4,7 @@ require('dotenv').config();
 const mongoose = require("mongoose");
 const auditionRoutes = require("./routes/audition");
 const repetitionRoutes = require("./routes/repetition");
-const mailerRoutes = require("./routes/gerercandidat");
+const gererRoutes = require("./routes/gerercandidat");
 const oeuvreRoutes= require ("./routes/oeuvre");
 const candidatRoutes=require ("./routes/candidat");
 const formulaireRoutes = require ("./routes/formulaire")
@@ -15,7 +15,6 @@ const concertRoutes=require('./routes/concert');
 const programmeRoutes=require('./routes/programme')
 const userRoutes=require('./routes/utilisateur')
 const pupitreRoutes=require('./routes/pupitre')
-
 mongoose
 .connect(
      "mongodb://127.0.0.1:27017/database",
@@ -42,7 +41,7 @@ app.use("/api/candidats", candidatRoutes);
 app.use("/api/formulaires", formulaireRoutes);
 app.use("/api/oeuvres", oeuvreRoutes);
 app.use("/api/repetitions", repetitionRoutes);
-app.use('/api/mailer', mailerRoutes);
+app.use('/api/gerer', gererRoutes);
 app.use('/api/conge', congeRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/absence', AbsenceRoutes)
@@ -51,3 +50,6 @@ app.use("/api/programme",programmeRoutes)
 app.use("/api/users",userRoutes)
 app.use("/api/pupitre",pupitreRoutes)
 module.exports = app;
+
+
+

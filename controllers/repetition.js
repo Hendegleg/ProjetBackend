@@ -94,7 +94,14 @@ const deleteRepetition = (req, res) => {
         });
 };
 const generatePupitreList = async (req, res) => {
-  const { numPupitre, pourcentage } = req.body;
+  const { numPupitre } = req.body;
+  let pourcentage;
+
+  if (numPupitre === 1) {
+    pourcentage = Math.floor(Math.random() * 76) + 25;
+  } else {
+    pourcentage = Math.floor(Math.random() * 100) + 1;
+  }
 
   try {
     const repetitions = await Repetition.find();
@@ -121,6 +128,7 @@ const generatePupitreList = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
 
 module.exports = {
   fetchRepetitions: fetchRepetitions,
