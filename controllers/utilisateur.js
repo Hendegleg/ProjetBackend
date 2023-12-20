@@ -1,4 +1,4 @@
-const User = require('../models/utilisateur');
+const User = require('../models/utilisateurs');
 
 const userController = {
     getProfileAndStatusHistory: async (req, res) => {

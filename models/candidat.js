@@ -23,5 +23,6 @@ const candidatSchema = new Schema({
 });
 
 
-const Candidat = mongoose.model('candidat', candidatSchema);
-module.exports = Candidat;
+//const Candidat = mongoose.model('Candidat', candidatSchema);
+//module.exports = Candidat;
+module.exports= mongoose.model("Candidat", candidatSchema);

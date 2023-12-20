@@ -7,9 +7,10 @@ const oeuvreRoutes= require ("./routes/oeuvre");
 const candidatRoutes=require ("./routes/candidat");
 const formulaireRoutes = require ("./routes/formulaire")
 const congeRoutes = require('./routes/conge');
+const filtragecandidatRoutes= require('./routes/filtragecandidats.js')
 mongoose
 .connect(
-     "mongodb://127.0.0.1:27017/",
+     "mongodb://127.0.0.1:27017/projet",
    { /*useNewUrlParser: true, useUnifiedTopology: true*/}
 )
 .then(()=>console.log("connexion a mongoDB reussite"))
@@ -35,7 +36,7 @@ app.use("/api/oeuvres", oeuvreRoutes);
 app.use("/api/repetitions", repetitionRoutes);
 app.use('/api/mailer', mailerRoutes);
 app.use('/api/conge', congeRoutes);
-app.use('/api/candidats/filter', candidatRoutes);
+app.use('/api/filtragecandidats', filtragecandidatRoutes);
 
 
 
