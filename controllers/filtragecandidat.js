@@ -9,6 +9,10 @@ const getCandidats = async (req, res) => {
     if (req.query.max && req.query.min  ) {
       filter.taille_en_m  = {  $lte: req.query.max ,$gte: req.query.min };
     }
+
+ 
+
+    
     if (req.query.nom) {
       filter.nom = { $regex: req.query.nom, $options: "i" };
     }
@@ -35,9 +39,8 @@ const getCandidats = async (req, res) => {
         $options: "i",
       };
     }
-
     if (req.query.date_naissance) {
-      filter.date_naissance = req.query.date_de_naissance;
+      filter.date_naissance = req.query.date_naissance; 
     }
 
     const page = parseInt(req.query.page) || 1;

@@ -2,27 +2,22 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const AuditionSchema = new Schema({
-    DateAudition: { type : Date , required : true},
-    nombre_séance: { type : Number , required : true},
-    dureeAudition: { type : String , required : true},
+    date_audition:{ type: Date },
+    heure_debut:{ type: Date },
+    heure_fin :{ type: Date },
     evenementAudition: { type: mongoose.Schema.Types.ObjectId, ref: 'evenementAudition' },
-
     candidat: { type: mongoose.Schema.Types.ObjectId, ref: 'Candidat' },
-    extraitChante : { type: String, required: true },
-    tessiture: { type: String, required: true },
+    extraitChante : { type: String },
+    tessiture: { type: String },
     evaluation : { 
         type : String,
-        enum: ["A","B","C"] , 
-        required: true },
+        enum: ["A","B","C"] },
     decisioneventuelle :{ type: String,
         enum:["retenu","en attente","refuse"]
-    ,required: true },
-    remarque : { type: String, required: true },
+    , default:"en attente"},
+    remarque : { type: String},
 
 });
 
-
-
 const Audition= mongoose.model('Audition', AuditionSchema);
-
 module.exports = Audition;

@@ -31,6 +31,7 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use('/api/filtragecandidats', filtragecandidatRoutes);
 app.use('/api/auditions', auditionRoutes);
 app.use("/api/candidats", candidatRoutes);
 app.use("/api/formulaires", formulaireRoutes);
@@ -38,7 +39,8 @@ app.use("/api/oeuvres", oeuvreRoutes);
 app.use("/api/repetitions", repetitionRoutes);
 app.use('/api/mailer', mailerRoutes);
 app.use('/api/conge', congeRoutes);
-app.use('/api/filtragecandidats', filtragecandidatRoutes);
+
+
 
 
 

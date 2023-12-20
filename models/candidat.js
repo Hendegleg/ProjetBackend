@@ -12,6 +12,7 @@ const candidatSchema = new Schema({
     email : {type: String, required:true},
     telephone : { type: Number, required: true},
     cinpassport :{ type: String, required: true },
+    date_naissance:{ type: Date, required: true },
     situationProfessionnelle: { type: String, required: true },
     connaissances :  { type: String, required: true },
     parraine : { type: String, required: true },
