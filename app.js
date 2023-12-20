@@ -9,6 +9,7 @@ const formulaireRoutes = require ("./routes/formulaire")
 const congeRoutes = require('./routes/conge');
 const authRoutes = require ('./routes/auth');
 const AbsenceRoutes = require ('./routes/absenceRequest')
+const tessitureRoutes = require ('./routes/tessiture')
 
 mongoose
 .connect(
@@ -41,6 +42,7 @@ app.use('/api/gerer', gererRoutes);
 app.use('/api/conge', congeRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/absence', AbsenceRoutes)
+app.use('/api/tessiture', tessitureRoutes)
 
 
 
