@@ -18,10 +18,7 @@ const AuditionSchema = new Schema({
         enum:["retenu","en attente","refuse"]
     ,required: true },
     remarque : { type: String, required: true },
-
 });
-
-
 const Audition= mongoose.model('Audition', AuditionSchema);
 
 module.exports = Audition;

@@ -1,4 +1,7 @@
+const cron = require('node-cron');
+const nodemailer = require('nodemailer');
 const Repetition = require("../models/repetition");
+const User = require('../models/utilisateurs');
 
 const fetchRepetitions = (req, res) => {
   Repetition.find()
@@ -122,6 +125,67 @@ const generatePupitreList = async (req, res) => {
   }
 };
 
+
+
+// const envoyerNotificationChoristes = async () => {
+//     try {
+//         const choristes = await User.find({
+//             role: 'choriste',
+//             estEnConge: false,
+//         });
+
+//         if (choristes.length > 0) {
+//             const transporter = nodemailer.createTransport({
+//                 service: 'gmail',
+//                 auth: {
+//                     user: 'wechcrialotfi@gmail.com',
+//                     pass: 'vqbs baba usst djrw',
+//                 },
+//             });
+//             const maintenant = new Date();
+//             const dateDans24h = new Date();
+//             dateDans24h.setHours(maintenant.getHours() + 24);
+
+//             const repetitionsDans24h = await Repetition.find({
+//               dateRepetition: { $gte: maintenant, $lt: dateDans24h },
+//           });
+
+//           if (repetitionsDans24h.length > 0) {
+//             const contenuEmail = `
+//             Bonjour choristes,
+
+//             Vous avez une répétition dans les 24 heures suivantes. Voici les détails :
+
+//             Date de la répétition : ${repetitionsDans24h[0].dateRepetition}
+
+//             Merci et à bientôt !
+//             `;
+
+
+//             for (const choriste of choristes) {
+//               await transporter.sendMail({
+//                   from: 'wechcrialotfi@gmail.com',
+//                   to: choriste.email,
+//                   subject: 'Notification importante - Répétition à venir',
+//                   text: contenuEmail,
+//               });
+
+//               console.log(`Notification envoyée à ${choriste.email}`);
+//           }
+//       } else {
+//           console.log('Aucune répétition dans les 24 heures suivantes.');
+//       }
+//   } else {
+//       console.log('Aucun choriste à notifier.');
+//   }
+// } catch (error) {
+//   console.error('Erreur lors de l\'envoi des notifications aux choristes :', error.message);
+// }
+// };
+
+// cron.schedule('0 12 * * *', envoyerNotificationChoristes);
+
+
 module.exports = {
   fetchRepetitions: fetchRepetitions,
   addRepetition: addRepetition,
@@ -129,4 +193,5 @@ module.exports = {
   updateRepetition: updateRepetition,
   deleteRepetition: deleteRepetition,
   generatePupitreList: generatePupitreList,
+ // envoyerNotificationChoristes : envoyerNotificationChoristes,
 };
