@@ -45,4 +45,25 @@ module.exports.isChoriste = (req, res, next) => {
     res.status(401).json({ error: error.message });
   }
 };
-
+module.exports.ischefpupitre = (req, res, next) => {
+  try {
+    if (req.auth.role === 'chef de pupitre') {
+      next();
+    } else {
+      res.status(403).json({ error: "Tu ne peux pas accéder à cette route" });
+    }
+  } catch (error) {
+    res.status(401).json({ error: error.message });
+  }
+};
+module.exports.ismanagerChoeur = (req, res, next) => {
+  try {
+    if (req.auth.role === 'manager de choeur') {
+      next();
+    } else {
+      res.status(403).json({ error: "Tu ne peux pas accéder à cette route" });
+    }
+  } catch (error) {
+    res.status(401).json({ error: error.message });
+  }
+};
