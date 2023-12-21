@@ -32,7 +32,6 @@ const UserSchema = new Schema({
     tessiture: {type : String }, 
     taille_en_m  : {type: String}, 
     
-    
 });
 
 UserSchema.virtual('name').get(function () {

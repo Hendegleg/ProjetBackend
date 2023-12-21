@@ -1,4 +1,6 @@
 const express = require("express");
+require('dotenv').config();
+
 const mongoose = require("mongoose");
 const auditionRoutes = require("./routes/audition");
 const repetitionRoutes = require("./routes/repetition");
@@ -10,10 +12,10 @@ const congeRoutes = require('./routes/conge');
 const authRoutes = require ('./routes/auth');
 const AbsenceRoutes = require ('./routes/absenceRequest')
 const tessitureRoutes = require ('./routes/tessiture')
-
+const filtragecandidatRoutes= require('./routes/filtragecandidats.js')
 mongoose
 .connect(
-     "mongodb://127.0.0.1:27017/DS",
+     "mongodb://127.0.0.1:27017/projet",
    { /*useNewUrlParser: true, useUnifiedTopology: true*/}
 )
 .then(()=>console.log("connexion a mongoDB reussite"))
@@ -32,8 +34,8 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use('/api/filtragecandidats', filtragecandidatRoutes);
 app.use('/api/auditions', auditionRoutes);
-
 app.use("/api/candidats", candidatRoutes);
 app.use("/api/formulaires", formulaireRoutes);
 app.use("/api/oeuvres", oeuvreRoutes);
@@ -43,6 +45,8 @@ app.use('/api/conge', congeRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/absence', AbsenceRoutes)
 app.use('/api/tessiture', tessitureRoutes)
+
+
 
 
 
