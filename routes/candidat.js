@@ -23,4 +23,7 @@ router.post('/addEmailCandidat', candidatController.addEmailCandidat);
 router.post("/:id",candidatController.createCandidat)
 
 
+
+
+
 module.exports = router;

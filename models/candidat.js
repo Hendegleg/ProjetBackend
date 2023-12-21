@@ -12,6 +12,7 @@ const candidatSchema = new Schema({
     email : {type: String, required:true},
     telephone : { type: Number, required: true},
     cinpassport :{ type: String, required: true },
+    date_naissance:{ type: Date, required: true },
     situationProfessionnelle: { type: String, required: true },
     connaissances :  { type: String, required: true },
     parraine : { type: String, required: true },
@@ -26,6 +27,6 @@ const candidatSchema = new Schema({
 });
 
 
-const Candidat = mongoose.model('Candidat', candidatSchema);
-
-module.exports = Candidat;
+//const Candidat = mongoose.model('Candidat', candidatSchema);
+//module.exports = Candidat;
+module.exports= mongoose.model("Candidat", candidatSchema);

@@ -9,13 +9,14 @@ const oeuvreRoutes= require ("./routes/oeuvre");
 const candidatRoutes=require ("./routes/candidat");
 const formulaireRoutes = require ("./routes/formulaire")
 const congeRoutes = require('./routes/conge');
+const filtragecandidatRoutes= require('./routes/filtragecandidats.js')
 const authRoutes = require ('./routes/auth');
 const AbsenceRoutes = require ('./routes/absenceRequest')
 const tessitureRoutes = require ('./routes/tessiture')
 
 mongoose
 .connect(
-     "mongodb://127.0.0.1:27017/database",
+     "mongodb://127.0.0.1:27017/projet",
    { /*useNewUrlParser: true, useUnifiedTopology: true*/}
 )
 .then(()=>console.log("connexion a mongoDB reussite"))
@@ -34,8 +35,8 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use('/api/filtragecandidats', filtragecandidatRoutes);
 app.use('/api/auditions', auditionRoutes);
-
 app.use("/api/candidats", candidatRoutes);
 app.use("/api/formulaires", formulaireRoutes);
 app.use("/api/oeuvres", oeuvreRoutes);

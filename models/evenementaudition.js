@@ -2,7 +2,11 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const EvenementAuditionSchema = new Schema({
-    date: { type: Date, required: true },
+    Date_debut_Audition: { type : Date , required : true},
+    nombre_séance: { type : Number , required : true},
+    dureeAudition: { type : String , required : true},
+    Date_fin_Audition: { type : Date , required : true},
+    //date: { type: Date, required: true },
     lienFormulaire: { type: String},
   });
   
