@@ -5,6 +5,12 @@ const concertController = {
   
   createConcert: async (req, res) => {
     try {
+      const { presence, date, lieu, heure, programme, planning, nom_concert, placement } = req.body;
+
+      
+      if (!presence || !date || !lieu || !heure || !programme || !planning || !nom_concert || !placement) {
+        return res.status(400).json({ success: false, error: "Certains champs sont manquants." });
+      }
       const newConcert = await Concert.create(req.body); 
       res.status(201).json({  model: newConcert });
     } catch (error) {

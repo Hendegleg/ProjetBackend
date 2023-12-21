@@ -6,7 +6,7 @@ const StatusSchema = new Schema({
          enum: [ 'inactif','Choriste Junior', 'Choriste Senior', 'Veteran'],
          required:true,
          },
-    saison: { type: Number }, 
+    saison: { type: Number,required: true  }, 
     
 
     

@@ -16,6 +16,9 @@ exports.createAudition = async (req, res) => {
         decisioneventuelle,
         remarque
       } = req.body;
+      if (!DateAudition || !nombre_séance || !dureeAudition || !candidat) {
+        return res.status(400).json({ message: "Certains champs sont manquants pour créer une audition." });
+      }
       const nouvelleAudition = new Audition({
         DateAudition,
         nombre_séance,
@@ -42,9 +45,14 @@ exports.createAudition = async (req, res) => {
     }
   };
   // Lire les informations d'une audition spécifique par son ID
-exports.getAuditionById = async (req, res) => {
+  exports.getAuditionById = async (req, res) => {
     try {
       const audition = await Audition.findById(req.params.id).populate('candidat');
+      
+      if (!audition) {
+        return res.status(404).json({ message: "Audition non trouvée." });
+      }
+  
       res.json(audition);
     } catch (err) {
       res.status(500).json({ message: err.message });
@@ -52,19 +60,34 @@ exports.getAuditionById = async (req, res) => {
   };
 
   // update
-exports.updateAudition = async (req, res) => {
+
+  exports.updateAudition = async (req, res) => {
     try {
-      const audition = await Audition.findByIdAndUpdate(req.params.id, req.body, { new: true });
-      res.json(audition);
+      const { id } = req.params;
+      const audition = await Audition.findById(id);
+      
+      if (!audition) {
+        return res.status(404).json({ message: "Audition non trouvée." });
+      }
+  
+      const updatedAudition = await Audition.findByIdAndUpdate(id, req.body, { new: true });
+      res.json(updatedAudition);
     } catch (err) {
       res.status(400).json({ message: err.message });
     }
   };
 
   
-exports.deleteAudition = async (req, res) => {
+  exports.deleteAudition = async (req, res) => {
     try {
-      await Audition.findByIdAndDelete(req.params.id);
+      const { id } = req.params;
+      const audition = await Audition.findById(id);
+  
+      if (!audition) {
+        return res.status(404).json({ message: "Audition non trouvée." });
+      }
+  
+      await Audition.findByIdAndDelete(id);
       res.json({ message: 'Audition supprimée' });
     } catch (err) {
       res.status(500).json({ message: err.message });
