@@ -7,7 +7,7 @@ const candidatSchema = new Schema({
     prenom : { type: String, required: true },
     nom_jeune_fille: { type: String, required: true },
     sexe:{ type: String, required: true },
-    nationalite : { type: String, required: true },
+    nationalite : { type: String, },
     taille_en_m :  { type: String, required: true },
     email : {type: String, required:true},
     telephone : { type: Number, required: true},
@@ -21,6 +21,7 @@ const candidatSchema = new Schema({
     estConfirme : {type: Boolean, default : false },
     signature : {type: Boolean, default : false },
     estEngage: {type: Boolean, default : false },
+    token : {type: String}
    
 });
 

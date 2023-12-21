@@ -13,7 +13,8 @@ const RepetitionSchema = new Schema({
     pourcentagesPupitres: [{
         pupitre: { type: mongoose.Schema.Types.ObjectId, ref: 'Pupitre' },
         pourcentage: Number
-    }]
+    }],
+    programme : {type: String}
 });
 
 const Repetition = mongoose.model('Repetition', RepetitionSchema);

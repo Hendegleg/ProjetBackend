@@ -1,10 +1,16 @@
 const nodemailer = require('nodemailer');
-const jwt = require('jsonwebtoken');
-
 const Candidat = require('../models/candidat');
-const Verifmail = require("../models/verifmail");
 
-
+// create
+exports.createCandidat = async (req, res) => {
+    try {
+        const candidat = new Candidat(req.body);
+        const savedCandidat = await candidat.save();
+        res.status(201).json(savedCandidat);
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+};
 
 // gat_all
 exports.getAllCandidats = async (req, res) => {

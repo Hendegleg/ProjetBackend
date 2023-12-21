@@ -16,7 +16,8 @@ const concertSchema = new Schema({
         }
     ],
     planning : { type:  Schema.Types.ObjectId, ref: 'Planning', required: true },
-    nom_concert : { type : String, require : true }
+    nom_concert : { type : String, require : true }, 
+    placement : {type :Schema.Types.ObjectId, ref : 'Placement' }
 });
 
 
