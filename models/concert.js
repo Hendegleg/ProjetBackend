@@ -11,12 +11,12 @@ const concertSchema = new Schema({
     heure: { type: Date, required: true },
     programme: [
         {
-            oeuvre: { type: Schema.Types.ObjectId, ref: 'oeuvres' },
+            programme: { type: Schema.Types.ObjectId, ref: 'Programme' },
             requiresChoir: { type: Boolean, default: true }
         }
     ],
-    planning : { type:  Schema.Types.ObjectId, ref: 'Planning', required: true },
-    nom_concert : { type : String, require : true }, 
+    planning : { type:  Schema.Types.ObjectId, ref: 'repetition', required: true },
+    nom_concert : { type : String, require : true },
     placement : {type :Schema.Types.ObjectId, ref : 'Placement' }
 });
 

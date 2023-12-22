@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
 require('dotenv').config();
+const Candidat = require('../models/candidat')
 const Audition = require('../models/audition');
 const User = require('../models/utilisateurs');
 const bcrypt = require('bcrypt');

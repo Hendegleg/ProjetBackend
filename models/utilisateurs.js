@@ -28,8 +28,8 @@ const UserSchema = new Schema({
     dateSortieChoeur: { type: Date },
     role: { type: String,
          enum: ['choriste','manager de choeur','chef de pupitre', 'admin'],
-         default: 'user' },
-    tessiture: {type : String }, 
+         default: 'choriste' },
+    tessiture: {type : String },
     taille_en_m  : {type: String}, 
     
 });
