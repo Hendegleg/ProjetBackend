@@ -4,6 +4,14 @@ const User = require('../models/utilisateurs');
 const 
     getProfileAndStatusHistory= async (req, res) => {
       try {
+        const {
+          statusHistory,
+          dateEntreeChoeur, 
+          dateSortieChoeur,
+          concertsValidated ,
+          repetitionsValidated ,
+
+        }=req.body;
         const userId = req.params.id; 
         
         
@@ -14,7 +22,7 @@ const
         }
   
        
-        const statusHistory = user.statusHistory || [];
+        //const statusHistory = user.statusHistory || [];
   
         
         let currentStatus = 'Inactif'; 
@@ -23,8 +31,7 @@ const
           currentStatus = 'Choriste Junior'; 
         } else {
           
-          const concertsValidated = user.concertsValidated ;
-          const repetitionsValidated = user.repetitionsValidated ;
+          
   
           
           const firstSeasonYear = statusHistory[0].season;

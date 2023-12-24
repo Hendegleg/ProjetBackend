@@ -3,7 +3,7 @@ const EvenementAudition = require('../models/evenementaudition');
 const Candidat = require('../models/candidat');
 const nodemailer = require('nodemailer')
 
-exports.createAudition = async (req, res) => {
+const createAudition = async (req, res) => {
     try {
       const {
         DateAudition,
@@ -36,7 +36,7 @@ exports.createAudition = async (req, res) => {
       res.status(400).json({ message: err.message });
     }
   };
-  exports.getAudition = async (req, res) => {
+ const getAudition = async (req, res) => {
     try {
       const audition = await Audition.find(req.params).populate('candidat');
       res.json(audition);
@@ -44,8 +44,7 @@ exports.createAudition = async (req, res) => {
       res.status(500).json({ message: err.message });
     }
   };
-  // Lire les informations d'une audition spécifique par son ID
-  exports.getAuditionById = async (req, res) => {
+ const getAuditionById = async (req, res) => {
     try {
       const audition = await Audition.findById(req.params.id).populate('candidat');
       
@@ -61,7 +60,7 @@ exports.createAudition = async (req, res) => {
 
   // update
 
-  exports.updateAudition = async (req, res) => {
+const updateAudition = async (req, res) => {
     try {
       const { id } = req.params;
       const audition = await Audition.findById(id);
@@ -78,7 +77,7 @@ exports.createAudition = async (req, res) => {
   };
 
   
-  exports.deleteAudition = async (req, res) => {
+const deleteAudition = async (req, res) => {
     try {
       const { id } = req.params;
       const audition = await Audition.findById(id);
@@ -96,7 +95,7 @@ exports.createAudition = async (req, res) => {
 
   //evenemnt de l'audition et envoi des emails
   
-  exports.lancerEvenementAudition = async (req, res) => {
+const lancerEvenementAudition = async (req, res) => {
     try {
       
       const { date, lienFormulaire } = req.body;
@@ -144,4 +143,14 @@ exports.createAudition = async (req, res) => {
       res.status(500).json({ error: error.message });
     }
   };
+  module .exports ={
+    createAudition,
+    getAudition,
+    getAuditionById,
+    deleteAudition,
+    updateAudition,
+    lancerEvenementAudition
+
+    
+  }
   
