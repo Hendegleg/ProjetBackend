@@ -137,8 +137,10 @@ const generatePupitreList = async (req, res) => {
 
 
 
-const envoyerNotificationChoristes = async () => {
-  try {
+const envoyerNotificationChoristesJob = new CronJob('10 48 13 * * *', async () => {
+ try {
+  console.log('Tâche cron en cours d\'exécution...');
+
     const choristes = await User.find({
       role: 'choriste',
       estEnConge: false,
@@ -167,6 +169,7 @@ const envoyerNotificationChoristes = async () => {
           },
         });
 
+
         for (const choriste of choristes) {
           const contenuEmail = `
             Bonjour ${choriste.nom},
@@ -191,6 +194,7 @@ const envoyerNotificationChoristes = async () => {
 
           console.log(`Notification envoyée à ${choriste.email}`);
         }
+
       } else {
         console.log('Aucune répétition dans les 24 heures suivantes.');
       }
@@ -199,14 +203,15 @@ const envoyerNotificationChoristes = async () => {
     }
   } catch (error) {
     console.error('Erreur lors de l\'envoi des notifications aux choristes :', error.message);
+  
   }
-};
+}, null, true, 'Europe/Paris'); // Vous pouvez ajuster le fuseau horaire 'UTC' selon vos besoins
 
-// Planifier la tâche cron
-cron.schedule('0 12 * * *', async () => {
-  await envoyerNotificationChoristes();
-  console.log('Tâche cron exécutée.');
-});
+envoyerNotificationChoristesJob.start();
+
+
+
+
 
 
 // const envoyerNotificationChoristes = async () => {
@@ -273,13 +278,13 @@ cron.schedule('0 12 * * *', async () => {
 //       console.error('Erreur lors de l\'envoi des notifications aux choristes :', error.message);
 //   }
 // };
-// // cron.schedule('0 12 * * *', async () => {
-// //   await envoyerNotificationChoristes();
+// cron.schedule('0 12 * * *', async () => {
+//   await envoyerNotificationChoristes();
 
-// //   console.log('Tâche cron exécutée.');
-// // });
+//   console.log('Tâche cron exécutée.');
+// });
 
-//envoyerNotificationChoristes();
+// envoyerNotificationChoristes();
 
 
 
