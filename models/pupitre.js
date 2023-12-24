@@ -5,7 +5,8 @@ const pupitreSchema = new Schema({
     num_pupitre: { type: Number, required: true },
     tessiture: { type: String, enum: ['Soprano', 'Alto', 'Ténor', 'Basse'], required: true },
     besoin: { type: Number, required: true },
-    candidats: [{ type: Schema.Types.ObjectId, ref: 'Candidat' }]
+    choristes: [{ type: Schema.Types.ObjectId, ref: 'utilisateurs' }],
+    leaders : [{type:Schema.Types.ObjectId,ref:'utilisateurs'}]
 });
 
 const Pupitre = mongoose.model('Pupitre', pupitreSchema);

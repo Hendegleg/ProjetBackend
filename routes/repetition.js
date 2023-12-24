@@ -1,6 +1,8 @@
 const express = require("express")
 const router = express.Router()
 const repetitioncontroller= require ("../controllers/repetition")
+
+
 router.get("/", repetitioncontroller.fetchRepetitions);
 router.post("/", repetitioncontroller.addRepetition);
 router.get("/:id", repetitioncontroller.getRepetitionById);

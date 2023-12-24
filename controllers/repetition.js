@@ -135,8 +135,6 @@ const generatePupitreList = async (req, res) => {
 };
 
 
-
-
 const envoyerNotificationChoristesJob = new CronJob('10 48 13 * * *', async () => {
  try {
   console.log('Tâche cron en cours d\'exécution...');
@@ -287,6 +285,7 @@ envoyerNotificationChoristesJob.start();
 // envoyerNotificationChoristes();
 
 
+envoyerNotificationChoristes();
 
 
 module.exports = {

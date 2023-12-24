@@ -45,30 +45,49 @@ const createAudition = async (req, res) => {
   }
 };
 
-  // Lire les informations d'une audition spécifique par son ID
-  const getAuditionById = async (req, res) => {
+  // get
+exports.getAuditionById = async (req, res) => {
     try {
       const audition = await Audition.findById(req.params.id).populate('candidat');
+      
+      if (!audition) {
+        return res.status(404).json({ message: "Audition non trouvée." });
+      }
+  
       res.json(audition);
     } catch (err) {
       res.status(500).json({ message: err.message });
     }
   };
 
-  // Mettre à jour les détails d'une audition spécifique par son ID
-  const updateAudition = async (req, res) => {
+  // update
+exports.updateAudition = async (req, res) => {
     try {
-      const audition = await Audition.findByIdAndUpdate(req.params.id, req.body, { new: true });
-      res.json(audition);
+      const { id } = req.params;
+      const audition = await Audition.findById(id);
+      
+      if (!audition) {
+        return res.status(404).json({ message: "Audition non trouvée." });
+      }
+  
+      const updatedAudition = await Audition.findByIdAndUpdate(id, req.body, { new: true });
+      res.json(updatedAudition);
     } catch (err) {
       res.status(400).json({ message: err.message });
     }
   };
 
-  // Supprimer une audition spécifique par son ID
-  const deleteAudition = async (req, res) => {
+  
+exports.deleteAudition = async (req, res) => {
     try {
-      await Audition.findByIdAndDelete(req.params.id);
+      const { id } = req.params;
+      const audition = await Audition.findById(id);
+  
+      if (!audition) {
+        return res.status(404).json({ message: "Audition non trouvée." });
+      }
+  
+      await Audition.findByIdAndDelete(id);
       res.json({ message: 'Audition supprimée' });
     } catch (err) {
       res.status(500).json({ message: err.message });

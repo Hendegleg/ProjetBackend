@@ -13,7 +13,9 @@ const AuditionSchema = new Schema({
         enum: ['Soprano', 'Alto', 'Ténor','Basse','Autre'],
         required: true
     },
-   
+    extraitChante : { type: String },
+    tessiture: { type: String },
+  evaluation : { 
     evaluation : { 
         type : String,
         enum: ["A","B","C"] },
@@ -21,6 +23,6 @@ const AuditionSchema = new Schema({
         enum:["retenu","en attente","refuse"]
     , default:"en attente"},
     remarque : { type: String, required: true },
-});
+}});
 const Audition= mongoose.model('Audition', AuditionSchema);
 module.exports = Audition;

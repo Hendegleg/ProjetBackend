@@ -27,11 +27,10 @@ const UserSchema = new Schema({
     dateEntreeChoeur: { type: Date }, 
     dateSortieChoeur: { type: Date },
     role: { type: String,
-         enum: ['choriste','manager de choeur','chef de pupitre', 'admin'],
-         default: 'user' },
-    tessiture: {type : String }, 
-    taille_en_m  : {type: String}, 
-    
+        enum: ['choriste','manager de choeur','manager de choeur','chef de pupitre', 'admin'],
+        default: 'choriste' },
+        tessiture: {type : String },
+        taille_en_m  : {type: String}, 
     
 });
 

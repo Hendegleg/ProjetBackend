@@ -5,7 +5,7 @@ const EvenementAudition= require('../models/evenementaudition');
 
 // Créer une nouvelle audition
 router.post('/', auditionController.createAudition);
-
+router.get('/', auditionController.getAudition);
 // Lire les informations d'une audition spécifique par son ID
 router.get('/:id', auditionController.getAuditionById);
 router.get('/', auditionController.getAudition);
