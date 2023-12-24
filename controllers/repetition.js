@@ -1,4 +1,9 @@
+const cron = require('node-cron');
+const { CronJob } = require('cron');
+const nodemailer = require('nodemailer');
 const Repetition = require("../models/repetition");
+const User = require('../models/utilisateurs');
+const mongoose = require ('mongoose');
 
 const fetchRepetitions = (req, res) => {
   Repetition.find()
@@ -128,7 +133,6 @@ const generatePupitreList = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
-
 
 module.exports = {
   fetchRepetitions: fetchRepetitions,

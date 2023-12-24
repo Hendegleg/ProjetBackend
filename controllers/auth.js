@@ -14,10 +14,6 @@ exports.signup = async (req, res, next) => {
       email,
       password: hashedPassword,
       role,
-      
-     
-    
-      
     });
 
     await newUser.save();

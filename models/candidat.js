@@ -12,6 +12,7 @@ const candidatSchema = new Schema({
     email : {type: String, required:true},
     telephone : { type: Number, required: true, unique: true},
     cinpassport :{ type: String, required: true },
+    date_naissance:{ type: Date, required: true },
     situationProfessionnelle: { type: String, required: true },
     connaissances :  { type: String, required: true },
     parraine : { type: String, required: true },
@@ -21,6 +22,7 @@ const candidatSchema = new Schema({
     estConfirme : {type: Boolean, default : false },
     signature : {type: Boolean, default : false },
     estEngage: {type: Boolean, default : false },
+    
     token : {type: String}
    
 });

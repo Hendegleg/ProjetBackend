@@ -19,19 +19,21 @@ const UserSchema = new Schema({
     role: { type: String,
         enum: ["choriste",'manager de choeur','chef de pupitre', 'admin'],
         default: 'choriste' },
-    statusHistory: {type: mongoose.Schema.Types.ObjectId, ref: 'status' },
-    demandeConge: {type: Boolean, enum :['enconge','enattente']},
+    StatusHistory: {type: mongoose.Schema.Types.ObjectId, ref: 'StatusHistory' },
+    demandeConge: {type: Boolean, default : false},
     estEnConge: { type: Boolean, default: false }, 
+    conge : {type: String, enum : ['enattente','enconge']},
     dateDebutConge: { type: Date }, 
     dateFinConge: { type: Date }, 
     statusChanged: { type: Boolean , default: false },
     active: { type: Boolean, default: true }, 
     dateEntreeChoeur: { type: Date }, 
     dateSortieChoeur: { type: Date },
-   
-    tessiture: {type : String },
-    taille_en_m  : {type: String}, 
-   
+    tessiture: {type : String }, 
+    taille_en_m  : {type: String},
+    nbsaison:{type:Number}, 
+    absence: [{ type: mongoose.Schema.Types.ObjectId, ref: 'absence' }]
+    
     
 });
 

@@ -9,12 +9,17 @@ const oeuvreRoutes= require ("./routes/oeuvre");
 const candidatRoutes=require ("./routes/candidat");
 const formulaireRoutes = require ("./routes/formulaire")
 const congeRoutes = require('./routes/conge');
+const filtragecandidatRoutes= require('./routes/filtragecandidats.js')
 const authRoutes = require ('./routes/auth');
 const AbsenceRoutes = require ('./routes/absenceRequest')
-const concertRoutes=require('./routes/concert');
+const tessitureRoutes = require ('./routes/tessiture')
+const saisonRoutes = require ('./routes/saison')
+const concertRoutes=require('./routes/concert')
 const programmeRoutes=require('./routes/programme')
 const userRoutes=require('./routes/utilisateur')
 const pupitreRoutes=require('./routes/pupitre')
+
+
 mongoose
 .connect(
      "mongodb://127.0.0.1:27017/database",
@@ -36,6 +41,8 @@ app.use((req, res, next) => {
   next();
 });
 
+
+app.use('/api/filtragecandidats', filtragecandidatRoutes);
 app.use('/api/auditions', auditionRoutes);
 app.use("/api/candidats", candidatRoutes);
 app.use("/api/formulaires", formulaireRoutes);
@@ -45,6 +52,8 @@ app.use('/api/gerer', gererRoutes);
 app.use('/api/conge', congeRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/absence', AbsenceRoutes)
+app.use('/api/tessiture', tessitureRoutes);
+app.use('/api/saisons', saisonRoutes);
 app.use("/api/concerts",concertRoutes)
 app.use("/api/programme",programmeRoutes)
 app.use("/api/users",userRoutes)

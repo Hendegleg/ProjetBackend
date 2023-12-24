@@ -5,7 +5,7 @@ const candidatController = require('../controllers/candidat');
 //getAll
  router.get('/', candidatController.getAllCandidats);
 //create without verif
- router.post('/', candidatController.create);
+ router.post('/', candidatController.createCandidat);
 
 
 // get By Id
@@ -21,6 +21,9 @@ const candidatController = require('../controllers/candidat');
 router.get("/:id/verify/:token/", candidatController.verifyEmailToken);
 router.post('/addEmailCandidat', candidatController.addEmailCandidat);
 router.post("/:id",candidatController.createCandidat)
+
+
+
 
 
 module.exports = router;
