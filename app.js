@@ -13,6 +13,8 @@ const filtragecandidatRoutes= require('./routes/filtragecandidats.js')
 const authRoutes = require ('./routes/auth');
 const AbsenceRoutes = require ('./routes/absenceRequest')
 const tessitureRoutes = require ('./routes/tessiture')
+const saisonRoutes = require ('./routes/saison')
+
 
 mongoose
 .connect(
@@ -46,7 +48,10 @@ app.use('/api/gerer', gererRoutes);
 app.use('/api/conge', congeRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/absence', AbsenceRoutes)
-app.use('/api/tessiture', tessitureRoutes)
+app.use('/api/tessiture', tessitureRoutes);
+app.use('/api/saisons', saisonRoutes);
+
+
 
 
 

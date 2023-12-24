@@ -8,6 +8,8 @@ router.post('/', auditionController.createAudition);
 
 // Lire les informations d'une audition spécifique par son ID
 router.get('/:id', auditionController.getAuditionById);
+router.get('/', auditionController.getAudition);
+
 
 // Mettre à jour les détails d'une audition spécifique par son ID
 router.patch('/:id', auditionController.updateAudition);
@@ -20,7 +22,7 @@ router.post('/generer-planning', auditionController.genererPlanification);
 
 
 // Route pour cree les  auditions pour les candidats
-router.post('/creeAuditionsCandidats', auditionController.createAuditionsForCandidats);
+//router.post('/creeAuditionsCandidats', auditionController.createAuditionsForCandidats);
 
 // Route to generate and send audition plans
 //router.post('/generateAndSendAuditionPlan', auditionController.generateAndSendAuditionPlan);
