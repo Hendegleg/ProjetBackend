@@ -1,10 +1,7 @@
 
 const nodemailer = require('nodemailer');
 const Candidat = require('../models/candidat');
-const nodemailer = require('nodemailer');
 const jwt = require('jsonwebtoken');
-
-const Candidat = require('../models/candidat');
 const Verifmail = require("../models/verifmail");
 
 
@@ -18,6 +15,7 @@ exports.getAllCandidats = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
+
 
 // get_by_id
 exports.getCandidatById = async (req, res) => {

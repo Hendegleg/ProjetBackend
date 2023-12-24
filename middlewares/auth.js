@@ -30,9 +30,11 @@ module.exports.authMiddleware = async (req, res, next) => {
   }
 };
 
+
 module.exports.isAdmin = (req, res, next) => {
   try {
     if (req.auth.role === 'admin') {
+
       next();
     } else {
       res.status(403).json({ error: "Pas d'accès à cette route" });

@@ -205,7 +205,7 @@ cron.schedule('0 12 * * *', async () => {
   console.log('Tâche cron exécutée.');
 });
 
-envoyerNotificationChoristes();
+//envoyerNotificationChoristes();
 
 
 module.exports = {

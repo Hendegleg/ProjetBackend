@@ -3,7 +3,7 @@ const EvenementAudition = require('../models/evenementaudition');
 const Candidat = require('../models/candidat');
 const nodemailer = require('nodemailer')
 
-exports.createAudition = async (req, res) => {
+const createAudition = async (req, res) => {
     try {
       const {
         DateAudition,
@@ -35,7 +35,7 @@ exports.createAudition = async (req, res) => {
   };
 
   // get
-exports.getAuditionById = async (req, res) => {
+const getAuditionById = async (req, res) => {
     try {
       const audition = await Audition.findById(req.params.id).populate('candidat');
       
@@ -48,9 +48,17 @@ exports.getAuditionById = async (req, res) => {
       res.status(500).json({ message: err.message });
     }
   };
+const getAudition = async (req, res) => {
+    try {
+      const audition = await Audition.find(req.params).populate('candidat');
+      res.json(audition);
+    } catch (err) {
+      res.status(500).json({ message: err.message });
+    }
+  };
 
   // update
-exports.updateAudition = async (req, res) => {
+const updateAudition = async (req, res) => {
     try {
       const { id } = req.params;
       const audition = await Audition.findById(id);
@@ -67,7 +75,7 @@ exports.updateAudition = async (req, res) => {
   };
 
   
-exports.deleteAudition = async (req, res) => {
+const deleteAudition = async (req, res) => {
     try {
       const { id } = req.params;
       const audition = await Audition.findById(id);
@@ -311,6 +319,6 @@ exports.deleteAudition = async (req, res) => {
     deleteAudition,
     genererPlanification,
     lancerEvenementAudition ,
-    createAuditionsForCandidats,
     generateAndSendAuditionPlan,
+    getAudition,
   };

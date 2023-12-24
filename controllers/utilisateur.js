@@ -22,8 +22,8 @@ const  getProfileAndStatusHistory= async (req, res) => {
           currentStatus = 'Choriste Junior'; 
         } else {
           
-          const concertsValidated = user.concertsValidated || 0;
-          const repetitionsValidated = user.repetitionsValidated || 0;
+          const concertsValidated = user.concertsValidated ;
+          const repetitionsValidated = user.repetitionsValidated ;
   
           
           const firstSeasonYear = statusHistory[0].season;
