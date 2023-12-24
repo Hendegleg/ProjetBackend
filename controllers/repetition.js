@@ -2,6 +2,7 @@ const cron = require('node-cron');
 const nodemailer = require('nodemailer');
 const Repetition = require("../models/repetition");
 const User = require('../models/utilisateurs');
+const mongoose = require ('mongoose');
 
 const fetchRepetitions = (req, res) => {
   Repetition.find()
@@ -134,63 +135,81 @@ const generatePupitreList = async (req, res) => {
 
 
 
-// const envoyerNotificationChoristes = async () => {
-//     try {
-//         const choristes = await User.find({
-//             role: 'choriste',
-//             estEnConge: false,
-//         });
-
-//         if (choristes.length > 0) {
-//             const transporter = nodemailer.createTransport({
-//                 service: 'gmail',
-//                 auth: {
-//                     user: 'wechcrialotfi@gmail.com',
-//                     pass: 'vqbs baba usst djrw',
-//                 },
-//             });
-//             const maintenant = new Date();
-//             const dateDans24h = new Date();
-//             dateDans24h.setHours(maintenant.getHours() + 24);
-
-//             const repetitionsDans24h = await Repetition.find({
-//               dateRepetition: { $gte: maintenant, $lt: dateDans24h },
-//           });
-
-//           if (repetitionsDans24h.length > 0) {
-//             const contenuEmail = `
-//             Bonjour choristes,
-
-//             Vous avez une répétition dans les 24 heures suivantes. Voici les détails :
-
-//             Date de la répétition : ${repetitionsDans24h[0].dateRepetition}
-
-//             Merci et à bientôt !
-//             `;
 
 
-//             for (const choriste of choristes) {
-//               await transporter.sendMail({
-//                   from: 'wechcrialotfi@gmail.com',
-//                   to: choriste.email,
-//                   subject: 'Notification importante - Répétition à venir',
-//                   text: contenuEmail,
-//               });
+const envoyerNotificationChoristes = async () => {
+  try {
+      const choristes = await User.find({
+          role: 'choriste',
+          estEnConge: false,
+      });
 
-//               console.log(`Notification envoyée à ${choriste.email}`);
-//           }
-//       } else {
-//           console.log('Aucune répétition dans les 24 heures suivantes.');
-//       }
-//   } else {
-//       console.log('Aucun choriste à notifier.');
-//   }
-// } catch (error) {
-//   console.error('Erreur lors de l\'envoi des notifications aux choristes :', error.message);
-// }
-// };
+      if (choristes.length > 0) {
+          const maintenant = new Date();
+          console.log('Maintenant:', maintenant);
 
-// cron.schedule('0 12 * * *', envoyerNotificationChoristes);
+          const dateDans24h = new Date(maintenant.getTime() + 24 * 60 * 60 * 1000);
+          console.log('Date dans 24 heures:', dateDans24h);
+
+          const repetitionsDans24h = await Repetition.find({
+              date: { $gte: maintenant, $lt: dateDans24h },
+          });
+
+          console.log('Répétitions dans les 24 heures suivantes:', repetitionsDans24h);
+
+          if (repetitionsDans24h.length > 0) {
+              // Envoyer  notifications  aux choristes
+              const transporter = nodemailer.createTransport({
+                  service: 'gmail',
+                  auth: {
+                      user: 'wechcrialotfi@gmail.com',
+                      pass: 'vqbs baba usst djrw',
+                  },
+              });
+
+              for (const choriste of choristes) {
+                  const contenuEmail = `
+                      Bonjour ${choriste.nom},
+
+                      Vous avez une répétition dans les 24 heures suivantes. Voici les détails :
+
+                      Date de la répétition : ${repetitionsDans24h[0].date}
+                      Heure de début : ${repetitionsDans24h[0].heureDebut}
+                      Heure de fin : ${repetitionsDans24h[0].heureFin}
+                      Lieu : ${repetitionsDans24h[0].lieu}
+                      Participants : ${repetitionsDans24h[0].participant}
+
+                      Merci et à bientôt !
+                  `;
+
+                  await transporter.sendMail({
+                      from: 'wechcrialotfi@gmail.com',
+                      to: choriste.email,
+                      subject: 'Notification importante - Répétition à venir',
+                      text: contenuEmail,
+                  });
+
+                  console.log(`Notification envoyée à ${choriste.email}`);
+              }
+          } else {
+              console.log('Aucune répétition dans les 24 heures suivantes.');
+          }
+      } else {
+          console.log('Aucun choriste à notifier.');
+      }
+  } catch (error) {
+      console.error('Erreur lors de l\'envoi des notifications aux choristes :', error.message);
+  }
+};
+cron.schedule('0 12 * * *', async () => {
+  await envoyerNotificationChoristes();
+
+  console.log('Tâche cron exécutée.');
+});
+
+envoyerNotificationChoristes();
+
+
 
 
 module.exports = {
@@ -200,5 +219,4 @@ module.exports = {
   updateRepetition: updateRepetition,
   deleteRepetition: deleteRepetition,
   generatePupitreList: generatePupitreList,
- // envoyerNotificationChoristes : envoyerNotificationChoristes,
 };
