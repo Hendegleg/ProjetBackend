@@ -1,4 +1,7 @@
+const cron = require('node-cron');
+const nodemailer = require('nodemailer');
 const Repetition = require("../models/repetition");
+const User = require('../models/utilisateurs');
 
 const fetchRepetitions = (req, res) => {
   Repetition.find()
@@ -129,7 +132,6 @@ const generatePupitreList = async (req, res) => {
   }
 };
 
-
 module.exports = {
   fetchRepetitions: fetchRepetitions,
   addRepetition: addRepetition,
@@ -137,4 +139,5 @@ module.exports = {
   updateRepetition: updateRepetition,
   deleteRepetition: deleteRepetition,
   generatePupitreList: generatePupitreList,
+ // envoyerNotificationChoristes : envoyerNotificationChoristes,
 };
