@@ -30,10 +30,11 @@ module.exports.authMiddleware = async (req, res, next) => {
   }
 };
 
+
 module.exports.isAdmin = (req, res, next) => {
   try {
  
-    if (req.auth.role === 'admin') {
+    if (req.auth.role === 'choriste') {
       next();
     } else {
       res.status(403).json({ error: "Pas d'accès à cette route" });
@@ -54,4 +55,5 @@ module.exports.isChoriste = (req, res, next) => {
     res.status(401).json({ error: error.message });
   }
 };
+
 

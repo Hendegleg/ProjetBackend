@@ -16,6 +16,9 @@ const UserSchema = new Schema({
         },
     },
     password:  { type: String, required: true },
+    role: { type: String,
+        enum: ["choriste",'manager de choeur','chef de pupitre', 'admin'],
+        default: 'choriste' },
     statusHistory: {type: mongoose.Schema.Types.ObjectId, ref: 'status' },
     demandeConge: {type: Boolean, enum :['enconge','enattente']},
     estEnConge: { type: Boolean, default: false }, 
@@ -25,11 +28,10 @@ const UserSchema = new Schema({
     active: { type: Boolean, default: true }, 
     dateEntreeChoeur: { type: Date }, 
     dateSortieChoeur: { type: Date },
-    role: { type: String,
-         enum: ['choriste','manager de choeur','chef de pupitre', 'admin'],
-         default: 'choriste' },
+   
     tessiture: {type : String },
     taille_en_m  : {type: String}, 
+   
     
 });
 
