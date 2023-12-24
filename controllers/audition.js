@@ -82,55 +82,72 @@ exports.deleteAudition = async (req, res) => {
       res.status(500).json({ message: err.message });
     }
   };
+
+
+
   const lancerEvenementAudition = async (req, res) => {
     try {
-      
-      const { date, lienFormulaire } = req.body;
-  
-      
-      const nouvelEvenement = await EvenementAudition.create({
-        date,
-        lienFormulaire,
-      });
-      const tousLesCandidats = await Candidat.find();
-      const transporter = nodemailer.createTransport({
-        service: 'gmail',
-        auth: {
-            user: 'wechcrialotfi@gmail.com', 
-            pass: 'vqbs baba usst djrw'  
+        const { Date_debut_Audition, nombre_séance, dureeAudition, Date_fin_Audition, lienFormulaire } = req.body;
+
+        // Validate required fields
+        if (!Date_debut_Audition || !nombre_séance || !dureeAudition || !Date_fin_Audition) {
+            return res.status(400).json({ error: 'Please provide all required fields.' });
         }
-    });
-  
-      
-      const contenuEmail = `
-      Cher candidat,
 
-      Nous sommes ravis de vous informer de notre prochaine audition.
-
-      Date : ${date}
-      Lien vers le formulaire de candidature : ${lienFormulaire}
-
-      Merci et à bientôt !
-      Nous vous souhaitons une bonne chance !
-    
-
-      `;
-  
-      for (const candidat of tousLesCandidats) {
-        await transporter.sendMail({
-          from: 'wechcrialotfi@gmail.com',
-          to: candidat.email,
-          subject: 'Invitation à l\'audition',
-          text: contenuEmail,
+        // Create a new EvenementAudition
+        const newEvenementAudition = new EvenementAudition({
+            Date_debut_Audition,
+            nombre_séance,
+            dureeAudition,
+            Date_fin_Audition,
+            lienFormulaire,
         });
-      }
-  
-      res.status(200).json({ message: 'Événement d\'audition lancé avec succès et e-mails envoyés aux candidats.' });
-    } catch (error) {
-      res.status(500).json({ error: error.message });
-    }
-  };
 
+        // Save the new EvenementAudition to the database
+        await newEvenementAudition.save();
+
+        // Add the email sending logic
+        const tousLesCandidats = await Candidat.find();
+        const transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                user: 'wechcrialotfi@gmail.com',
+                pass: 'vqbs baba usst djrw'
+            }
+        });
+
+        const contenuEmail = `
+            Cher candidat,
+
+            Nous sommes ravis de vous informer que la nouvelle saison de notre programme passionnant a officiellement commencé !
+            Nous vous encourageons vivement à participer et à montrer au monde votre talent unique durant les auditions.
+
+            Date_de_debut des auditions : ${Date_debut_Audition}
+
+            Lien vers le formulaire de candidature : ${lienFormulaire}
+
+            Merci et à bientôt !
+            Nous vous souhaitons une bonne chance !
+        `;
+
+        for (const candidat of tousLesCandidats) {
+            await transporter.sendMail({
+                from: 'wechcrialotfi@gmail.com',
+                to: candidat.email,
+                subject: 'Invitation à l\'audition',
+                text: contenuEmail,
+            });
+        }
+
+        res.status(201).json({ message: 'EvenementAudition created successfully and emails sent to candidates.' });
+    } catch (error) {
+        console.error('Error creating EvenementAudition:', error.message);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+};
+
+
+ 
   // tache b 
   
   async function genererPlanification(req, res) {

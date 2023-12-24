@@ -16,7 +16,7 @@ const tessitureRoutes = require ('./routes/tessiture')
 
 mongoose
 .connect(
-     "mongodb://127.0.0.1:27017/projet",
+     "mongodb://127.0.0.1:27017/database",
    { /*useNewUrlParser: true, useUnifiedTopology: true*/}
 )
 .then(()=>console.log("connexion a mongoDB reussite"))
@@ -34,6 +34,7 @@ app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, PATCH, OPTIONS");
   next();
 });
+
 
 app.use('/api/filtragecandidats', filtragecandidatRoutes);
 app.use('/api/auditions', auditionRoutes);
