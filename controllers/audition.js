@@ -2,112 +2,81 @@ const Audition = require('../models/audition');
 const EvenementAudition = require('../models/evenementaudition');
 const Candidat = require('../models/candidat');
 const nodemailer = require('nodemailer')
-const moment = require('moment');
 
-const createAuditionsForCandidats = async (req, res) => {
-  try {
-      const auditionPlanning = await planningAudition.find();
-console.log(auditionPlanning[0].debutAud)
-      if (!auditionPlanning) {
-          return res.status(404).json({ message: 'Audition planning not found1' });
-      }
+exports.createAudition = async (req, res) => {
+    try {
+      const {
+        DateAudition,
+        nombre_séance,
+        dureeAudition,
+        candidat,
+        extraitChante,
+        tessiture,
+        evaluation,
+        decisioneventuelle,
+        remarque
+      } = req.body;
+      const nouvelleAudition = new Audition({
+        DateAudition,
+        nombre_séance,
+        dureeAudition,
+        candidat,
+        extraitChante,
+        tessiture,
+        evaluation,
+        decisioneventuelle,
+        remarque
+      });
+      const auditionEnregistree = await nouvelleAudition.save();
+      res.status(201).json(auditionEnregistree);
+    } catch (err) {
+      res.status(400).json({ message: err.message });
+    }
+  };
 
-      const candidats = await Candidat.find();
-
-      let currentAuditionTime = auditionPlanning[0].debutAud;
-      if (isNaN(currentAuditionTime.getTime())) {
-          return res.status(400).json({ error: 'Invalid date for audition time1' });
-      }
-      console.log(currentAuditionTime.getTime())
-
-
-      for (const candidat of candidats) {
-          console.log(currentAuditionTime.getTime())
-
-          if (currentAuditionTime.getHours() >= 16) {
-              currentAuditionTime.setDate(currentAuditionTime.getDate() + 1);
-              currentAuditionTime.setHours(8, 0, 0, 0);
-          }
-
-          if (isNaN(currentAuditionTime.getTime())) {
-              return res.status(400).json({ error: 'Invalid date for audition time' });
-          }
-
-          const audition = new Audition({
-              extraitChanter: "Sample singing excerpt",
-              tessiture: "Sample tessiture",
-              evaluation: "Sample evaluation",
-              decision: "Sample decision",
-              date_heure: currentAuditionTime,
-              candidat: candidat._id, 
-          });
-
-          await audition.save();
-
-          currentAuditionTime = new Date(currentAuditionTime.getTime() + auditionPlanning[0].dureeCoriste * 60 * 60 * 1000);
-      }
-
-      res.status(201).json({ message: 'Auditions cree pour tous les candidats ' });
-  } catch (error) {
-      res.status(500).json({ error: error.message });
-  }
-};
-
-const createAudition = async (req, res) => {
-  try {
-    const {
-      DateAudition,
-      nombre_séance,
-      dureeAudition,
-      candidat,
-      extraitChante,
-      tessiture,
-      evaluation,
-      decisioneventuelle,
-      remarque
-    } = req.body;
-    const nouvelleAudition = new Audition({
-      DateAudition,
-      nombre_séance,
-      dureeAudition,
-      candidat,
-      extraitChante,
-      tessiture,
-      evaluation,
-      decisioneventuelle,
-      remarque
-    });
-    const auditionEnregistree = await nouvelleAudition.save();
-    res.status(201).json(auditionEnregistree);
-  } catch (err) {
-    res.status(400).json({ message: err.message });
-  }
-};
-
-  // Lire les informations d'une audition spécifique par son ID
-  const getAuditionById = async (req, res) => {
+  // get
+exports.getAuditionById = async (req, res) => {
     try {
       const audition = await Audition.findById(req.params.id).populate('candidat');
+      
+      if (!audition) {
+        return res.status(404).json({ message: "Audition non trouvée." });
+      }
+  
       res.json(audition);
     } catch (err) {
       res.status(500).json({ message: err.message });
     }
   };
 
-  // Mettre à jour les détails d'une audition spécifique par son ID
-  const updateAudition = async (req, res) => {
+  // update
+exports.updateAudition = async (req, res) => {
     try {
-      const audition = await Audition.findByIdAndUpdate(req.params.id, req.body, { new: true });
-      res.json(audition);
+      const { id } = req.params;
+      const audition = await Audition.findById(id);
+      
+      if (!audition) {
+        return res.status(404).json({ message: "Audition non trouvée." });
+      }
+  
+      const updatedAudition = await Audition.findByIdAndUpdate(id, req.body, { new: true });
+      res.json(updatedAudition);
     } catch (err) {
       res.status(400).json({ message: err.message });
     }
   };
 
-  // Supprimer une audition spécifique par son ID
-  const deleteAudition = async (req, res) => {
+  
+exports.deleteAudition = async (req, res) => {
     try {
-      await Audition.findByIdAndDelete(req.params.id);
+      const { id } = req.params;
+      const audition = await Audition.findById(id);
+  
+      if (!audition) {
+        return res.status(404).json({ message: "Audition non trouvée." });
+      }
+  
+      await Audition.findByIdAndDelete(id);
       res.json({ message: 'Audition supprimée' });
     } catch (err) {
       res.status(500).json({ message: err.message });

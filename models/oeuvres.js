@@ -9,7 +9,7 @@ const OeuvresSchema = new Schema({
     genre : { type: String, required: true },
     paroles : { type: String, required: true },
     partition: { type: String, required: true },
-    presenceChoeur: { type: String, required: true },
+    requiresChoir: { type: Boolean, default: true }
 });
 
 

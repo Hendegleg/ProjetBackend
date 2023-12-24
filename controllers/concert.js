@@ -2,8 +2,9 @@ const Concert = require('../models/concert');
 const QRCode= require('qrcode');
 const Absense = require('../models/absence');
 
+
 const concertController = {
-  // Create: Créer un nouveau concert
+  
   createConcert: async (req, res) => {
     try {
       const newConcert = await Concert.create(req.body); // Créer un nouveau concert en utilisant les données reçues dans le corps de la requête
@@ -14,41 +15,53 @@ const concertController = {
         }
       });
       res.status(201).json({ success: true, data: newConcert });
+      const { presence, date, lieu, heure, programme, planning, nom_concert, placement } = req.body;
+
+      
+      if (!presence || !date || !lieu || !heure || !programme || !planning || !nom_concert || !placement) {
+        return res.status(400).json({ success: false, error: "Certains champs sont manquants." });
+      }
+      const newConcert = await Concert.create(req.body); 
+      res.status(201).json({  model: newConcert });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
     }
   },
-
-  // Read: Récupérer tous les concerts
+ 
   getAllConcerts: async (req, res) => {
     try {
       const concerts = await Concert.find();
-      res.status(200).json({ success: true, data: concerts });
+      res.status(200).json({  model: concerts });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
     }
   },
-
-  // Update: Mettre à jour un concert existant
+  
   updateConcert: async (req, res) => {
     try {
       const { id } = req.params;
       const updatedConcert = await Concert.findByIdAndUpdate(id, req.body, { new: true });
-      res.status(200).json({ success: true, data: updatedConcert });
+      res.status(200).json({  model: updatedConcert });
+    } catch (error) {
+      res.status(500).json({ success: false, error: error.message });
+    }
+  },
+ 
+  deleteConcert: async (req, res) => {
+    try {
+      const { id } = req.params;
+      await Concert.findByIdAndDelete(id);
+      res.status(200).json({model: {} });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
     }
   },
 
-  // Delete: Supprimer un concert
-  deleteConcert: async (req, res) => {
-    try {
-      const { id } = req.params;
-      await Concert.findByIdAndDelete(id);
-      res.status(200).json({ success: true, data: {} });
-    } catch (error) {
-      res.status(500).json({ success: false, error: error.message });
-    }
+
+  
+  
+
+};
   },
   confirmerpresenceConcert:async (req, res) => {
     try {
