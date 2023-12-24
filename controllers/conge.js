@@ -11,7 +11,7 @@ const transporter = nodemailer.createTransport({
   }
 });
 
-const envoyerNotificationCongeJob = new CronJob('30 28 18 * * *', async () => {
+const envoyerNotificationCongeJob = new CronJob('40 02 19 * * *', async () => {
   try {
     console.log('Tâche cron en cours d\'exécution pour l\'envoi de notifications de congé...');
 
@@ -169,25 +169,36 @@ terminateLeaveJob.start();
 
 exports.getLeaveNotifications = async (req, res) => {
   try {
-    // Récupérer les utilisateurs en congé
-    const usersEnConge = await User.find({ estEnConge: "enconge" });
+    const usersOnLeave = await User.find({ demandeConge: true, role: 'choriste' });
+    const admin = await User.findOne({ role: 'admin' });
 
-    const leaveNotifications = [];
-    // Parcourir les utilisateurs en congé pour créer les notifications
-    for (const user of usersEnConge) {
-      const notification = new Notification({
-        userId: user._id,
-        message: 'Vous êtes en congé.'
-      });
+    if (admin) {
+      for (const user of usersOnLeave) {
+        const contenuEmail = `
+          Bonjour ${admin.nom},
 
-      await notification.save();
-      leaveNotifications.push(notification);
+          le choriste ${user.nom} ${user.prenom} a demandé un congé.
+          
+          Merci de modifier son statut!
+
+        `;
+
+        await transporter.sendMail({
+          from: 'hendlegleg1@gmail.com', 
+          to: admin.email, 
+          subject: 'Notification de congé',
+          text: contenuEmail
+        });
+        user.demandeConge = false;
+        await user.save();
+      }
+
+      res.status(200).json({ message: 'Notifications de congé envoyées à l\'administrateur.' });
+    } else {
+      res.status(404).json({ message: 'Aucun utilisateur avec le rôle admin trouvé.' });
     }
-
-    res.status(200).json({ message: 'Liste des congés sous forme de notifications', leaveNotifications });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
-
 
