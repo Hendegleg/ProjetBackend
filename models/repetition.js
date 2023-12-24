@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const RepetitionSchema = new Schema({
-    
+    lienConfirmation: { type: String },
     nom: { type: String, required: true },
     date: { type: Date, required: true },
     heureDebut: { type: String, required: true }, 

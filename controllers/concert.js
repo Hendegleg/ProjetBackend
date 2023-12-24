@@ -1,11 +1,18 @@
 const Concert = require('../models/concert'); 
-const exceljs = require('exceljs');
+const QRCode= require('qrcode');
+const Absense = require('../models/absence');
 
 const concertController = {
   // Create: Créer un nouveau concert
   createConcert: async (req, res) => {
     try {
       const newConcert = await Concert.create(req.body); // Créer un nouveau concert en utilisant les données reçues dans le corps de la requête
+      await QRCode.toFile(`C:\\Users\\tinne\\OneDrive\\Desktop\\ProjetBackend\\image QR\\qrcode-${newConcert._id}.png`,`http://localhost:5000/api/concerts/concerts/${newConcert._id}/confirmerpresence`, {
+        color: {
+          dark: '#000000', 
+          light: '#ffffff'  
+        }
+      });
       res.status(201).json({ success: true, data: newConcert });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -42,8 +49,34 @@ const concertController = {
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
     }
+  },
+  confirmerpresenceConcert:async (req, res) => {
+    try {
+      const { id } = req.params;
+      const concert = await Concert.find({_id:id});
+      if (!concert) { 
+        res.status(404).json({message:"concert non trouve!"})
+
+      }
+      else{
+        const { userid } = req.body;
+        const absense = await Absense.create({
+          user: userid,
+          status: "present" ,
+          concert:id
+
+        })
+        if (!absense) { 
+          res.status(404).json({message:"Prensence echoue"})
+      }else {
+        res.status(200).json({ message:"Prensence enregistre"});
+      }
+      }
+      res.status(200).json({ success: true, data: {} });
+    } catch (error) {
+      res.status(500).json({ success: false, error: error.message });
+    }
   }
-  
 };
 
 const importerConcertsDepuisExcel = async (filePath) => {

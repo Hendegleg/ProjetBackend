@@ -9,9 +9,6 @@ const getCandidats = async (req, res) => {
     if (req.query.max && req.query.min  ) {
       filter.taille_en_m  = {  $lte: req.query.max ,$gte: req.query.min };
     }
-
- 
-
     
     if (req.query.nom) {
       filter.nom = { $regex: req.query.nom, $options: "i" };

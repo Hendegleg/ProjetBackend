@@ -10,6 +10,8 @@ const candidatRoutes=require ("./routes/candidat");
 const formulaireRoutes = require ("./routes/formulaire")
 const congeRoutes = require('./routes/conge');
 const filtragecandidatRoutes= require('./routes/filtragecandidats.js')
+const concertsRoutes= require('./routes/concert.js')
+const qrcodeRoutes = require('./routes/qrcode');
 mongoose
 .connect(
      "mongodb://127.0.0.1:27017/projet",
@@ -30,7 +32,7 @@ app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, PATCH, OPTIONS");
   next();
 });
-
+app.use("/api/concerts", concertsRoutes);
 app.use('/api/filtragecandidats', filtragecandidatRoutes);
 app.use('/api/auditions', auditionRoutes);
 app.use("/api/candidats", candidatRoutes);
@@ -39,6 +41,8 @@ app.use("/api/oeuvres", oeuvreRoutes);
 app.use("/api/repetitions", repetitionRoutes);
 app.use('/api/mailer', mailerRoutes);
 app.use('/api/conge', congeRoutes);
+//app.use('/confirmation', confirmationRoutes);
+//app.use('/qrcode', qrcodeRoutes);
 
 
 
