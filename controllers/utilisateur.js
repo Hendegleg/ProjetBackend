@@ -1,8 +1,7 @@
 const User = require('../models/utilisateurs');
 
 
-const 
-    getProfileAndStatusHistory= async (req, res) => {
+const  getProfileAndStatusHistory= async (req, res) => {
       try {
         const userId = req.params.id; 
         
@@ -23,8 +22,8 @@ const
           currentStatus = 'Choriste Junior'; 
         } else {
           
-          const concertsValidated = user.concertsValidated || 0;
-          const repetitionsValidated = user.repetitionsValidated || 0;
+          const concertsValidated = user.concertsValidated ;
+          const repetitionsValidated = user.repetitionsValidated ;
   
           
           const firstSeasonYear = statusHistory[0].season;
@@ -47,10 +46,9 @@ const
         
         res.status(200).json({ success: true, data: { profile: user.toPublic(), statusHistory, currentStatus } });
       } catch (error) {
-        res.status(500).json({ success: false, error: error.message });
+        res.status(500).json({ success: false, error: error.message });}
       }
-    };
-  
-
   module.exports = {
     getProfileAndStatusHistory};
+
+  module.exports = {userController}

@@ -4,9 +4,9 @@ const Schema = mongoose.Schema;
 const StatusSchema = new Schema({
     status: { type: String,
          enum: [ 'inactif','Choriste Junior', 'Choriste Senior', 'Veteran'],
-         required:true,
+         default:'Choriste Junior',
          },
-    saison: { type: Number,required: true  }, 
+    saison: { type: Number}, 
     
 
     

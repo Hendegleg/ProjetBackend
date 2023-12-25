@@ -1,7 +1,6 @@
 const express = require('express');
 const router = express.Router();
 const absenceController = require('../controllers/absencerequest');
-router.post('/createrequest', absenceController.createAbsenceRequest);
-router.post('/getabsence', absenceController.getAbsenceRequestsByUser);
-
+router.post('/createrequest/:id', absenceController.informerAbsence);
+router.get('/getabsence/:userId', absenceController.getAbsenceRequestsByUser);
 module.exports = router;

@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
-
-const User = require('../models/utilisateurs')
+const User = require('../models/utilisateurs');
+const User = require('../controllers/utilisateurs');
 
 module.exports.authMiddleware = async (req, res, next) => {
   try {
@@ -13,8 +13,7 @@ module.exports.authMiddleware = async (req, res, next) => {
     const decodedToken = jwt.verify(token, 'RANDOM_TOKEN_SECRET');
     const userId = decodedToken.userId;
 
-    const user = await User.findById(userId);
-
+    const user = await User.findById(userId); 
     if (user) {
       req.auth = {
         userId: userId,
@@ -27,13 +26,15 @@ module.exports.authMiddleware = async (req, res, next) => {
   } catch (error) {
     console.error(error); // Log the error for debugging purposes
     res.status(401).json({ error: "Erreur de token: " + error.message });
+    res.status(401).json({ error: "Erreur de token" });
   }
 };
 
+
 module.exports.isAdmin = (req, res, next) => {
   try {
- 
     if (req.auth.role === 'admin') {
+
       next();
     } else {
       res.status(403).json({ error: "Pas d'accès à cette route" });
@@ -44,7 +45,6 @@ module.exports.isAdmin = (req, res, next) => {
 };
 module.exports.isChoriste = (req, res, next) => {
   try {
-   
     if (req.auth.role === 'choriste') {
       next();
     } else {

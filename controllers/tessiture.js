@@ -1,6 +1,7 @@
 const User = require('../models/utilisateurs');
 exports.updateTessiture = (req, res) => {
-    const { userId, nouvelleTessiture } = req.body;
+    const { nouvelleTessiture } = req.body;
+    const userId = req.params.id; 
   
     User.findById(userId)
       .then((utilisateur) => {
