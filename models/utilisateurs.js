@@ -32,6 +32,7 @@ const UserSchema = new Schema({
     tessiture: {type : String }, 
     taille_en_m  : {type: String},
     nbsaison:{type:Number}, 
+    approved:{type: Boolean},
     absence: [{ type: mongoose.Schema.Types.ObjectId, ref: 'absence' }]
     
     

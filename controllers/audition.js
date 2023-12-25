@@ -27,6 +27,12 @@ const createAudition = async (req, res) => {
       decisioneventuelle,
       remarque
     } = req.body;
+
+    // Vérification des données requises
+    if (!DateAudition || !nombre_séance || !dureeAudition || !candidat) {
+      return res.status(400).json({ message: "Certains champs sont manquants pour créer une audition." });
+    }
+
     const nouvelleAudition = new Audition({
       DateAudition,
       nombre_séance,
@@ -38,6 +44,7 @@ const createAudition = async (req, res) => {
       decisioneventuelle,
       remarque
     });
+
     const auditionEnregistree = await nouvelleAudition.save();
     res.status(201).json(auditionEnregistree);
   } catch (err) {
