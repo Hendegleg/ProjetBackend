@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const gerercontroller = require('../controllers/gerercandidat');
+const Auth = require('../middlewares/auth')
 
 router.post('/acceptation', gerercontroller.envoyerEmailAcceptation);
 router.post('/mailconfirmation/:id', gerercontroller.envoyerEmailConfirmation);

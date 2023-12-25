@@ -124,9 +124,9 @@ exports.sendNotification = async (req, res) => {
 
 
 
-const terminateLeaveJob = new CronJob('52 20 * * *', async () => {
+const terminateLeaveJob = new CronJob('0 56 20 * * *', async () => {
   try {
-    const users = await User.find({ estEnConge: 'enconge' });
+    const users = await User.find({ conge: 'enconge' });
 
     for (const user of users) {
       const currentDate = new Date();
@@ -145,7 +145,7 @@ const terminateLeaveJob = new CronJob('52 20 * * *', async () => {
         `;
 
         await transporter.sendMail({
-          from: 'your_email@gmail.com', // Replace with your email address
+          from: 'hendlegleg1@gmail.com',
           to: user.email,
           subject: 'Notification de fin de congé',
           text: contenuEmail

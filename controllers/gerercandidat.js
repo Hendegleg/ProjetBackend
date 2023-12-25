@@ -19,77 +19,55 @@ const transporter = nodemailer.createTransport({
         pass: process.env.EMAIL_PASSWORD
     }
 });
-
 exports.getListeCandidatsParPupitre = async (req, res) => {
     try {
-        const besoinPupitres = req.body; 
-
-        const candidatsParDecision = await Audition.find({ decisioneventuelle: { $in: ["retenu", "en attente", "refuse"] } })
-            .populate('candidat');
-        const candidatsParPupitre = {
-            Soprano: [],
-            Alto: [],
-            Ténor: [],
-            Basse: []
-        };
-
-        candidatsParDecision.forEach(audition => {
-            if (audition.candidat) {
-                const candidat = audition.candidat;
-                switch (audition.tessiture) {
-                    case 'Soprano':
-                        if (besoinPupitres.Soprano > 0) {
-                            candidatsParPupitre.Soprano.push({
-                                nom: candidat.nom,
-                                prenom: candidat.prenom,
-                                decisioneventuelle: audition.decisioneventuelle
-                            });
-                            besoinPupitres.Soprano--;
-                        }
-                        break;
-                    case 'Alto':
-                        if (besoinPupitres.Alto > 0) {
-                            candidatsParPupitre.Alto.push({
-                                nom: candidat.nom,
-                                prenom: candidat.prenom,
-                                decisioneventuelle: audition.decisioneventuelle
-                            });
-                            besoinPupitres.Alto--;
-                        }
-                        break;
-                    case 'Ténor':
-                        if (besoinPupitres.Ténor > 0) {
-                            candidatsParPupitre.Ténor.push({
-                                nom: candidat.nom,
-                                prenom: candidat.prenom,
-                                decisioneventuelle: audition.decisioneventuelle
-                            });
-                            besoinPupitres.Ténor--;
-                        }
-                        break;
-                    case 'Basse':
-                        if (besoinPupitres.Basse > 0) {
-                            candidatsParPupitre.Basse.push({
-                                nom: candidat.nom,
-                                prenom: candidat.prenom,
-                                decisioneventuelle: audition.decisioneventuelle
-                            });
-                            besoinPupitres.Basse--;
-                        }
-                        break;
-                    default:
-                        break;
-                }
-            }
-        });
-        return res.status(200).json(candidatsParPupitre);
+      const besoinPupitres = req.body;
+  
+      const auditions = await Audition.find().populate('candidat');
+      const candidatsParPupitre = {
+        Soprano: { retenu: [], 'en attente': [], refuse: [] },
+        Alto: { retenu: [], 'en attente': [], refuse: [] },
+        Ténor: { retenu: [], 'en attente': [], refuse: [] },
+        Basse: { retenu: [], 'en attente': [], refuse: [] }
+      };
+  
+      for (const audition of auditions) {
+        if (audition.candidat) {
+          const candidat = audition.candidat;
+  
+          const candidatData = {
+            nom: candidat.nom,
+            prenom: candidat.prenom,
+            decisioneventuelle: audition.decisioneventuelle
+          };
+  
+          switch (audition.tessiture) {
+            case 'Soprano':
+              candidatsParPupitre.Soprano[candidatData.decisioneventuelle].push(candidatData);
+              break;
+            case 'Alto':
+              candidatsParPupitre.Alto[candidatData.decisioneventuelle].push(candidatData);
+              break;
+            case 'Ténor':
+              candidatsParPupitre.Ténor[candidatData.decisioneventuelle].push(candidatData);
+              break;
+            case 'Basse':
+              candidatsParPupitre.Basse[candidatData.decisioneventuelle].push(candidatData);
+              break;
+            default:
+              break;
+          }
+        }
+      }
+  
+      return res.status(200).json(candidatsParPupitre);
+  
     } catch (error) {
-        console.error('Erreur lors de la récupération des candidats par pupitre :', error);
-        return res.status(500).json({ error: 'Erreur lors de la récupération des candidats par pupitre' });
+      console.error('Erreur lors de la récupération des candidats par pupitre :', error);
+      return res.status(500).json({ error: 'Erreur lors de la récupération des candidats par pupitre' });
     }
-};
-
-
+  };
+  
 
 exports.confirmerPresence = async (req, res) => {
     const { token } = req.query;
@@ -114,12 +92,14 @@ exports.confirmerPresence = async (req, res) => {
 
 exports.envoyerEmailAcceptation = async (req, res) => {
     try {
-        const auditions = await Audition.find({ decisioneventuelle: "retenu" });
+        const auditions = await Audition.find({ decisioneventuelle: "retenu" });       
         const candidatsRetenusIds = auditions.map(audition => audition.candidat);
+
 
         for (const id of candidatsRetenusIds) {
             try {
                 const candidat = await Candidat.findById(id);
+                console.log(candidat)
 
                 console.log("Candidat trouvé : ", candidat);
 
@@ -147,8 +127,6 @@ exports.envoyerEmailAcceptation = async (req, res) => {
 
                     await transporter.sendMail(mailOptions);
                     console.log(`Email envoyé à ${candidat.email}`);
-
-                    // Mise à jour des informations du candidat
                     await Candidat.findByIdAndUpdate(id, { estretenu: true, dateEnvoiEmail: Date.now() });
                 }
             } catch (error) {
