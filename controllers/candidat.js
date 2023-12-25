@@ -1,10 +1,8 @@
 
-const nodemailer = require('nodemailer');
 const Candidat = require('../models/candidat');
 const nodemailer = require('nodemailer');
 const jwt = require('jsonwebtoken');
 
-const Candidat = require('../models/candidat');
 const Verifmail = require("../models/verifmail");
 
 

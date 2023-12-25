@@ -46,7 +46,7 @@ const createAudition = async (req, res) => {
 };
 
   // get
-exports.getAuditionById = async (req, res) => {
+const getAuditionById = async (req, res) => {
     try {
       const audition = await Audition.findById(req.params.id).populate('candidat');
       
@@ -61,7 +61,7 @@ exports.getAuditionById = async (req, res) => {
   };
 
   // update
-exports.updateAudition = async (req, res) => {
+const updateAudition = async (req, res) => {
     try {
       const { id } = req.params;
       const audition = await Audition.findById(id);
@@ -78,7 +78,7 @@ exports.updateAudition = async (req, res) => {
   };
 
   
-exports.deleteAudition = async (req, res) => {
+const deleteAudition = async (req, res) => {
     try {
       const { id } = req.params;
       const audition = await Audition.findById(id);
@@ -96,7 +96,7 @@ exports.deleteAudition = async (req, res) => {
 
 
 
-  const lancerEvenementAudition = async (req, res) => {
+const lancerEvenementAudition = async (req, res) => {
     try {
         const { Date_debut_Audition, nombre_séance, dureeAudition, Date_fin_Audition, lienFormulaire } = req.body;
 
@@ -316,10 +316,10 @@ exports.deleteAudition = async (req, res) => {
     }
   };
   module.exports = {
-    createAudition ,
-    getAuditionById,
-    updateAudition,
     deleteAudition,
+    updateAudition,
+    createAudition ,
+    getAuditionById ,
     genererPlanification,
     lancerEvenementAudition ,
     getAudition,
