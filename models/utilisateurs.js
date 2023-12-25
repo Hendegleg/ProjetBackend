@@ -33,8 +33,12 @@ const UserSchema = new Schema({
     taille_en_m  : {type: String},
     nbsaison:{type:Number}, 
     approved:{type: Boolean},
-    absence: [{ type: mongoose.Schema.Types.ObjectId, ref: 'absence' }]
-    
+    absence: [{ type: mongoose.Schema.Types.ObjectId, ref: 'absence' }],
+    elimination:{type:String, enum:['nomine','elimine']},
+    eliminationDuree: {
+        type: Number,
+        default: 365,
+      },
     
 });
 
