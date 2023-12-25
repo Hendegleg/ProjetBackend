@@ -1,5 +1,6 @@
 const Repetition = require("../models/repetition");
-
+const Absence = require('../models/absence');
+const QRCode = require('qrcode');
 const fetchRepetitions = (req, res) => {
   Repetition.find()
     .then((repetitions) => {
@@ -16,23 +17,31 @@ const fetchRepetitions = (req, res) => {
     });
 };
 
-const addRepetition = (req, res) => {
-  const newRepetition = new Repetition(req.body);
-  newRepetition
-    .save()
-    .then(() => {
-      res.status(200).json({
-        repetition: newRepetition,
-        message: "Répétition ajoutée avec succès",
-      });
-    })
-    .catch((error) => {
-      res.status(400).json({
-        error: error.message,
-        message: "Échec d'ajout de la répétition",
-      });
+const addRepetition = async (req, res) => {
+  try {
+    const newRepetition = new Repetition(req.body);
+    await newRepetition.save();
+
+    // Génération du QR code
+    await QRCode.toFile(`C:\\Users\\tinne\\OneDrive\\Desktop\\ProjetBackend\\image QR\\qrcode-${newRepetition._id}.png`, `http://localhost:5000/api/repetitions/${newRepetition._id}/confirmerpresence`, {
+      color: {
+        dark: '#000000',
+        light: '#ffffff'
+      }
     });
+
+    res.status(200).json({
+      repetition: newRepetition,
+      message: "Répétition ajoutée avec succès",
+    });
+  } catch (error) {
+    res.status(400).json({
+      error: error.message,
+      message: "Échec d'ajout de la répétition",
+    });
+  }
 };
+
 
 const getRepetitionById = (req, res) => {
   Repetition.findById(req.params.id)
@@ -128,6 +137,31 @@ const generatePupitreList = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+const confirmerpresenceRepetition = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const repetition = await Repetition.findById(id);
+
+    if (!repetition) {
+      return res.status(404).json({ message: "Répétition non trouvée!" });
+    } else {
+      const { userid } = req.body;
+      const absence = await Absence.create({
+        user: userid,
+        status: "present",
+        repetition: id
+      });
+
+      if (!absence) {
+        return res.status(404).json({ message: "Présence échouée" });
+      } else {
+        return res.status(200).json({ message: "Présence enregistrée" });
+      }
+    }
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+}
 
 
 module.exports = {
@@ -137,4 +171,5 @@ module.exports = {
   updateRepetition: updateRepetition,
   deleteRepetition: deleteRepetition,
   generatePupitreList: generatePupitreList,
+  confirmerpresenceRepetition: confirmerpresenceRepetition,
 };

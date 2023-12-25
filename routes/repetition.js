@@ -10,4 +10,5 @@ router.get("/:id", repetitioncontroller.getRepetitionById);
 router.put("/updaterepetition/:id", repetitioncontroller.updateRepetition);
 router.delete("/deleterepetition/:id", repetitioncontroller.deleteRepetition);
 router.post('/generatePupitreList', repetitioncontroller.generatePupitreList);
+router.post('/:id/confirmerpresence',  repetitioncontroller.confirmerpresenceRepetition);
 module.exports = router
