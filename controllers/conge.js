@@ -48,7 +48,7 @@ const envoyerNotificationCongeJob = new CronJob('40 02 19 * * *', async () => {
 
 envoyerNotificationCongeJob.start();
 
-exports.sendNotificationForLeaveRequest = async (req, res) => {
+const sendNotificationForLeaveRequest = async (req, res) => {
   try {
     const { userId } = req.body;
 
@@ -78,7 +78,7 @@ exports.sendNotificationForLeaveRequest = async (req, res) => {
 };
 
 
-exports.declareLeave = async (req, res) => {
+const declareLeave = async (req, res) => {
   try {
     const {startDate, endDate } = req.body;
     const userId = req.params.id;
@@ -101,7 +101,7 @@ exports.declareLeave = async (req, res) => {
   }
 };
 
-exports.sendNotification = async (req, res) => {
+const sendNotification = async (req, res) => {
   try {
     const { userId, message } = req.body; 
 
@@ -167,7 +167,7 @@ const terminateLeaveJob = new CronJob('0 56 20 * * *', async () => {
 terminateLeaveJob.start();
 
 
-exports.getLeaveNotifications = async (req, res) => {
+const getLeaveNotifications = async (req, res) => {
   try {
     const usersOnLeave = await User.find({ demandeConge: true, role: 'choriste' });
     const admin = await User.findOne({ role: 'admin' });
@@ -201,4 +201,9 @@ exports.getLeaveNotifications = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
-
+module.exports={
+  sendNotificationForLeaveRequest,
+  getLeaveNotifications,
+  sendNotification,
+  declareLeave,
+}
