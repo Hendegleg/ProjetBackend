@@ -8,7 +8,7 @@ const Verifmail = require("../models/verifmail");
 
 
 // gat_all
-exports.getAllCandidats = async (req, res) => {
+const getAllCandidats = async (req, res) => {
     try {
         const candidats = await Candidat.find();
         res.status(200).json(candidats);
@@ -18,7 +18,7 @@ exports.getAllCandidats = async (req, res) => {
 };
 
 // get_by_id
-exports.getCandidatById = async (req, res) => {
+const getCandidatById = async (req, res) => {
     try {
         const candidat = await Candidat.findById(req.params.id);
         if (!candidat) {
@@ -31,7 +31,7 @@ exports.getCandidatById = async (req, res) => {
 };
 
 // update
-exports.updateCandidatById = async (req, res) => {
+const updateCandidatById = async (req, res) => {
     try {
         const candidat = await Candidat.findByIdAndUpdate(req.params.id, req.body, { new: true });
         if (!candidat) {
@@ -44,7 +44,7 @@ exports.updateCandidatById = async (req, res) => {
 };
 
 // dalete
-exports.deleteCandidatById = async (req, res) => {
+const deleteCandidatById = async (req, res) => {
     try {
         const candidat = await Candidat.findByIdAndRemove(req.params.id);
         if (!candidat) {
@@ -58,7 +58,7 @@ exports.deleteCandidatById = async (req, res) => {
 
 
 //create
-exports.create = async (req, res) => {
+const create = async (req, res) => {
     try {
         const candidat = new Candidat(req.body);
         const savedCandidat = await candidat.save();
@@ -68,7 +68,7 @@ exports.create = async (req, res) => {
     }
 }
 
-exports.sendEmail = async (email, subject, text, attachments = []) => {
+const sendEmail = async (email, subject, text, attachments = []) => {
     try {
         const transporter = nodemailer.createTransport({
             host: "smtp.gmail.com", 
@@ -100,7 +100,7 @@ exports.sendEmail = async (email, subject, text, attachments = []) => {
     }
 };
 
-exports.addEmailCandidat = async (req, res) => {
+const addEmailCandidat = async (req, res) => {
     try {
         const existingCandidat = await Verifmail.findOne({ email: req.body.email });
 
@@ -133,7 +133,7 @@ exports.addEmailCandidat = async (req, res) => {
     }
     
 };
-exports.verifyEmailToken = async (req, res) => {
+const verifyEmailToken = async (req, res) => {
     try {
         const { id, token } = req.params;
 
@@ -164,7 +164,7 @@ exports.verifyEmailToken = async (req, res) => {
         }
     }
 };
-exports.createCandidat = async (req, res) => {
+const createCandidat = async (req, res) => {
     try {
         const { id } = req.params;
 
@@ -224,7 +224,18 @@ exports.createCandidat = async (req, res) => {
     }
 };
 
+module.exports={
+    createCandidat,
+    verifyEmailToken,
+    sendEmail,
+    create,
+    deleteCandidatById,
+    updateCandidatById,
+    getCandidatById,
+    getAllCandidats,
+    addEmailCandidat
 
+}
 
 
 

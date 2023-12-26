@@ -19,6 +19,9 @@ const saisonRoutes = require ('./routes/saison')
 const pupitreRoutes = require ('./routes/pupitre')
 const repetitioncontroller = require ('./controllers/repetition')
 cron.schedule('08 19 * * *', repetitioncontroller.envoyerNotificationChoristes);
+const concertRoutes=require('./routes/concert')
+const programmeRoutes=require('./routes/programme')
+const userRoutes=require('./routes/utilisateur')
 
 
 mongoose
@@ -55,12 +58,10 @@ app.use('/api/auth', authRoutes);
 app.use('/api/absence', AbsenceRoutes)
 app.use('/api/tessiture', tessitureRoutes);
 app.use('/api/saisons', saisonRoutes);
-app.use('/api/pupitres', pupitreRoutes);
-
-
-
-
-
+app.use("/api/concerts",concertRoutes)
+app.use("/api/programme",programmeRoutes)
+app.use("/api/users",userRoutes)
+app.use("/api/pupitre",pupitreRoutes)
 module.exports = app;
 
 

@@ -1,8 +1,10 @@
 const jwt = require('jsonwebtoken');
-const User = require('../models/utilisateurs');
+//const User = require('../models/utilisateurs');
 const User = require('../controllers/utilisateurs');
 
-module.exports.authMiddleware = async (req, res, next) => {
+
+
+const authMiddleware = async (req, res, next) => {
   try {
     const token = req.headers.authorization.split(' ')[1];
 
@@ -30,7 +32,7 @@ module.exports.authMiddleware = async (req, res, next) => {
   }
 };
 
-module.exports.isAdmin = (req, res, next) => {
+const isAdmin = (req, res, next) => {
   try {
     if (req.auth.role === 'admin') {
       next();
@@ -41,7 +43,7 @@ module.exports.isAdmin = (req, res, next) => {
     res.status(401).json({ error: error.message });
   }
 };
-module.exports.isChoriste = (req, res, next) => {
+const isChoriste = (req, res, next) => {
   try {
     if (req.auth.role === 'choriste') {
       next();
@@ -63,7 +65,7 @@ module.exports.ischefpupitre = (req, res, next) => {
     res.status(401).json({ error: error.message });
   }
 };
-module.exports.ismanagerChoeur = (req, res, next) => {
+const ismanagerChoeur = (req, res, next) => {
   try {
     if (req.auth.role === 'manager de choeur') {
       next();
@@ -74,3 +76,13 @@ module.exports.ismanagerChoeur = (req, res, next) => {
     res.status(401).json({ error: error.message });
   }
 };
+
+
+module.exports={
+  authMiddleware,
+  isAdmin,
+  isChoriste,
+  ismanagerChoeur
+
+
+}

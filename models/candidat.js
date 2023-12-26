@@ -24,6 +24,7 @@ const candidatSchema = new Schema({
     estConfirme : {type: Boolean, default : false },
     signature : {type: Boolean, default : false },
     estEngage: {type: Boolean, default : false },
+    
     token : {type: String}
    
 });

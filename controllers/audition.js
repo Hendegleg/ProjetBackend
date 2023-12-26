@@ -27,6 +27,12 @@ const createAudition = async (req, res) => {
       decisioneventuelle,
       remarque
     } = req.body;
+
+    // Vérification des données requises
+    if (!DateAudition || !nombre_séance || !dureeAudition || !candidat) {
+      return res.status(400).json({ message: "Certains champs sont manquants pour créer une audition." });
+    }
+
     const nouvelleAudition = new Audition({
       DateAudition,
       nombre_séance,
@@ -38,6 +44,7 @@ const createAudition = async (req, res) => {
       decisioneventuelle,
       remarque
     });
+
     const auditionEnregistree = await nouvelleAudition.save();
     res.status(201).json(auditionEnregistree);
   } catch (err) {
@@ -60,8 +67,8 @@ const getAuditionById = async (req, res) => {
     }
   };
 
-  // update
-const updateAudition = async (req, res) => {
+  // Mettre à jour les détails d'une audition spécifique par son ID
+  const updateAudition = async (req, res) => {
     try {
       const { id } = req.params;
       const audition = await Audition.findById(id);
@@ -315,6 +322,7 @@ const lancerEvenementAudition = async (req, res) => {
       res.status(500).json({ success: false, error: error.message });
     }
   };
+  
   module.exports = {
     deleteAudition,
     updateAudition,
@@ -323,5 +331,7 @@ const lancerEvenementAudition = async (req, res) => {
     genererPlanification,
     lancerEvenementAudition ,
     getAudition,
-    generateAndSendAuditionPlan,
-  };
+    getAuditionById,
+    genererPlanification
+
+  }

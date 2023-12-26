@@ -2,8 +2,8 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const UserSchema = new Schema({
-    nom: { type: String, required: true },
-    prenom: { type: String, required: true },
+    nom: { type: String },
+    prenom: { type: String},
     email: {
         type: String,
         requiràed: true,
@@ -16,7 +16,10 @@ const UserSchema = new Schema({
         },
     },
     password:  { type: String, required: true },
-    statusHistory: {type: mongoose.Schema.Types.ObjectId, ref: 'status' },
+    role: { type: String,
+        enum: ["choriste",'manager de choeur','chef de pupitre', 'admin'],
+        default: 'choriste' },
+    StatusHistory: {type: mongoose.Schema.Types.ObjectId, ref: 'StatusHistory' },
     demandeConge: {type: Boolean, default : false},
     estEnConge: { type: Boolean, default: false }, 
     conge : {type: String, enum : ['enattente','enconge']},
@@ -26,11 +29,12 @@ const UserSchema = new Schema({
     active: { type: Boolean, default: true }, 
     dateEntreeChoeur: { type: Date }, 
     dateSortieChoeur: { type: Date },
-    role: { type: String,
-        enum: ['choriste','manager de choeur','manager de choeur','chef de pupitre', 'admin'],
-        default: 'choriste' },
-        tessiture: {type : String },
-        taille_en_m  : {type: String}, 
+    tessiture: {type : String }, 
+    taille_en_m  : {type: String},
+    nbsaison:{type:Number}, 
+    approved:{type: Boolean},
+    absence: [{ type: mongoose.Schema.Types.ObjectId, ref: 'absence' }]
+    
     
 });
 

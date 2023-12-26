@@ -5,7 +5,7 @@ const candidatController = require('../controllers/candidat');
 //getAll
  router.get('/', candidatController.getAllCandidats);
 //create without verif
- router.post('/', candidatController.create);
+ router.post('/', candidatController.createCandidat);
 
 
 // get By Id
