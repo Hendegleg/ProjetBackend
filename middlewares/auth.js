@@ -1,5 +1,7 @@
 const jwt = require('jsonwebtoken');
 const User = require ("../controllers/auth")
+const luser = require ("../models/utilisateurs")
+
 module.exports.authMiddleware = async (req, res, next) => {
   try {
     const token = req.headers.authorization?.split(' ')[1];
@@ -11,7 +13,7 @@ module.exports.authMiddleware = async (req, res, next) => {
     const decodedToken = jwt.verify(token, 'RANDOM_TOKEN_SECRET');
     const userId = decodedToken.userId;
 
-    const user = await User.findById(userId);
+    const user = await luser.findById(userId);
     if (user) {
       req.auth = {
         userId: userId,
@@ -22,7 +24,7 @@ module.exports.authMiddleware = async (req, res, next) => {
       return res.status(401).json({ error: "L'utilisateur n'existe pas" });
     }
   } catch (error) {
-    console.error(error); // Log the error for debugging purposes
+    console.error(error); 
     return res.status(401).json({ error: "Erreur de token: " + error.message });
   }
 };
