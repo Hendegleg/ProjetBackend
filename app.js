@@ -18,7 +18,7 @@ const concertRoutes=require('./routes/concert')
 const programmeRoutes=require('./routes/programme')
 const userRoutes=require('./routes/utilisateur')
 const pupitreRoutes=require('./routes/pupitre')
-
+const eliminationRoutes=require('./routes/elimination')
 
 mongoose
 .connect(
@@ -58,6 +58,7 @@ app.use("/api/concerts",concertRoutes)
 app.use("/api/programme",programmeRoutes)
 app.use("/api/users",userRoutes)
 app.use("/api/pupitre",pupitreRoutes)
+app.use('/api/elimination',eliminationRoutes)
 module.exports = app;
 
 

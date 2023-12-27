@@ -7,9 +7,11 @@ const absenceElemination=require('../controllers/absenceElemination')
 router.post('/createrequest', absenceController.createAbsenceRequest);
 router.get('/getabsence/:id', absenceController.getAbsenceRequestsByUser);
 
-
-router.get('/nomines',absenceElemination.getChoristesNominés)
+//EliminationNomination
+router.get('/nomines',absenceElemination.getChoristesNominés,absenceElemination.envoyermailnominé)
 router.get('/elimine',absenceElemination.getChoristesÉliminés)
 router.get('/getChoristedepasseseuil/:seuil',absenceElemination.getChoristedepasseseuil)
+router.get('/gestionAbsencesExcessives/:seuil',absenceElemination.gestionAbsencesExcessives,absenceElemination.envoyermailnominé)
+
 
 module.exports = router;

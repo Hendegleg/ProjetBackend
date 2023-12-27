@@ -4,9 +4,9 @@ const Absence = require('../models/absence');
 
 const getAllAbsences = async () => {
     try {
-      const absence = await Absence.find({}); // Utilisation de find() sans critère pour récupérer toutes les absences
+      const absence = await Absence.find({approved}); 
       
-      return absence; // Retourner toutes les absences
+      return absence; 
     } catch (error) {
       console.error(error);
       throw new Error('Erreur lors de la récupération de toutes les absences.');
@@ -17,21 +17,43 @@ const getAllAbsences = async () => {
     try {
       const seuil = req.params.seuil; 
   
-      // Récupérer toutes les absences
-      const allAbsences = await getAllAbsences();
+      const choristes = await User.find({}); 
   
-      // Filtrer les choristes dépassant le seuil d'absences
-      const choristesDepassantSeuil = allAbsences.filter((absenceRequest) => absenceRequest.absence.length > seuil);
+      const filteredChoristes = await Promise.all(
+        choristes.map(async (choriste) => {
+          if (choriste.absencecount > seuil) {
+            // Éliminer le choriste pour absences excessives
+            choriste.elimination = 'elimine';
+            choriste.eliminationReason = `Dépassement du taux d'absences (${choriste.absence} absences)`;
+            await choriste.save();
   
-      if (choristesDepassantSeuil.length === 0) {
-        return res.status(404).json({ success: false, message: 'Aucun choriste ne dépasse le seuil d\'absences défini.' });
+            return {
+              _id: choriste._id,
+              nom: choriste.nom,
+              prenom: choriste.prenom,
+              email: choriste.email,
+              eliminationReason: choriste.eliminationReason,
+            };
+          }
+          return null;
+        })
+      );
+  
+      const choristesElimines = filteredChoristes.filter(choriste => choriste !== null);
+      if (choristesElimines.length === 0) {
+        return res.status(200).json({ message: 'Aucun choriste ne dépasse le seuil d\'absences.' });
       }
   
-      res.status(200).json({ success: true, choristesDepassantSeuil });
+      res.status(200).json(choristesElimines);
     } catch (error) {
-      res.status(500).json({ success: false, error: error.message });
+      console.error('Erreur lors de la gestion des choristes par élimination pour absences excessives :', error.message);
+      res.status(500).json({ error: 'Erreur lors de la gestion des choristes par élimination pour absences excessives' });
     }
   };
+
+
+
+  
   const envoyermailnominé = async (email, subject, message) => {
           
     const transporter = nodemailer.createTransport({
@@ -39,8 +61,8 @@ const getAllAbsences = async () => {
       port: 465, 
       secure: true, 
       auth: {
-          user: "wechcrialotfi@gmail.com", 
-          pass: "vqbs baba usst djrw", 
+          user: "ttwejden@gmail.com", 
+          pass: "vxcn ynmf ovcp gwij", 
       },
   });
   
@@ -50,7 +72,7 @@ const getAllAbsences = async () => {
       to: email, 
       subject: subject, 
       text: message, 
-      // html: '<p>vous êtes absents 2 fois veuillez expliquer</p>', //
+      // html: '<p>vous êtes nominés d'être éliminés veuillez expliquer</p>', //
     };
   
     try {
@@ -62,49 +84,155 @@ const getAllAbsences = async () => {
       throw new Error('Erreur lors de l\'envoi de l\'e-mail au choriste nominé.');
     }
   };
+  //envoi notification NOMINATION
 
-const seuil = 2;
-const gestionAbsencesExcessives = async () => {
-  try {
-    
-    const tousLesChoristes = await User.find({ role: 'choriste' }).populate('absence');
-    for (const choriste of tousLesChoristes) {
-      if (choriste.absence.length > seuil) {
-        // Si le choriste dépasse le seuil d'absences, le marquer comme "nominé"
-        choriste.elimination = 'nominé';
-        await choriste.save();
-        await envoyermailnominé(choriste.email, 'Notification de nomination', 'Vous êtes nominé en raison de vos absences excessives.'); 
+  const gestionAbsencesExcessives = async (req, res) => {
+    try {
+      const seuil = parseInt(req.query.seuil);
+  
+      if (isNaN(seuil)) {
+        return res.status(400).json({ error: 'Le seuil fourni n\'est pas valide.' });
       }
+  
+      const tousLesChoristes = await User.find({ role: 'choriste' });
+      for (const choriste of tousLesChoristes) {
+        if (choriste.absencecount > seuil) {
+          choriste.elimination = 'nomine';
+          await choriste.save();
+          await envoyermailnominé(choriste.email, 'Notification de nomination', 'Vous êtes nominé en raison de vos absences excessives.'); 
+        }
+      }
+  
+      res.status(200).json({ message: 'Traitement des absences effectué avec succès.' });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: 'Erreur lors du traitement des absences.' });
     }
+  };
+  
+
+//envoi notification ELIMINATION
+
+const eliminationExcessiveAbsences = async (req, res) => {
+  const { userId, seuil } = req.body;
+
+  try {
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'Utilisateur non trouvé.' });
+    }
+
+    const absences = user.absencecount;
+    if (absences > seuil) {
+      user.elimination = 'elimine';
+      user.eliminationReason = `Dépassement du taux d'absences (${absences} absences)`;
+      await user.save();
+      const transporter = nodemailer.createTransport({
+        host: "smtp.gmail.com", 
+        port: 465, 
+        secure: true, 
+        auth: {
+            user: "ttwejden@gmail.com", 
+            pass: "vxcn ynmf ovcp gwij", 
+        },
+    });
+
+      const mailOptions = {
+        from: 'ttwejden@gmail.com',
+        to: user.email, 
+        subject: 'Notification d\'élimination pour absences excessives',
+        text: `Bonjour ${user.prenom},\nVous avez été éliminé en raison d'un dépassement du taux d'absences.\nRaison: ${user.eliminationReason}`,
+      };
+
+      transporter.sendMail(mailOptions, (error, info) => {
+        if (error) {
+          console.error('Erreur lors de l\'envoi de l\'e-mail:', error);
+        } else {
+          console.log('E-mail envoyé:', info.response);
+        }
+      });
+
+      return res.status(200).json({ success: true, message: 'Utilisateur éliminé pour absences excessives.' });
+    }
+
+    return res.status(400).json({ success: false, message: 'Le nombre d\'absences est inférieur au seuil requis.' });
   } catch (error) {
     console.error(error);
-    throw new Error('Erreur lors du traitement des absences.');
+    return res.status(500).json({ success: false, error: 'Erreur lors de l\'élimination pour absences excessives.' });
   }
 };
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//liste nominés
+
 const getChoristesNominés = async (req, res, next) => {
   try {
-    const choristesNominés = await User.find({ elimination: 'nomine' });
-    if (choristesNominés.length === 0) {
+    const choristesNominés = await User.find({ elimination: 'nomine' }).select('_id email nom prenom elimination role');
+    const count = choristesNominés.length;
+    //const absencecount =choristesNominés.absencecount;
+
+    if (count === 0 ) {
       return res.status(404).json({ success: false, message: 'Aucun choriste nominé trouvé.' });
     }
-    res.status(200).json({ success: true, data: choristesNominés });
+
+    res.status(200).json({ success: true, count, data: choristesNominés });
   } catch (error) {
     console.error(error);
     res.status(500).json({ success: false, error: 'Erreur lors de la récupération des choristes nominés.' });
   }
 };
 
+//liste eliminés
+
 const getChoristesÉliminés = async (req, res, next) => {
   try {
-    const choristesÉliminés = await User.find({ elimination: 'elimine' });
-    if (choristesÉliminés.length === 0) {
+    const choristesÉliminés = await User.find({ elimination: 'elimine' }).select('_id email nom prenom elimination role');
+    const count = choristesÉliminés.length;
+
+    if (count === 0) {
       return res.status(404).json({ success: false, message: 'Aucun choriste éliminé trouvé.' });
     }
-    res.status(200).json({ success: true, data: choristesÉliminés });
+
+    res.status(200).json({ success: true, count, data: choristesÉliminés });
   } catch (error) {
     console.error(error);
     res.status(500).json({ success: false, error: 'Erreur lors de la récupération des choristes éliminés.' });
+  }
+};
+
+
+//discipline
+
+const eliminationDiscipline = async (req, res) => {
+  const { userId, reason } = req.body; 
+  
+  try {
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'Utilisateur non trouvé.' });
+    }
+
+    user.elimination = 'elimine';
+    user.eliminationReason = `Raison disciplinaire: ${reason}`;
+    await user.save();
+
+    return res.status(200).json({ success: true, message: 'Utilisateur éliminé pour raison disciplinaire.' });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ success: false, error: 'Erreur lors de l\'élimination pour raison disciplinaire.' });
   }
 };
 
@@ -116,7 +244,9 @@ const getChoristesÉliminés = async (req, res, next) => {
     gestionAbsencesExcessives,
     envoyermailnominé ,
     getChoristesNominés,
-    getChoristesÉliminés
+    getChoristesÉliminés,
+    eliminationDiscipline,
+    eliminationExcessiveAbsences
 
     
   };
