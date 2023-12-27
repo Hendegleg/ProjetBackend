@@ -1,5 +1,10 @@
-const nodemailer = require('nodemailer');
+
 const Candidat = require('../models/candidat');
+const nodemailer = require('nodemailer');
+const jwt = require('jsonwebtoken');
+
+const Verifmail = require("../models/verifmail");
+
 
 
 // gat_all

@@ -2,9 +2,11 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const Verifmail = require('./verifmail');
 
+
 const candidatSchema = new Schema({
     nom: { type: String, required: true },
-    prenom: { type: String, required: true },
+    prenom : { type: String, required: true },
+
     nom_jeune_fille: { type: String, required: true },
     sexe:{ type: String, required: true },
     nationalite : { type: String, },
@@ -27,6 +29,7 @@ const candidatSchema = new Schema({
    
 });
 
-const Candidat= mongoose.model('Candidat', candidatSchema);
+
+const Candidat = mongoose.model('Candidat', candidatSchema);
 
 module.exports = Candidat;

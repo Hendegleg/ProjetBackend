@@ -13,8 +13,7 @@ const declareLeave = async (req, res) => {
       return res.status(404).json({ message: 'Utilisateur non trouvé' }); 
     }
     user.demandeConge = true;
-    user.conge = "enattente";
- 
+    user.conge = "enattente"
     user.dateDebutConge = startDate;
     user.dateFinConge = endDate;
     

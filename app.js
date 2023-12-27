@@ -1,4 +1,6 @@
 const express = require("express");
+const cron = require('node-cron');
+
 require('dotenv').config();
 
 const mongoose = require("mongoose");
@@ -14,10 +16,12 @@ const authRoutes = require ('./routes/auth');
 const AbsenceRoutes = require ('./routes/absenceRequest')
 const tessitureRoutes = require ('./routes/tessiture')
 const saisonRoutes = require ('./routes/saison')
+const pupitreRoutes = require ('./routes/pupitre')
+const repetitioncontroller = require ('./controllers/repetition')
+cron.schedule('08 19 * * *', repetitioncontroller.envoyerNotificationChoristes);
 const concertRoutes=require('./routes/concert')
 const programmeRoutes=require('./routes/programme')
 const userRoutes=require('./routes/utilisateur')
-const pupitreRoutes=require('./routes/pupitre')
 const eliminationRoutes=require('./routes/elimination')
 
 mongoose

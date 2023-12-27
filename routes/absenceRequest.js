@@ -4,12 +4,14 @@ const absenceController = require('../controllers/absencerequest');
 const absenceElemination=require('../controllers/absenceElemination')
 
 
+
 router.post('/createrequest', absenceController.createAbsenceRequest);
 router.get('/getabsence/:id', absenceController.getAbsenceRequestsByUser);
 
-//EliminationNomination
-router.get('/nomines',absenceElemination.getChoristesNominés,absenceElemination.envoyermailnominé)
-router.get('/elimine',absenceElemination.getChoristesÉliminés)
+router.post('/', absenceController.createAbsence);
+router.get("/getparticipants/:repetitionId/:tessiture", absenceController.getChoristesByRepetitionAndPupitre);
+
+
 router.get('/getChoristedepasseseuil/:seuil',absenceElemination.getChoristedepasseseuil)
 router.get('/gestionAbsencesExcessives/:seuil',absenceElemination.gestionAbsencesExcessives,absenceElemination.envoyermailnominé)
 

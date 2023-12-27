@@ -34,6 +34,62 @@ const assignLeadersToPupitre = async (req, res) => {
     }
 };
 
+
+
+const createPupitre = async (req, res) => {
+    try {
+      const { num_pupitre, tessiture, besoin , choristes , leaders } = req.body;
+  
+      const newPupitre = new Pupitre({
+        num_pupitre,
+        tessiture,
+        besoin,
+        choristes,
+        leaders,
+      });
+  
+      const savedPupitre = await newPupitre.save();
+  
+      res.status(201).json(savedPupitre);
+    } catch (error) {
+      console.error('Erreur lors de la création du pupitre :', error.message);
+      res.status(500).json({ error: `Erreur lors de la création du pupitre : ${error.message}` });
+    }
+  };
+  const updatePupitreById = async (req, res) => {
+    try {
+      const pupitreId = req.params.id;
+      const { num_pupitre, tessiture, besoin, choristes, leaders } = req.body;
+  
+      // Vérifiez si le pupitre existe
+      const existingPupitre = await Pupitre.findById(pupitreId);
+  
+      if (!existingPupitre) {
+        return res.status(404).json({ error: 'Pupitre non trouvé' });
+      }
+  
+      // Mettez à jour les champs du pupitre
+      existingPupitre.num_pupitre = num_pupitre;
+      existingPupitre.tessiture = tessiture;
+      existingPupitre.besoin = besoin;
+      existingPupitre.choristes = choristes;
+      existingPupitre.leaders = leaders;
+  
+      // Sauvegardez les modifications
+      const updatedPupitre = await existingPupitre.save();
+  
+      res.status(200).json(updatedPupitre);
+    } catch (error) {
+      console.error('Erreur lors de la mise à jour du pupitre :', error.message);
+      res.status(500).json({ error: `Erreur lors de la mise à jour du pupitre : ${error.message}` });
+    }
+  };
+  
+
+  
+
 module.exports = {
     assignLeadersToPupitre,
+    createPupitre,
+    updatePupitreById,
 };

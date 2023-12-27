@@ -1,14 +1,21 @@
 const jwt = require('jsonwebtoken');
-const User = require('../controllers/utilisateur'); 
+//const User = require('../models/utilisateurs');
+const User = require('../controllers/utilisateurs');
+
+
 
 const authMiddleware = async (req, res, next) => {
   try {
     const token = req.headers.authorization.split(' ')[1];
+
+    if (!token) {
+      return res.status(401).json({ error: "Token non fourni" });
+    }
+
     const decodedToken = jwt.verify(token, 'RANDOM_TOKEN_SECRET');
     const userId = decodedToken.userId;
 
     const user = await User.findById(userId); 
-
     if (user) {
       req.auth = {
         userId: userId,
@@ -19,6 +26,8 @@ const authMiddleware = async (req, res, next) => {
       res.status(401).json({ error: "L'utilisateur n'existe pas" });
     }
   } catch (error) {
+    console.error(error); // Log the error for debugging purposes
+    res.status(401).json({ error: "Erreur de token: " + error.message });
     res.status(401).json({ error: "Erreur de token" });
   }
 };
@@ -45,7 +54,7 @@ const isChoriste = (req, res, next) => {
     res.status(401).json({ error: error.message });
   }
 };
-const ischefpupitre = (req, res, next) => {
+module.exports.ischefpupitre = (req, res, next) => {
   try {
     if (req.auth.role === 'chef de pupitre') {
       next();
@@ -73,7 +82,6 @@ module.exports={
   authMiddleware,
   isAdmin,
   isChoriste,
-  ischefpupitre ,
   ismanagerChoeur
 
 
