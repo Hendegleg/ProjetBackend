@@ -2,7 +2,6 @@ const express = require("express");
 const cron = require('node-cron');
 
 require('dotenv').config();
-
 const mongoose = require("mongoose");
 const auditionRoutes = require("./routes/audition");
 const repetitionRoutes = require("./routes/repetition");
@@ -11,6 +10,9 @@ const oeuvreRoutes= require ("./routes/oeuvre");
 const candidatRoutes=require ("./routes/candidat");
 const formulaireRoutes = require ("./routes/formulaire")
 const congeRoutes = require('./routes/conge');
+
+const concertsRoutes= require('./routes/concert.js')
+const qrcodeRoutes = require('./routes/qrcode');
 const filtragecandidatRoutes= require('./routes/filtragecandidats.js')
 const authRoutes = require ('./routes/auth');
 const AbsenceRoutes = require ('./routes/absenceRequest')
@@ -55,9 +57,11 @@ app.use("/api/oeuvres", oeuvreRoutes);
 app.use("/api/repetitions", repetitionRoutes);
 app.use('/api/gerer', gererRoutes);
 app.use('/api/conge', congeRoutes);
-app.use('/api/auth', authRoutes);
-app.use('/api/absence', AbsenceRoutes)
-app.use('/api/tessiture', tessitureRoutes);
+
+//app.use('/confirmation', confirmationRoutes);
+//app.use('/qrcode', qrcodeRoutes);
+
+;
 app.use('/api/saisons', saisonRoutes);
 app.use("/api/concerts",concertRoutes)
 app.use("/api/programme",programmeRoutes)

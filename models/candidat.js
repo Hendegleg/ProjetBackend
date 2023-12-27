@@ -24,8 +24,11 @@ const candidatSchema = new Schema({
     estConfirme : {type: Boolean, default : false },
     signature : {type: Boolean, default : false },
     estEngage: {type: Boolean, default : false },
-    
-    token : {type: String}
+    estPresent: { type: Boolean, default: false },
+    // decisioneventuelle :{ type: String,
+    //     enum:["retenu","en attente","refuse"]
+    // , default:"en attente"},
+    token : {type: String},
    
 });
 
