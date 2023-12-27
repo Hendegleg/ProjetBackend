@@ -32,7 +32,7 @@ const getAbsenceRequestsByUser = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
-exports.createAbsence = async (req, res) => {
+const createAbsence = async (req, res) => {
   try {
     const { user, status, reason, repetition, concert, approved } = req.body;
 
@@ -58,7 +58,7 @@ exports.createAbsence = async (req, res) => {
 
 
 
-exports.getChoristesByRepetitionAndPupitre = async (req, res) => {
+const getChoristesByRepetitionAndPupitre = async (req, res) => {
   try {
     const repetitionId = req.params.repetitionId;
     const tessiture = req.params.tessiture;
@@ -113,5 +113,8 @@ exports.getChoristesByRepetitionAndPupitre = async (req, res) => {
 
 module.exports={
   createAbsenceRequest,
-  getAbsenceRequestsByUser
+  getAbsenceRequestsByUser,
+  getChoristesByRepetitionAndPupitre,
+  createAbsence
+
 }

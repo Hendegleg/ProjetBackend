@@ -18,6 +18,7 @@ const tessitureRoutes = require ('./routes/tessiture')
 const saisonRoutes = require ('./routes/saison')
 const pupitreRoutes = require ('./routes/pupitre')
 const repetitioncontroller = require ('./controllers/repetition')
+
 cron.schedule('08 19 * * *', repetitioncontroller.envoyerNotificationChoristes);
 const concertRoutes=require('./routes/concert')
 const programmeRoutes=require('./routes/programme')
