@@ -4,7 +4,7 @@ const nodemailer = require('nodemailer');
 const Repetition = require("../models/repetition");
 
 const fetchRepetitions = (req, res) => {
-  try{
+  
   Repetition.find()
     .then((repetitions) => {
       res.status(200).json({
@@ -19,7 +19,6 @@ const fetchRepetitions = (req, res) => {
       });
     });
 }
-};
 
 const addRepetition = async (req, res) => {
   try {

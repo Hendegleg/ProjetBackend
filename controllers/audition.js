@@ -4,14 +4,7 @@ const Candidat = require('../models/candidat');
 const nodemailer = require('nodemailer')
 const moment = require('moment');
 
-const getAudition = async (req, res) => {
-  try {
-    const audition = await Audition.find(req.params).populate('candidat');
-    res.json(audition);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-};
+
 
 
 const createAudition = async (req, res) => {

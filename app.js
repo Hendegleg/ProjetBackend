@@ -57,11 +57,13 @@ app.use("/api/oeuvres", oeuvreRoutes);
 app.use("/api/repetitions", repetitionRoutes);
 app.use('/api/gerer', gererRoutes);
 app.use('/api/conge', congeRoutes);
+app.use('/api/absence',AbsenceRoutes)
+app.use('/api/tessiture',tessitureRoutes)
 
 //app.use('/confirmation', confirmationRoutes);
 //app.use('/qrcode', qrcodeRoutes);
-
-;
+app.use('/api/auth',authRoutes)
+app.use('/api/concert',concertsRoutes);
 app.use('/api/saisons', saisonRoutes);
 app.use("/api/concerts",concertRoutes)
 app.use("/api/programme",programmeRoutes)
