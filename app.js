@@ -14,6 +14,17 @@ const authRoutes = require ('./routes/auth');
 const AbsenceRoutes = require ('./routes/absenceRequest')
 const tessitureRoutes = require ('./routes/tessiture')
 const intervenantRoutes = require ('./routes/intervenants')
+const cron = require('node-cron');
+const {io}=require("./socket.js");
+const { notifiercongechoriste }= require('./controllers/conge.js')
+cron.schedule('54 10 * * *', async () => {
+  const liste = await notifiercongechoriste();
+
+  if (liste) {
+  
+    io.emit("notif-6582068777dd44c527da3a08", { message: "Demandes de congé des choristes", liste });
+  }
+});
 
 mongoose
 .connect(

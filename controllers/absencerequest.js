@@ -38,8 +38,8 @@ exports.informerAbsence = (req, res) => {
       eventObj = event;
 
       const absenceRequest = new AbsenceRequest({
-        user: userObj._id, // Utilisation de l'ID de l'utilisateur
-        nom: userObj.nom, // Utilisation du champ 'nom' de l'utilisateur
+        user: userObj._id,
+        nom: userObj.nom, 
         status: 'absent',
         reason: reason,
         repetition: eventType === 'repetition' ? event._id : null,
