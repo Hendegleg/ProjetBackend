@@ -317,6 +317,20 @@ const createAudition = async (req, res) => {
       console.error(`Erreur lors de l'envoi de l'e-mail à ${candidat.email}:`, error.message);
     }
   };
+  const generateAndSendAuditionPlan = async (req, res) => {
+    try {
+      // ... existing code to generate audition planning
+  
+      // Send emails and generate links for follow-up
+      await sendAuditionEmails(candidats);
+  
+      res.status(200).json({ success: true, data: planning });
+    } catch (error) {
+      console.error('Error generating audition plan:', error.message);
+      res.status(500).json({ success: false, error: error.message });
+    }
+  };
+  
   
   
  
@@ -331,6 +345,6 @@ const createAudition = async (req, res) => {
     getAuditionById,
     genererPlanification,
     generateAndSendAuditionPlan,
-    createAuditionsForCandidats,
-    generateAndSendAuditionPlan,
+    
+   
   };

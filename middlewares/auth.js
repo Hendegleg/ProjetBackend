@@ -50,7 +50,8 @@ const checkRole = (allowedRoles) => {
   };
 };
 
-
+module.exports = {
+  authMiddleware}
 module.exports.isAdmin = checkRole(['admin']);
 module.exports.isChoriste = checkRole(['choriste']);
 module.exports.ischefpupitre = checkRole(['chef de pupitre']);

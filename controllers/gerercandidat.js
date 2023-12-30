@@ -69,7 +69,7 @@ exports.getListeCandidatsParPupitre = async (req, res) => {
   };
   
 
-  exports.confirmerPresence = (req, res) => {
+exports.confirmerPresence = (req, res) => {
     const { token } = req.query;
 
     Candidat.findOne({ token })

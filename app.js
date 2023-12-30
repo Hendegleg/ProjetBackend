@@ -10,15 +10,18 @@ const oeuvreRoutes= require ("./routes/oeuvre");
 const candidatRoutes=require ("./routes/candidat");
 const formulaireRoutes = require ("./routes/formulaire")
 const congeRoutes = require('./routes/conge');
-
-const concertsRoutes= require('./routes/concert.js')
+const saisonRoutes = require('./routes/saison.js');
+const concertsRoutes = require('./routes/concert.js');
 const qrcodeRoutes = require('./routes/qrcode');
+const userRoutes = require('./routes/utilisateur.js')
 const filtragecandidatRoutes= require('./routes/filtragecandidats.js')
 const authRoutes = require ('./routes/auth');
 const AbsenceRoutes = require ('./routes/absenceRequest')
 const tessitureRoutes = require ('./routes/tessiture')
 const intervenantRoutes = require ('./routes/intervenants')
-const cron = require('node-cron');
+const programmeRoutes= require('./routes/programme.js')
+const pupitreRoutes = require('./routes/pupitre.js')
+const eliminationRoutes = require ('./routes/elimination.js')
 const {io}=require("./socket.js");
 const { notifiercongechoriste }= require('./controllers/conge.js')
 cron.schedule('54 10 * * *', async () => {
@@ -66,13 +69,13 @@ app.use('/api/tessiture',tessitureRoutes)
 //app.use('/confirmation', confirmationRoutes);
 //app.use('/qrcode', qrcodeRoutes);
 app.use('/api/auth',authRoutes)
-app.use('/api/concert',concertsRoutes);
+app.use('/api/concert', concertsRoutes);
 app.use('/api/saisons', saisonRoutes);
-app.use("/api/concerts",concertRoutes)
 app.use("/api/programme",programmeRoutes)
 app.use("/api/users",userRoutes)
 app.use("/api/pupitre",pupitreRoutes)
 app.use('/api/elimination',eliminationRoutes)
+app.use('/api/intervenant',intervenantRoutes)
 module.exports = app;
 
 
