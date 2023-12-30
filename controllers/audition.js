@@ -88,6 +88,7 @@ const updateAudition = async (req, res) => {
   const deleteAudition = async (req, res) => {
   
 const deleteAudition = async (req, res) => {
+const deleteAudition = async (req, res) => {
     try {
       const { id } = req.params;
       const audition = await Audition.findById(id);
@@ -106,7 +107,7 @@ const deleteAudition = async (req, res) => {
 
 
 
-  const lancerEvenementAudition = async (req, res) => {
+const lancerEvenementAudition = async (req, res) => {
     try {
         const { Date_debut_Audition, nombre_séance, dureeAudition, Date_fin_Audition, lienFormulaire } = req.body;
 
@@ -323,10 +324,10 @@ const deleteAudition = async (req, res) => {
   
  
   module.exports = {
-    createAudition ,
-    getAuditionById,
-    updateAudition,
     deleteAudition,
+    updateAudition,
+    createAudition ,
+    getAuditionById ,
     genererPlanification,
     lancerEvenementAudition ,
     getAudition,

@@ -7,7 +7,7 @@ const RepetitionSchema = new Schema({
     heureDebut: { type: String, required: true }, 
     heureFin: { type: String, required: true }, 
     lieu: { type: String, required: true },
-    participant: { type: String, required: true },
+    participant: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }], 
     nbr_repetition: { type: Number, required: true },
     // pourcentagesPupitres: [{
     //     pupitre: { type: mongoose.Schema.Types.ObjectId, ref: 'Pupitre' },

@@ -1,4 +1,6 @@
 const express = require("express");
+const cron = require('node-cron');
+
 require('dotenv').config();
 const mongoose = require("mongoose");
 const auditionRoutes = require("./routes/audition");
@@ -15,6 +17,11 @@ const filtragecandidatRoutes= require('./routes/filtragecandidats.js')
 const authRoutes = require ('./routes/auth');
 const AbsenceRoutes = require ('./routes/absenceRequest')
 const tessitureRoutes = require ('./routes/tessiture')
+const saisonRoutes = require ('./routes/saison')
+const pupitreRoutes = require ('./routes/pupitre')
+const repetitioncontroller = require ('./controllers/repetition')
+cron.schedule('08 19 * * *', repetitioncontroller.envoyerNotificationChoristes);
+
 
 mongoose
 .connect(
@@ -50,6 +57,10 @@ app.use('/api/conge', congeRoutes);
 
 //app.use('/confirmation', confirmationRoutes);
 //app.use('/qrcode', qrcodeRoutes);
+
+;
+app.use('/api/saisons', saisonRoutes);
+app.use('/api/pupitres', pupitreRoutes);
 
 
 

@@ -1,9 +1,12 @@
 const cron = require('node-cron');
+const { CronJob } = require('cron');
 const nodemailer = require('nodemailer');
 const Repetition = require("../models/repetition");
 const Absence = require('../models/absence');
 const QRCode = require('qrcode');
 const User = require('../models/utilisateurs');
+const AbsenceRequest = require('../models/absence'); // Assurez-vous de fournir le chemin correct
+
 const mongoose = require ('mongoose');
 
 const fetchRepetitions = (req, res) => {
@@ -142,31 +145,12 @@ const generatePupitreList = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
-const confirmerpresenceRepetition = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const repetition = await Repetition.findById(id);
 
-    if (!repetition) {
-      return res.status(404).json({ message: "Répétition non trouvée!" });
-    } else {
-      const { userid } = req.body;
-      const absence = await Absence.create({
-        user: userid,
-        status: "present",
-        repetition: id
-      });
 
-      if (!absence) {
-        return res.status(404).json({ message: "Présence échouée" });
-      } else {
-        return res.status(200).json({ message: "Présence enregistrée" });
-      }
-    }
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
-}
+
+
+
+
 
 
 
@@ -210,7 +194,6 @@ const envoyerNotificationChoristes = async () => {
                       Heure de début : ${repetitionsDans24h[0].heureDebut}
                       Heure de fin : ${repetitionsDans24h[0].heureFin}
                       Lieu : ${repetitionsDans24h[0].lieu}
-                      Participants : ${repetitionsDans24h[0].participant}
 
                       Merci et à bientôt !
                   `;
@@ -240,7 +223,8 @@ cron.schedule('0 12 * * *', async () => {
   console.log('Tâche cron exécutée.');
 });
 
-//envoyerNotificationChoristes();
+
+
 
 
 module.exports = {
@@ -250,5 +234,5 @@ module.exports = {
   updateRepetition: updateRepetition,
   deleteRepetition: deleteRepetition,
   generatePupitreList: generatePupitreList,
-  confirmerpresenceRepetition: confirmerpresenceRepetition,
+  envoyerNotificationChoristes,
 };
