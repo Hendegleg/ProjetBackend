@@ -10,7 +10,9 @@ const moment = require('moment');
 const createAudition = async (req, res) => {
   try {
     const {
-      DateAudition,
+      heure_debut,
+      heure_fin ,
+      date_audition,
       nombre_séance,
       dureeAudition,
       candidat,
@@ -27,7 +29,9 @@ const createAudition = async (req, res) => {
     }
 
     const nouvelleAudition = new Audition({
-      DateAudition,
+      heure_debut,
+      heure_fin ,
+      date_audition,
       nombre_séance,
       dureeAudition,
       candidat,

@@ -7,7 +7,7 @@ const UserSchema = new Schema({
     prenom: { type: String},
     email: {
         type: String,
-        requiràed: true,
+        required: true,
         unique: true,
         validate: {
             validator: function (v) {

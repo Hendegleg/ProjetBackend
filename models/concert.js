@@ -5,7 +5,6 @@ const concertSchema = new Schema({
     
     presence: {
         type: Boolean,
-        
     },
     date: { type: Date, required: true },
 
