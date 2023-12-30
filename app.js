@@ -17,19 +17,22 @@ const filtragecandidatRoutes= require('./routes/filtragecandidats.js')
 const authRoutes = require ('./routes/auth');
 const AbsenceRoutes = require ('./routes/absenceRequest')
 const tessitureRoutes = require ('./routes/tessiture')
-const saisonRoutes = require ('./routes/saison')
-const pupitreRoutes = require ('./routes/pupitre')
-const repetitioncontroller = require ('./controllers/repetition')
+const intervenantRoutes = require ('./routes/intervenants')
+const cron = require('node-cron');
+const {io}=require("./socket.js");
+const { notifiercongechoriste }= require('./controllers/conge.js')
+cron.schedule('54 10 * * *', async () => {
+  const liste = await notifiercongechoriste();
 
-cron.schedule('08 19 * * *', repetitioncontroller.envoyerNotificationChoristes);
-const concertRoutes=require('./routes/concert')
-const programmeRoutes=require('./routes/programme')
-const userRoutes=require('./routes/utilisateur')
-const eliminationRoutes=require('./routes/elimination')
+  if (liste) {
+  
+    io.emit("notif-6582068777dd44c527da3a08", { message: "Demandes de congé des choristes", liste });
+  }
+});
 
 mongoose
 .connect(
-     "mongodb://127.0.0.1:27017/database",
+     "mongodb://127.0.0.1:27017/DS",
    { /*useNewUrlParser: true, useUnifiedTopology: true*/}
 )
 .then(()=>console.log("connexion a mongoDB reussite"))

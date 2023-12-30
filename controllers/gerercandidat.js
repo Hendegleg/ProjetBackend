@@ -7,7 +7,7 @@ const User = require('../models/utilisateurs');
 const bcrypt = require('bcrypt');
 const uuid = require('uuid');
 function generateUniqueToken() {
-    return uuid.v4(); // Génère un identifiant UUID v4 aléatoire
+    return uuid.v4(); 
 }
 
 
@@ -19,117 +19,90 @@ const transporter = nodemailer.createTransport({
         pass: process.env.EMAIL_PASSWORD
     }
 });
-
 exports.getListeCandidatsParPupitre = async (req, res) => {
     try {
-        const besoinPupitres = req.body; 
-
-        const candidatsParDecision = await Audition.find({ decisioneventuelle: { $in: ["retenu", "en attente", "refuse"] } })
-            .populate('candidat');
-        const candidatsParPupitre = {
-            Soprano: [],
-            Alto: [],
-            Ténor: [],
-            Basse: []
-        };
-
-        candidatsParDecision.forEach(audition => {
-            if (audition.candidat) {
-                const candidat = audition.candidat;
-                switch (audition.tessiture) {
-                    case 'Soprano':
-                        if (besoinPupitres.Soprano > 0) {
-                            candidatsParPupitre.Soprano.push({
-                                nom: candidat.nom,
-                                prenom: candidat.prenom,
-                                decisioneventuelle: audition.decisioneventuelle
-                            });
-                            besoinPupitres.Soprano--;
-                        }
-                        break;
-                    case 'Alto':
-                        if (besoinPupitres.Alto > 0) {
-                            candidatsParPupitre.Alto.push({
-                                nom: candidat.nom,
-                                prenom: candidat.prenom,
-                                decisioneventuelle: audition.decisioneventuelle
-                            });
-                            besoinPupitres.Alto--;
-                        }
-                        break;
-                    case 'Ténor':
-                        if (besoinPupitres.Ténor > 0) {
-                            candidatsParPupitre.Ténor.push({
-                                nom: candidat.nom,
-                                prenom: candidat.prenom,
-                                decisioneventuelle: audition.decisioneventuelle
-                            });
-                            besoinPupitres.Ténor--;
-                        }
-                        break;
-                    case 'Basse':
-                        if (besoinPupitres.Basse > 0) {
-                            candidatsParPupitre.Basse.push({
-                                nom: candidat.nom,
-                                prenom: candidat.prenom,
-                                decisioneventuelle: audition.decisioneventuelle
-                            });
-                            besoinPupitres.Basse--;
-                        }
-                        break;
-                    default:
-                        break;
-                }
-            }
-        });
-        return res.status(200).json(candidatsParPupitre);
+      const besoinPupitres = req.body;
+  
+      const auditions = await Audition.find().populate('candidat');
+      const candidatsParPupitre = {
+        Soprano: { retenu: [], 'en attente': [], refuse: [] },
+        Alto: { retenu: [], 'en attente': [], refuse: [] },
+        Ténor: { retenu: [], 'en attente': [], refuse: [] },
+        Basse: { retenu: [], 'en attente': [], refuse: [] }
+      };
+  
+      for (const audition of auditions) {
+        if (audition.candidat) {
+          const candidat = audition.candidat;
+  
+          const candidatData = {
+            nom: candidat.nom,
+            prenom: candidat.prenom,
+            decisioneventuelle: audition.decisioneventuelle
+          };
+  
+          switch (audition.tessiture) {
+            case 'Soprano':
+              candidatsParPupitre.Soprano[candidatData.decisioneventuelle].push(candidatData);
+              break;
+            case 'Alto':
+              candidatsParPupitre.Alto[candidatData.decisioneventuelle].push(candidatData);
+              break;
+            case 'Ténor':
+              candidatsParPupitre.Ténor[candidatData.decisioneventuelle].push(candidatData);
+              break;
+            case 'Basse':
+              candidatsParPupitre.Basse[candidatData.decisioneventuelle].push(candidatData);
+              break;
+            default:
+              break;
+          }
+        }
+      }
+  
+      return res.status(200).json(candidatsParPupitre);
+  
     } catch (error) {
-        console.error('Erreur lors de la récupération des candidats par pupitre :', error);
-        return res.status(500).json({ error: 'Erreur lors de la récupération des candidats par pupitre' });
+      console.error('Erreur lors de la récupération des candidats par pupitre :', error);
+      return res.status(500).json({ error: 'Erreur lors de la récupération des candidats par pupitre' });
     }
-};
+  };
+  
 
-
-
-exports.confirmerPresence = async (req, res) => {
+  exports.confirmerPresence = (req, res) => {
     const { token } = req.query;
 
-    try {
+    Candidat.findOne({ token })
+        .then(async (candidat) => {
         
-        const candidat = await Candidat.findOne({ token });
+            if (!candidat) {
+                return res.status(404).send('Token invalide ou expiré.');
+            }
 
-        if (!candidat) {
-            return res.status(404).send('Token invalide ou expiré.');
-        }
+            candidat.estConfirme = true;
+            await candidat.save();
 
-        
-        candidat.estConfirme = true;
-        await candidat.save();
-
-        res.send('Confirmation réussie !');
-    } catch (error) {
-        res.status(500).send('Erreur lors de la confirmation.');
-    }
+            res.send('Confirmation réussie !');
+        })
+        .catch((error) => {
+            console.error(error);
+            res.status(500).send('Erreur lors de la confirmation.');
+        });
 };
 
 exports.envoyerEmailAcceptation = async (req, res) => {
     try {
-        const auditions = await Audition.find({ decisioneventuelle: "retenu" });
+        const auditions = await Audition.find({ decisioneventuelle: "retenu" });       
         const candidatsRetenusIds = auditions.map(audition => audition.candidat);
+        let countEmailsSent = 0;
 
         for (const id of candidatsRetenusIds) {
             try {
                 const candidat = await Candidat.findById(id);
 
-                console.log("Candidat trouvé : ", candidat);
-
                 if (!candidat.token) {
                     const token = generateUniqueToken();
                     candidat.token = token;
-                    await candidat.save();
-
-                    console.log("Token enregistré pour le candidat : ", candidat);
-
                     const confirmationLink = `http://votre-domaine.com/confirmation-presence?token=${token}&decision=confirm`;
 
                     const mailOptions = {
@@ -147,19 +120,27 @@ exports.envoyerEmailAcceptation = async (req, res) => {
 
                     await transporter.sendMail(mailOptions);
                     console.log(`Email envoyé à ${candidat.email}`);
-
-                    // Mise à jour des informations du candidat
-                    await Candidat.findByIdAndUpdate(id, { estretenu: true, dateEnvoiEmail: Date.now() });
+                    await candidat.save();
+                    countEmailsSent++;
+                } else {
+                    console.log(`Le candidat ${candidat.nom} a déjà un token. Aucun email envoyé.`);
                 }
             } catch (error) {
                 console.error('Erreur lors du traitement pour le candidat :', error);
             }
         }
 
-        return res.status(200).json({ message: 'le mail et token sont envoyé au candidat ' });
+        let message = '';
+        if (countEmailsSent > 0) {
+            message = `Les e-mails et tokens ont été envoyés à ${countEmailsSent} candidat(s) sans token existant.`;
+        } else {
+            message = 'Aucun e-mail envoyé car tous les candidats ont déjà un token.';
+        }
+
+        res.status(200).json({ message });
     } catch (error) {
         console.error('Erreur lors de l\'enregistrement des candidats retenus :', error);
-        return res.status(500).json({ message: 'Erreur lors de l\'enregistrement des candidats retenus.' });
+        res.status(500).json({ message: 'Erreur lors de l\'enregistrement des candidats retenus.' });
     }
 };
 
@@ -187,37 +168,35 @@ const ajouterChoriste = async (candidat, tessiture) => {
     }
 };
 
-exports.envoyerEmailConfirmation = async (req, res) => {
+exports.envoyerEmailConfirmation = async () => {
     try {
-        const candidatId = req.params.id;
-        const candidat = await Candidat.findById(candidatId);
-        const audition = await Audition.findOne({ candidat: candidatId });
-        const tessitureAudition = audition ? audition.tessiture : null;
-        const token = candidat ? candidat.token : null; 
-        
-        const confirmationLink = `http://votre-domaine.com/engagement?token=${token}&confirmation=true`; 
-        
+        const candidat = await Candidat.findOne({ estConfirme: true });
+
         if (!candidat) {
-            throw new Error('Candidat non trouvé');
+            throw new Error('Aucun candidat confirmé trouvé');
         }
+        const audition = await Audition.findOne({ candidat: candidat._id });
+        const tessitureAudition = audition ? audition.tessiture : null;
+        const token = candidat ? candidat.token : null;
 
-        const generatedPassword = await genererMotDePasse(candidatId); // Génération du mot de passe
-        const hashedPassword = await bcrypt.hash(generatedPassword, 10);
-        
-        candidat.motDePasse = hashedPassword;
-        await candidat.save();
-
-        const mailOptions = {
-            from: 'hendlegleg1@gmail.com',
-            to: candidat.email,
-            subject: 'Confirmation d\'inscription',
-            text: `Bonjour ${candidat.nom}, cliquez sur ce lien pour confirmer votre inscription : ${confirmationLink}. Voici votre login : ${candidat.email} et voici votre mot de passe pour accéder à la plateforme : ${generatedPassword}. Vous devez aussi signer la charte du choeur!`,
-        };
+        const confirmationLink = `http://votre-domaine.com/engagement?token=${token}&confirmation=true`;
 
         if (candidat.estConfirme === true) {
+            const generatedPassword = await genererMotDePasse(candidat._id);
+            const hashedPassword = await bcrypt.hash(generatedPassword, 10);
+
+            candidat.motDePasse = hashedPassword;
+            await candidat.save();
+            const mailOptions = {
+                from: 'hendlegleg1@gmail.com',
+                to: candidat.email,
+                subject: 'Confirmation d\'inscription',
+                text: `Bonjour ${candidat.nom}, cliquez sur ce lien pour confirmer votre inscription : ${confirmationLink}. Voici votre login : ${candidat.email} et voici votre mot de passe pour accéder à la plateforme : ${generatedPassword}. Vous devez aussi signer la charte du choeur!`,
+            };
+
             await transporter.sendMail(mailOptions);
             console.log(`Email de confirmation envoyé à ${candidat.email}`);
-            // Vérification et ajout du choriste seulement si le candidat est confirmé et tous les champs nécessaires sont correctement définis
+
             if (candidat.nom && candidat.prenom && candidat.email && candidat.motDePasse && tessitureAudition) {
                 await ajouterChoriste(candidat, tessitureAudition);
             } else {
@@ -225,10 +204,10 @@ exports.envoyerEmailConfirmation = async (req, res) => {
             }
         }
 
-        res.status(200).json({ message: 'Email de confirmation envoyé avec succès' });
+        return { message: 'Email de confirmation envoyé avec succès' };
     } catch (error) {
         console.error('Erreur lors de l\'envoi de l\'email de confirmation :', error);
-        res.status(500).json({ error: 'Erreur lors de l\'envoi de l\'email de confirmation' });
+        return { error: 'Erreur lors de l\'envoi de l\'email de confirmation' };
     }
 };
 
@@ -263,36 +242,13 @@ exports.confirmerEngagement = async (req, res) => {
 
         candidat.estEngage = true;
         await candidat.save();
-        /*if (candidat.nom && candidat.prenom && candidat.email && candidat.motDePasse && tessitureAudition) {
-            await ajouterChoriste(candidat, tessitureAudition);
-        } else {
-            console.error('Les informations nécessaires pour créer un choriste sont incomplètes.');
-        }
-*/
         res.send('Engagement confirmé avec succès !');
     } catch (error) {
         res.status(500).send('Erreur lors de la confirmation de l\'engagement.');
     }
 };
 
-/*
 
-exports.sauvegarderEngagementFinal = async (req, res) => {
-  try {
-    const candidatId = req.params.id;
-    const candidat = await Candidat.findById(candidatId);
-
-    if (!candidat) {
-      return res.status(404).json({ message: 'Candidat non trouvé' });
-    }
-    candidat.estEngage = true;
-    await candidat.save();
-    return res.status(200).json({ message: 'Engagement final sauvegardé avec succès' });
-  } catch (error) {
-    console.error('Erreur lors de la sauvegarde de l\'engagement final :', error);
-    return res.status(500).json({ error: 'Erreur lors de la sauvegarde de l\'engagement final' });
-  }
-};*/
 exports.getListeCandidats = async (req, res) => {
     try {
         const listeCandidats = await Candidat.find({});
@@ -323,7 +279,7 @@ exports.getCandidatsRetenusParPupitre = async (req, res) => {
                         nom: candidat.nom,
                         prenom: candidat.prenom,
                         email: candidat.email,
-                        // Ajoutez d'autres champs nécessaires du candidat si besoin
+                        
                     });
                     break;
                 case 'Alto':
@@ -332,7 +288,7 @@ exports.getCandidatsRetenusParPupitre = async (req, res) => {
                         nom: candidat.nom,
                         prenom: candidat.prenom,
                         email: candidat.email,
-                        // Ajoutez d'autres champs nécessaires du candidat si besoin
+                        
                     });
                     break;
                 case 'Ténor':
@@ -341,7 +297,7 @@ exports.getCandidatsRetenusParPupitre = async (req, res) => {
                         nom: candidat.nom,
                         prenom: candidat.prenom,
                         email: candidat.email,
-                        // Ajoutez d'autres champs nécessaires du candidat si besoin
+                       
                     });
                     break;
                 case 'Basse':
@@ -350,7 +306,7 @@ exports.getCandidatsRetenusParPupitre = async (req, res) => {
                         nom: candidat.nom,
                         prenom: candidat.prenom,
                         email: candidat.email,
-                        // Ajoutez d'autres champs nécessaires du candidat si besoin
+                       
                     });
                     break;
                 default:

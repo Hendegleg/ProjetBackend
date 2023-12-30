@@ -329,6 +329,8 @@ const createAudition = async (req, res) => {
     lancerEvenementAudition ,
     getAudition,
     getAuditionById,
-    genererPlanification
-
-  }
+    genererPlanification,
+    generateAndSendAuditionPlan,
+    createAuditionsForCandidats,
+    generateAndSendAuditionPlan,
+  };

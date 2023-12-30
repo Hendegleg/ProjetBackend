@@ -21,6 +21,10 @@ router.delete('/:id', auditionController.deleteAudition);
 // Route pour générer le planning d'auditions
 router.post('/generer-planning', auditionController.genererPlanification);
 
+
+// Route pour cree les  auditions pour les candidats
+router.post('/creeAuditionsCandidats', auditionController.createAuditionsForCandidats);
+
 // Route to generate and send audition plans
 //router.post('/generateAndSendAuditionPlan', auditionController.generateAndSendAuditionPlan);
 
