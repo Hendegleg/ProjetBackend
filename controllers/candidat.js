@@ -119,7 +119,8 @@ const addEmailCandidat = async (req, res) => {
 
         const url = `http://localhost:5000/api/candidats/${candidat.id}/verify/${token}`;
 
-        const emailSent = await exports.sendEmail(candidat.email, "Verify Email", url);
+        const emailSent = await sendEmail(candidat.email, "Verify Email", url);
+
 
         if (emailSent) {
             return res.status(201).send({ message: "An Email has been sent to your account, please verify" });
@@ -185,6 +186,7 @@ const createCandidat = async (req, res) => {
             taille_en_m,
             nationalite,
             cinpassport,
+            date_naissance,
             situationProfessionnelle,
             activite,
             parraine,
@@ -208,6 +210,7 @@ const createCandidat = async (req, res) => {
             nationalite,
             cinpassport,
             situationProfessionnelle,
+            date_naissance,
             activite,
             parraine,
             choeuramateur,

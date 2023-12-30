@@ -17,7 +17,9 @@ const concertSchema = new Schema({
     ],
     planning : { type:  Schema.Types.ObjectId, ref: 'repetition', required: true },
     nom_concert : { type : String, require : true },
-    placement : {type :Schema.Types.ObjectId, ref : 'Placement' }
+    placement : {type :Schema.Types.ObjectId, ref : 'Placement' },
+    participant: [{ type: Schema.Types.ObjectId, ref: 'User' }] 
+
 
 });
 

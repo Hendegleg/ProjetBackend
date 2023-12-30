@@ -18,7 +18,7 @@ const tessitureRoutes = require ('./routes/tessiture')
 const saisonRoutes = require ('./routes/saison')
 const pupitreRoutes = require ('./routes/pupitre')
 const repetitioncontroller = require ('./controllers/repetition')
-cron.schedule('08 19 * * *', repetitioncontroller.envoyerNotificationChoristes);
+cron.schedule('29 13 * * *', repetitioncontroller.envoyerNotificationChoristes);
 const concertRoutes=require('./routes/concert')
 const programmeRoutes=require('./routes/programme')
 const userRoutes=require('./routes/utilisateur')
@@ -44,6 +44,7 @@ app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, PATCH, OPTIONS");
   next();
 });
+
 
 
 app.use('/api/filtragecandidats', filtragecandidatRoutes);

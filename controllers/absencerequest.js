@@ -1,6 +1,7 @@
 const User = require('../models/utilisateurs');
 const AbsenceRequest = require('../models/absence');
 const Pupitre = require('../models/pupitre');
+const Concert = require('../models/concert');
 
 const createAbsenceRequest = async (req, res) => {
   try {
@@ -32,7 +33,7 @@ const getAbsenceRequestsByUser = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
-exports.createAbsence = async (req, res) => {
+const createAbsence = async (req, res) => {
   try {
     const { user, status, reason, repetition, concert, approved } = req.body;
 
@@ -58,19 +59,17 @@ exports.createAbsence = async (req, res) => {
 
 
 
-exports.getChoristesByRepetitionAndPupitre = async (req, res) => {
+const getChoristesByRepetitionAndPupitre = async (req, res) => {
   try {
     const repetitionId = req.params.repetitionId;
     const tessiture = req.params.tessiture;
 
-    console.log('Recherche des choristes pour la répétition avec l\'ID :', repetitionId);
 
     const choristes = await AbsenceRequest.find({
       repetition: repetitionId,
       status: 'present',
     }).populate('user', '_id nom prenom email');
 
-    console.log('Choristes trouvés :', choristes);
 
     const filteredChoristes = await Promise.all(
       choristes.map(async (absence) => {
@@ -111,7 +110,86 @@ exports.getChoristesByRepetitionAndPupitre = async (req, res) => {
   }
 };
 
+
+
+
+const getChoristesByConcertAndPupitre = async (req, res) => {
+  try {
+    const concertId = req.params.concertId;
+
+    const choristes = await AbsenceRequest.find({
+      concert: concertId,
+      status: 'present',
+    }).populate('user', 'nom prenom _id');
+
+    const pupitres = await Pupitre.find().populate('choristes');
+
+    const utilisateursParPupitre = new Map();
+
+
+    pupitres.forEach((pupitre) => {
+      pupitre.choristes.forEach((choriste) => {
+        utilisateursParPupitre.set(choriste._id.toString(), pupitre.tessiture);
+      });
+    });
+
+    const groupedUsersByPupitre = {};
+    const tauxAbsenceParPupitre = {};
+
+    pupitres.forEach((pupitre) => {
+      const totalMembres = pupitre.choristes.length;
+      const membresAbsents = choristes.filter(
+        (choriste) => choriste.user && utilisateursParPupitre.get(choriste.user._id.toString()) === pupitre.tessiture
+      ).length;
+
+      const tauxAbsence = totalMembres > 0 ? ((membresAbsents / totalMembres) * 100).toFixed(2) + "%" : "0%";
+      tauxAbsenceParPupitre[pupitre.tessiture] = tauxAbsence;
+
+      groupedUsersByPupitre[pupitre.tessiture] = {};
+    });
+    
+
+    choristes.forEach((choriste) => {
+      const utilisateurId = choriste.user._id.toString();
+      const pupitreTessiture = utilisateursParPupitre.get(utilisateurId);
+
+      if (pupitreTessiture) {
+        if (!groupedUsersByPupitre[pupitreTessiture][utilisateurId]) {
+          groupedUsersByPupitre[pupitreTessiture][utilisateurId] = {
+            id: choriste.user._id,
+            nom: choriste.user.nom,
+            prenom: choriste.user.prenom,
+            Nb_presence: 0,
+            Nb_absence: 0,
+          };
+        }
+
+        groupedUsersByPupitre[pupitreTessiture][utilisateurId][choriste.status === 'present' ? 'Nb_presence' : 'Nb_absence']++;
+      }
+    });
+
+
+    Object.keys(groupedUsersByPupitre).forEach((pupitreTessiture) => {
+      const utilisateursArray = Object.values(groupedUsersByPupitre[pupitreTessiture]);
+      utilisateursArray.sort((a, b) => b.Nb_presence - a.Nb_presence);
+      groupedUsersByPupitre[pupitreTessiture] = utilisateursArray;
+    });
+
+    res.status(200).json({
+      "Participants par pupitre": groupedUsersByPupitre,
+      "Taux d'absence par pupitre": tauxAbsenceParPupitre,
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+
+
 module.exports={
   createAbsenceRequest,
-  getAbsenceRequestsByUser
+  getAbsenceRequestsByUser,
+  createAbsence,
+  getChoristesByRepetitionAndPupitre,
+  getChoristesByConcertAndPupitre
 }

@@ -103,7 +103,7 @@ const deleteAudition = async (req, res) => {
 
 
 
-const lancerEvenementAudition = async (req, res) => {
+  const lancerEvenementAudition = async (req, res) => {
     try {
         const { Date_debut_Audition, nombre_séance, dureeAudition, Date_fin_Audition, lienFormulaire } = req.body;
 
@@ -112,7 +112,12 @@ const lancerEvenementAudition = async (req, res) => {
             return res.status(400).json({ error: 'Please provide all required fields.' });
         }
 
-        // Create a new EvenementAudition
+        // Validate if Date_fin_Audition is not before Date_debut_Audition
+        if (new Date(Date_fin_Audition) < new Date(Date_debut_Audition)) {
+            return res.status(400).json({ error: 'The end date cannot be before the start date.' });
+        }
+
+        //  new EvenementAudition
         const newEvenementAudition = new EvenementAudition({
             Date_debut_Audition,
             nombre_séance,
@@ -121,11 +126,13 @@ const lancerEvenementAudition = async (req, res) => {
             lienFormulaire,
         });
 
-        // Save the new EvenementAudition to the database
         await newEvenementAudition.save();
 
-        // Add the email sending logic
+        //  sending email
         const tousLesCandidats = await Candidat.find();
+        if (tousLesCandidats.length === 0) {
+          return res.status(404).json({ error: 'No candidates found in the database.' });
+      }
         const transporter = nodemailer.createTransport({
             service: 'gmail',
             auth: {
@@ -163,7 +170,6 @@ const lancerEvenementAudition = async (req, res) => {
         res.status(500).json({ error: 'Internal Server Error' });
     }
 };
-
 
  
   // tache b 

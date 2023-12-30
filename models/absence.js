@@ -8,7 +8,7 @@ const AbsenceRequestSchema = new Schema({
   reason: { type: String, required: function() { return this.status === 'absent'; } },
  
   repetition: { type: mongoose.Schema.Types.ObjectId, ref: 'repetition' },
-  concert: { type: mongoose.Schema.Types.ObjectId, ref: 'concert'},
+  concert: { type: mongoose.Schema.Types.ObjectId, ref: 'Concert'},
 
   approved: {type: Boolean,default:false},
   absence: [{ type: Date }], 

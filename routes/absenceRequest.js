@@ -10,6 +10,12 @@ router.get('/getabsence/:id', absenceController.getAbsenceRequestsByUser);
 
 router.post('/', absenceController.createAbsence);
 router.get("/getparticipants/:repetitionId/:tessiture", absenceController.getChoristesByRepetitionAndPupitre);
+router.get("/getparticipants/:concertId", absenceController.getChoristesByConcertAndPupitre);
+//router.get("/getparticipants/:concertId", absenceController.getChoristesByConcertAndPupitre);
+
+
+  
+
 
 
 router.get('/getChoristedepasseseuil/:seuil',absenceElemination.getChoristedepasseseuil)
