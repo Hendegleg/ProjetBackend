@@ -2,10 +2,10 @@ const express = require('express');
 const router = express.Router();
 const Auth=require('../middlewares/auth')
 const CongeController = require('../controllers/conge');
-
-router.post('/declareLeave/:id', CongeController.declareLeave);
+const auth = require("../middlewares/auth")
+router.post('/declareLeave/:id',auth.isChoriste, CongeController.declareLeave);
 router.get('/getleave', CongeController.notifiercongechoriste)
-router.post('/sendNotification', CongeController.sendNotification);
+/*router.post('/sendNotification', CongeController.sendNotification);*/
 //tache35
 router.get('/choristesanotifier',CongeController.LeaveNotifications)
 router.post('/modifyLeaveStatus', CongeController.modifyLeaveStatus)

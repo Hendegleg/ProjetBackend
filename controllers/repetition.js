@@ -2,6 +2,8 @@ const cron = require('node-cron');
 const { CronJob } = require('cron');
 const nodemailer = require('nodemailer');
 const Repetition = require("../models/repetition");
+const Pupitre = require('../models/pupitre');
+const User = require('../models/utilisateurs');
 
 const fetchRepetitions = (req, res) => {
   
@@ -20,6 +22,22 @@ const fetchRepetitions = (req, res) => {
     });
 }
 
+const addRepetitionn = async (req, res) => {
+  try {
+    const newRepetition = new Repetition(req.body);
+    await newRepetition.save();
+
+    res.status(200).json({
+      repetition: newRepetition,
+      message: "Répétition ajoutée avec succès",
+    });
+  } catch (error) {
+    res.status(400).json({
+      error: error.message,
+      message: "Échec d'ajout de la répétition",
+    });
+  }
+};
 const addRepetition = async (req, res) => {
   try {
     const newRepetition = new Repetition(req.body);
@@ -106,40 +124,53 @@ const deleteRepetition = (req, res) => {
         });
 };
 const generatePupitreList = async (req, res) => {
-  const { numPupitre } = req.body;
-  let pourcentage;
-
-  if (numPupitre === 1) {
-    pourcentage = Math.floor(Math.random() * 76) + 25;
-  } else {
-    pourcentage = Math.floor(Math.random() * 100) + 1;
-  }
+  const { pourcentagePersonnes } = req.body;
 
   try {
     const repetitions = await Repetition.find();
-    const pupitreList = [];
+    const pupitreInstances = [];
 
-    repetitions.forEach((repetition) => {
-      repetition.pourcentagesPupitres.forEach((pupitre) => {
-        if (pupitre.num_pupitre === numPupitre && pupitre.pourcentage === pourcentage) {
-          const repetitionInfo = {
-            repetitionId: repetition._id,
-            date: repetition.date,
-            lieu: repetition.lieu,
-            heureDebut: repetition.heureDebut,
-            heureFin: repetition.heureFin,
-            repetitionPercentage: pupitre.pourcentage,
-          };
-          pupitreList.push(repetitionInfo);
-        }
-      });
-    });
+    for (const repetition of repetitions) {
+      const pourcentage = pourcentagePersonnes || 100;
 
-    res.status(200).json(pupitreList);
+      for (const pupitre of repetition.pourcentagesPupitres) {
+        const pupitreId = pupitre.pupitre;
+
+        const choristes = await User.find({ role: 'choriste' });
+        const nombreChoristes = Math.ceil((pourcentage / 100) * choristes.length);
+        const selectedChoristes = choristes.slice(0, nombreChoristes).map(choriste => ({
+          _id: choriste._id,
+          nom: choriste.nom,
+          prenom: choriste.prenom,
+        }));
+
+        const repetitionInfo = {
+          repetitionId: repetition._id,
+          date: repetition.date,
+          lieu: repetition.lieu,
+          heureDebut: repetition.heureDebut,
+          heureFin: repetition.heureFin,
+          repetitionPercentage: pourcentage,
+        };
+
+        const newPupitreInstance = {
+          repetitionInfo,
+          pupitreId,
+          selectedChoristes,
+        };
+
+        pupitreInstances.push(newPupitreInstance);
+      }
+    }
+
+    res.status(200).json(pupitreInstances);
   } catch (err) {
+    console.error("Erreur lors de la génération des pupitres :", err);
     res.status(500).json({ message: err.message });
   }
 };
+
+
 const confirmerpresenceRepetition = async (req, res) => {
   try {
     const { id } = req.params;
@@ -165,14 +196,6 @@ const confirmerpresenceRepetition = async (req, res) => {
     res.status(500).json({ success: false, error: error.message });
   }
 }
-
-
-
-
-
-
-
-
 
 const envoyerNotificationChoristes = async () => {
   try {
@@ -255,4 +278,5 @@ module.exports = {
   generatePupitreList: generatePupitreList,
   envoyerNotificationChoristes,
   confirmerpresenceRepetition: confirmerpresenceRepetition,
+  addRepetitionn
 };

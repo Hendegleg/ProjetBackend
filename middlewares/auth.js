@@ -49,12 +49,12 @@ const checkRole = (allowedRoles) => {
     }
   };
 };
-
 module.exports = {
-  authMiddleware}
-module.exports.isAdmin = checkRole(['admin']);
-module.exports.isChoriste = checkRole(['choriste']);
-module.exports.ischefpupitre = checkRole(['chef de pupitre']);
-module.exports.ismanagerChoeur = checkRole(['manager de choeur']);
-module.exports.isAdminOrManager = checkRole(['admin', 'manager de choeur']);
-module.exports.isAll = checkRole(['admin', 'manager de choeur','chef de pupitre','choriste']);
+  authMiddleware,
+  isAdmin: checkRole(['admin']),
+  isChoriste: checkRole(['choriste']),
+  ischefpupitre: checkRole(['chef de pupitre']),
+  ismanagerChoeur: checkRole(['manager de choeur']),
+  isAdminOrManager: checkRole(['admin', 'manager de choeur']),
+  isAll: checkRole(['admin', 'manager de choeur', 'chef de pupitre', 'choriste']),
+};

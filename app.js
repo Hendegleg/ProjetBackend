@@ -22,14 +22,20 @@ const intervenantRoutes = require ('./routes/intervenants')
 const programmeRoutes= require('./routes/programme.js')
 const pupitreRoutes = require('./routes/pupitre.js')
 const eliminationRoutes = require ('./routes/elimination.js')
+const repetitioncontroller = require ('./controllers/repetition')
+const placementController = require('./routes/placement.js')
 const {io}=require("./socket.js");
 const { notifiercongechoriste }= require('./controllers/conge.js')
-cron.schedule('54 10 * * *', async () => {
-  const liste = await notifiercongechoriste();
+cron.schedule('29 13 * * *', repetitioncontroller.envoyerNotificationChoristes);
+cron.schedule('23 22 * * *', async () => {
+  try {
+    const liste = await notifiercongechoriste();
 
-  if (liste) {
-  
-    io.emit("notif-6582068777dd44c527da3a08", { message: "Demandes de congé des choristes", liste });
+    if (liste) {
+      io.emit("notif-6582068777dd44c527da3a08", { message: "Demandes de congé des choristes", liste });
+    }
+  } catch (error) {
+    console.error('Erreur lors de la planification de la tâche cron :', error);
   }
 });
 
@@ -65,9 +71,6 @@ app.use('/api/gerer', gererRoutes);
 app.use('/api/conge', congeRoutes);
 app.use('/api/absence',AbsenceRoutes)
 app.use('/api/tessiture',tessitureRoutes)
-
-//app.use('/confirmation', confirmationRoutes);
-//app.use('/qrcode', qrcodeRoutes);
 app.use('/api/auth',authRoutes)
 app.use('/api/concert', concertsRoutes);
 app.use('/api/saisons', saisonRoutes);
@@ -76,6 +79,7 @@ app.use("/api/users",userRoutes)
 app.use("/api/pupitre",pupitreRoutes)
 app.use('/api/elimination',eliminationRoutes)
 app.use('/api/intervenant',intervenantRoutes)
+app.use('/api/placement', placementController)
 module.exports = app;
 
 

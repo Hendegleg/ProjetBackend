@@ -4,9 +4,6 @@ const Candidat = require('../models/candidat');
 const nodemailer = require('nodemailer')
 const moment = require('moment');
 
-
-
-
 const createAudition = async (req, res) => {
   try {
     const {

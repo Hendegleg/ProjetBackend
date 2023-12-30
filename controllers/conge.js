@@ -10,8 +10,8 @@ const transporter = nodemailer.createTransport({
     pass: process.env.EMAIL_PASSWORD
   }
 });
-
-const envoyerNotificationCongeJob = new CronJob('00 37 10 * * *', async () => {
+//H
+const envoyerNotificationCongeJob = new CronJob('30 08 21 * * *', async () => {
   try {
     console.log('Tâche cron en cours d\'exécution pour l\'envoi de notifications de congé...');
 
@@ -47,7 +47,7 @@ const envoyerNotificationCongeJob = new CronJob('00 37 10 * * *', async () => {
 }, null, true, 'Europe/Paris'); 
 
 envoyerNotificationCongeJob.start();
-
+/*
 const sendNotificationForLeaveRequest = async (req, res) => {
   try {
     const { userId } = req.body;
@@ -76,7 +76,7 @@ const sendNotificationForLeaveRequest = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
-
+*/
 
 const declareLeave = async (req, res) => {
   try {
@@ -100,26 +100,7 @@ const declareLeave = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
-exports.sendNotificationForLeaveRequest = async (userId) => {
-  try {
-    const user = await User.findById(userId);
-    if (!user) {
-      throw new Error('Utilisateur non trouvé');
-    }
 
-    if (user.demandeConge === true) {
-      const notification = new Notification({
-        userId: user._id,
-        message: 'Notification pour la demande de congé.'
-      });
-
-      await notification.save();
-    }
-  } catch (error) {
-    console.error('Erreur lors de l\'envoi de la notification pour la demande de congé :', error);
-    throw new Error('Erreur lors de l\'envoi de la notification pour la demande de congé');
-  }
-};
 const sendNotification = async (req, res) => {
   try {
     const { userId, message } = req.body; 
@@ -141,83 +122,34 @@ const sendNotification = async (req, res) => {
   }
 };
 
-
-
-const terminateLeaveJob = new CronJob('0 56 20 * * *', async () => {
-  try {
-    const users = await User.find({ conge: 'enconge' });
-
-    for (const user of users) {
-      const currentDate = new Date();
-      const endDate = new Date(user.dateFinConge);
-
-      if (currentDate > endDate) {
-        user.estEnConge = false;
-        await user.save();
-
-        const contenuEmail = `
-          Bonjour ${user.nom},
-
-          Votre congé est terminé.
-
-          Merci et à bientôt !
-        `;
-
-        await transporter.sendMail({
-          from: 'hendlegleg1@gmail.com',
-          to: user.email,
-          subject: 'Notification de fin de congé',
-          text: contenuEmail
-        });
-
-        const notification = new Notification({
-          userId: user._id,
-          message: 'Votre congé est terminé.'
-        });
-
-        await notification.save();
-      }
-    }
-  } catch (error) {
-    console.error('Erreur dans le job cron :', error.message);
-  }
-});
-
-terminateLeaveJob.start();
-
+//hend
 
 const notifiercongechoriste = async () => {
   try {
     const usersOnLeave = await User.find({ demandeConge: true, role: 'choriste' });
-    const admin = await User.findOne({ role: 'admin' });
 
-    if (admin) {
-      const notifications = [];
+    if (usersOnLeave.length > 0) {
+      const listOfUsers = usersOnLeave.map(user => ({
+        nom: user.nom,
+        prenom: user.prenom
+      }));
+
       
       for (const user of usersOnLeave) {
-        notifications.push({
-          adminId: admin._id,
-          message: `Le choriste ${user.nom} ${user.prenom} a demandé un congé.`,
-          user: {
-            id: user._id,
-            nom: user.nom,
-            prenom: user.prenom
-          }
-        });
-
         user.demandeConge = false;
         await user.save();
       }
 
-      return notifications;
+      return listOfUsers;
     } else {
-      return null;
+      return null; 
     }
   } catch (error) {
     console.error('Erreur lors de la notification des congés choristes :', error);
     return null;
   }
 };
+
 const modifyLeaveStatus = async (req, res) => {
   try {
     const { userId, approved } = req.body;
@@ -269,7 +201,7 @@ const LeaveNotifications = async (req, res) => {
 
 
 module.exports={
-  sendNotificationForLeaveRequest,
+  /*sendNotificationForLeaveRequest,*/
   notifiercongechoriste,
   sendNotification,
   declareLeave,

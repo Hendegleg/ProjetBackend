@@ -6,6 +6,7 @@ const Audition = require('../models/audition');
 const User = require('../models/utilisateurs');
 const bcrypt = require('bcrypt');
 const uuid = require('uuid');
+const Pupitre = require ('../models/pupitre');
 function generateUniqueToken() {
     return uuid.v4(); 
 }
@@ -19,55 +20,44 @@ const transporter = nodemailer.createTransport({
         pass: process.env.EMAIL_PASSWORD
     }
 });
-exports.getListeCandidatsParPupitre = async (req, res) => {
+exports.getListeCandidatsParPupitre= async (req, res) => {
     try {
-      const besoinPupitres = req.body;
-  
-      const auditions = await Audition.find().populate('candidat');
-      const candidatsParPupitre = {
-        Soprano: { retenu: [], 'en attente': [], refuse: [] },
-        Alto: { retenu: [], 'en attente': [], refuse: [] },
-        Ténor: { retenu: [], 'en attente': [], refuse: [] },
-        Basse: { retenu: [], 'en attente': [], refuse: [] }
-      };
-  
-      for (const audition of auditions) {
-        if (audition.candidat) {
-          const candidat = audition.candidat;
-  
-          const candidatData = {
-            nom: candidat.nom,
-            prenom: candidat.prenom,
-            decisioneventuelle: audition.decisioneventuelle
-          };
-  
-          switch (audition.tessiture) {
-            case 'Soprano':
-              candidatsParPupitre.Soprano[candidatData.decisioneventuelle].push(candidatData);
-              break;
-            case 'Alto':
-              candidatsParPupitre.Alto[candidatData.decisioneventuelle].push(candidatData);
-              break;
-            case 'Ténor':
-              candidatsParPupitre.Ténor[candidatData.decisioneventuelle].push(candidatData);
-              break;
-            case 'Basse':
-              candidatsParPupitre.Basse[candidatData.decisioneventuelle].push(candidatData);
-              break;
-            default:
-              break;
-          }
+        const besoinPupitres = req.body; 
+
+        const candidatsParPupitre = {
+            Soprano: { retenu: [], 'en attente': [], refuse: [] },
+            Alto: { retenu: [], 'en attente': [], refuse: [] },
+            Ténor: { retenu: [], 'en attente': [], refuse: [] },
+            Basse: { retenu: [], 'en attente': [], refuse: [] }
+        };
+
+        const auditionsRetenues = await Audition.find({ decisioneventuelle: 'retenu' }).populate('candidat');
+
+        for (const audition of auditionsRetenues) {
+            const candidat = audition.candidat;
+            const tessiture = audition.tessiture;
+
+            const candidatData = {
+                id: candidat._id,
+                nom: candidat.nom,
+                prenom: candidat.prenom,
+                email: candidat.email,
+            };
+
+            if (candidatsParPupitre[tessiture].retenu.length < besoinPupitres[tessiture]) {
+                candidatsParPupitre[tessiture].retenu.push(candidatData);
+            } else {
+                candidatsParPupitre[tessiture]['en attente'].push(candidatData);
+            }
         }
-      }
-  
-      return res.status(200).json(candidatsParPupitre);
-  
+
+        return res.status(200).json(candidatsParPupitre);
     } catch (error) {
-      console.error('Erreur lors de la récupération des candidats par pupitre :', error);
-      return res.status(500).json({ error: 'Erreur lors de la récupération des candidats par pupitre' });
+        console.error('Erreur lors de la récupération des candidats retenus par pupitre :', error);
+        return res.status(500).json({ error: 'Erreur lors de la récupération des candidats retenus par pupitre' });
     }
-  };
-  
+};
+
 
 exports.confirmerPresence = (req, res) => {
     const { token } = req.query;
@@ -251,7 +241,8 @@ exports.confirmerEngagement = async (req, res) => {
 
 exports.getListeCandidats = async (req, res) => {
     try {
-        const listeCandidats = await Candidat.find({});
+        //const listeCandidats = await Candidat.find({});
+        const listeCandidats = await Candidat.find({}, 'nom prenom');
         res.status(200).json(listeCandidats);
         console.log("liste:", listeCandidats)
     } catch (error) {
@@ -272,46 +263,49 @@ exports.getCandidatsRetenusParPupitre = async (req, res) => {
 
         await Promise.all(auditionsRetenues.map(async (audition) => {
             const candidat = await Candidat.findById(audition.candidat);
+            let numPupitre = null;
+
             switch (audition.tessiture) {
                 case 'Soprano':
-                    candidatsParPupitre.Soprano.push({
-                        id: candidat._id,
-                        nom: candidat.nom,
-                        prenom: candidat.prenom,
-                        email: candidat.email,
-                        
-                    });
+                    numPupitre = 1;
                     break;
                 case 'Alto':
-                    candidatsParPupitre.Alto.push({
-                        id: candidat._id,
-                        nom: candidat.nom,
-                        prenom: candidat.prenom,
-                        email: candidat.email,
-                        
-                    });
+                    numPupitre = 2;
                     break;
                 case 'Ténor':
-                    candidatsParPupitre.Ténor.push({
-                        id: candidat._id,
-                        nom: candidat.nom,
-                        prenom: candidat.prenom,
-                        email: candidat.email,
-                       
-                    });
+                    numPupitre = 3;
                     break;
                 case 'Basse':
-                    candidatsParPupitre.Basse.push({
-                        id: candidat._id,
-                        nom: candidat.nom,
-                        prenom: candidat.prenom,
-                        email: candidat.email,
-                       
-                    });
+                    numPupitre = 4;
                     break;
                 default:
                     break;
             }
+
+            let existingPupitre = await Pupitre.findOne({ num_pupitre: numPupitre, tessiture: audition.tessiture });
+
+            if (existingPupitre) {
+                if (!existingPupitre.choristes.includes(candidat._id)) {
+                    existingPupitre.choristes.push(candidat._id);
+                    await existingPupitre.save();
+                }
+            } else {
+                const newPupitreInstance = new Pupitre({
+                    num_pupitre: numPupitre,
+                    tessiture: audition.tessiture,
+                    besoin: 1,
+                    choristes: [candidat._id]
+                });
+
+                await newPupitreInstance.save();
+            }
+
+            candidatsParPupitre[audition.tessiture].push({
+                id: candidat._id,
+                nom: candidat.nom,
+                prenom: candidat.prenom,
+                email: candidat.email,
+            });
         }));
 
         return res.status(200).json(candidatsParPupitre);

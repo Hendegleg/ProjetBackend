@@ -1,5 +1,6 @@
 const User = require('../models/utilisateurs');
-
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 exports.createUser = async (req, res, next) => {
   try {
     const { nom, prenom, email, password, role } = req.body;
@@ -79,7 +80,7 @@ exports.updateUser = async (req, res, next) => {
         return res.status(404).json({ message: 'Utilisateur non trouvé' });
       }
   
-      await user.remove();
+      await User.deleteOne({ _id: userId }); 
   
       res.status(200).json({ message: 'Utilisateur supprimé avec succès' });
     } catch (error) {
