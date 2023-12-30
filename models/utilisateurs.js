@@ -4,10 +4,7 @@ const Schema = mongoose.Schema;
 const UserSchema = new Schema({
     nom: { type: String, required: true },
     prenom: { type: String, required: true },
-    email: {
-        type: String,
-        requiràed: true,
-        unique: true,
+    email: {type: String,requiràed: true,unique: true,
         validate: {
             validator: function (v) {
                 return /\S+@\S+\.\S+/.test(v);
@@ -45,6 +42,25 @@ UserSchema.methods.toPublic = function () {
 
     return publicUserData;
 };
+UserSchema.statics.getChefDePupitreEmail = async function () {
+    try {
+        const utilisateur = await this.findOne({ role: 'chef de pupitre' });
+        return utilisateur ? utilisateur.email : null;
+    } catch (error) {
+        console.error('Erreur lors de la récupération de l\'adresse e-mail du chef de pupitre:', error.message);
+        return null;
+    }
+};
+UserSchema.statics.getChoristeEmail = async function () {
+    try {
+        const utilisateur = await this.findOne({ role: 'choriste' });
+        return utilisateur ? utilisateur.email : null;
+    } catch (error) {
+        console.error('Erreur lors de la récupération de l\'adresse e-mail du choriste:', error.message);
+        return null;
+    }
+};
+
 
 const User = mongoose.model('User', UserSchema);
 

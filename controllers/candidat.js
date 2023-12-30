@@ -15,8 +15,6 @@ exports.getAllCandidats = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
-
-
 // get_by_id
 exports.getCandidatById = async (req, res) => {
     try {
@@ -224,7 +222,28 @@ exports.createCandidat = async (req, res) => {
     }
 };
 
+exports.notifieradmin =async()=> {
+const today10am = new Date();
+  today10am.setHours(15, 0, 0, 0); 
 
+  const yesterday10am = new Date();
+  yesterday10am.setDate(yesterday10am.getDate() - 1); 
+  yesterday10am.setHours(10, 0, 0, 0); 
+
+  try {
+    const documents = await Candidat.find({
+      createdAt: {
+        $gte: yesterday10am,
+        $lt: today10am
+      }
+    }).select(" email nom prenom ").exec();
+    console.log(documents) 
+    
+    return documents;
+  } catch (error) {
+     console.log(error.message) 
+  }
+};
 
 
 

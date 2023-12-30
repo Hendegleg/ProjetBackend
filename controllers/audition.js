@@ -4,7 +4,6 @@ const Candidat = require('../models/candidat');
 const nodemailer = require('nodemailer')
 
 const createAudition = async (req, res) => {
-const createAudition = async (req, res) => {
     try {
       const {
         DateAudition,
@@ -36,7 +35,6 @@ const createAudition = async (req, res) => {
   };
 
   // get
- const getAuditionById = async (req, res) => {
 const getAuditionById = async (req, res) => {
     try {
       const audition = await Audition.findById(req.params.id).populate('candidat');
@@ -58,17 +56,10 @@ const getAuditionById = async (req, res) => {
       res.status(500).json({ message: err.message });
     }
   };
-const getAudition = async (req, res) => {
-    try {
-      const audition = await Audition.find(req.params).populate('candidat');
-      res.json(audition);
-    } catch (err) {
-      res.status(500).json({ message: err.message });
-    }
-  };
+
 
   // update
-  const updateAudition = async (req, res) => {
+ 
 const updateAudition = async (req, res) => {
     try {
       const { id } = req.params;
@@ -85,9 +76,7 @@ const updateAudition = async (req, res) => {
     }
   };
 
-  const deleteAudition = async (req, res) => {
   
-const deleteAudition = async (req, res) => {
 const deleteAudition = async (req, res) => {
     try {
       const { id } = req.params;
@@ -103,9 +92,6 @@ const deleteAudition = async (req, res) => {
       res.status(500).json({ message: err.message });
     }
   };
-
-
-
 
 const lancerEvenementAudition = async (req, res) => {
     try {
@@ -167,9 +153,6 @@ const lancerEvenementAudition = async (req, res) => {
         res.status(500).json({ error: 'Internal Server Error' });
     }
 };
-
-
- 
   // tache b 
   
   async function genererPlanification(req, res) {
@@ -322,6 +305,7 @@ const lancerEvenementAudition = async (req, res) => {
   };
   
   
+  
  
   module.exports = {
     deleteAudition,
@@ -333,6 +317,6 @@ const lancerEvenementAudition = async (req, res) => {
     getAudition,
    
   
-    generateAndSendAuditionPlan,
+   // generateAndSendAuditionPlan,
     getAudition,
   };

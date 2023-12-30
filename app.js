@@ -3,6 +3,7 @@ const cron = require('node-cron');
 
 require('dotenv').config();
 const mongoose = require("mongoose");
+const {io}=require("./socket.js");
 const auditionRoutes = require("./routes/audition");
 const repetitionRoutes = require("./routes/repetition");
 const gererRoutes = require("./routes/gerercandidat");
@@ -13,19 +14,26 @@ const congeRoutes = require('./routes/conge');
 const filtragecandidatRoutes= require('./routes/filtragecandidats.js')
 const concertsRoutes= require('./routes/concert.js')
 const qrcodeRoutes = require('./routes/qrcode');
-const filtragecandidatRoutes= require('./routes/filtragecandidats.js')
 const authRoutes = require ('./routes/auth');
 const AbsenceRoutes = require ('./routes/absenceRequest')
 const tessitureRoutes = require ('./routes/tessiture')
 const saisonRoutes = require ('./routes/saison')
 const pupitreRoutes = require ('./routes/pupitre')
-const repetitioncontroller = require ('./controllers/repetition')
+const repetitioncontroller = require ('./controllers/repetition');
+const { notifieradmin } = require("./controllers/candidat.js");
 cron.schedule('08 19 * * *', repetitioncontroller.envoyerNotificationChoristes);
+notifieradmin()
+cron.schedule('34 15 * * *',async () => {
+const liste = await notifieradmin();
+  if (liste){
+    io.emit("notif-658aaa32e0212355b342b333", {message :"liste des candidatures", liste });
+  }
+});
 
 
 mongoose
 .connect(
-     "mongodb://127.0.0.1:27017/DS",
+     "mongodb://127.0.0.1:27017/projet",
    { /*useNewUrlParser: true, useUnifiedTopology: true*/}
 )
 .then(()=>console.log("connexion a mongoDB reussite"))
@@ -55,10 +63,9 @@ app.use("/api/repetitions", repetitionRoutes);
 app.use('/api/gerer', gererRoutes);
 app.use('/api/conge', congeRoutes);
 
-//app.use('/confirmation', confirmationRoutes);
-//app.use('/qrcode', qrcodeRoutes);
 
-;
+//app.use('/confirmation', confirmationRoutes);
+app.use('/qrcode', qrcodeRoutes);
 app.use('/api/saisons', saisonRoutes);
 app.use('/api/pupitres', pupitreRoutes);
 

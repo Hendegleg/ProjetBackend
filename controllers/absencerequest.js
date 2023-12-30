@@ -1,7 +1,10 @@
 const AbsenceRequest = require('../models/absence');
 const Pupitre = require('../models/pupitre');
+const Repetition = require('../models/repetition');
+const Concert = require('../models/concert');
+const User = require('../models/utilisateurs');
 
-exports.createAbsenceRequest = async (req, res) => {
+const createAbsenceRequest = async (req, res) => {
   try {
     const { userId, reason, dates, type } = req.body;
     
@@ -18,11 +21,8 @@ exports.createAbsenceRequest = async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
-const Repetition = require('../models/repetition');
-const Concert = require('../models/concert');
-const User = require('../models/utilisateurs');
-
-exports.informerAbsence = (req, res) => {
+};
+const informerAbsence = (req, res) => {
   const { eventType, eventDate, reason } = req.body;
   const userId = req.params.id;
 
@@ -78,7 +78,7 @@ exports.informerAbsence = (req, res) => {
 
 
 
-exports.getAbsenceRequestsByUser = async (req, res) => {
+const getAbsenceRequestsByUser = async (req, res) => {
   try {
     const { userId } = req.params;
 
@@ -89,10 +89,7 @@ exports.getAbsenceRequestsByUser = async (req, res) => {
   }
 };
 
-
-
-
-exports.createAbsence = async (req, res) => {
+const createAbsence = async (req, res) => {
   try {
     const { user, status, reason, repetition, concert, approved } = req.body;
 
@@ -115,10 +112,7 @@ exports.createAbsence = async (req, res) => {
 };
 
 
-
-
-
-exports.getChoristesByRepetitionAndPupitre = async (req, res) => {
+ const getChoristesByRepetitionAndPupitre = async (req, res) => {
   try {
     const repetitionId = req.params.repetitionId;
     const tessiture = req.params.tessiture;
@@ -169,4 +163,12 @@ exports.getChoristesByRepetitionAndPupitre = async (req, res) => {
     console.error('Erreur lors de la récupération des choristes par répétition :', error.message);
     res.status(500).json({ error: 'Erreur lors de la récupération des choristes par répétition' });
   }
+};
+module.exports = {
+  createAbsence,
+  createAbsenceRequest,
+  getAbsenceRequestsByUser ,
+  informerAbsence,
+  getChoristesByRepetitionAndPupitre, 
+  getChoristesByRepetitionAndPupitre
 };

@@ -145,14 +145,31 @@ const generatePupitreList = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+const confirmerpresenceRepetition = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const repetition = await Repetition.findById(id);
 
+    if (!repetition) {
+      return res.status(404).json({ message: "Répétition non trouvée!" });
+    } else {
+      const { userid } = req.body;
+      const absence = await Absence.create({
+        user: userid,
+        status: "present",
+        repetition: id
+      });
 
-
-
-
-
-
-
+      if (!absence) {
+        return res.status(404).json({ message: "Présence échouée" });
+      } else {
+        return res.status(200).json({ message: "Présence enregistrée" });
+      }
+    }
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+}
 
 const envoyerNotificationChoristes = async () => {
   try {
@@ -234,5 +251,6 @@ module.exports = {
   updateRepetition: updateRepetition,
   deleteRepetition: deleteRepetition,
   generatePupitreList: generatePupitreList,
+  confirmerpresenceRepetition,
   envoyerNotificationChoristes,
 };
