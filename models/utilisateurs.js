@@ -1,12 +1,13 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
+const AbsenceRequest = require('../models/absence');
 
 const UserSchema = new Schema({
     nom: { type: String },
     prenom: { type: String},
     email: {
         type: String,
-        requiràed: true,
+        required: true,
         unique: true,
         validate: {
             validator: function (v) {
@@ -26,6 +27,7 @@ const UserSchema = new Schema({
     dateDebutConge: { type: Date }, 
     dateFinConge: { type: Date }, 
     statusChanged: { type: Boolean , default: false },
+    AbsencestatusChanged: { type: Boolean , default: false },
     active: { type: Boolean, default: true }, 
     dateEntreeChoeur: { type: Date }, 
     dateSortieChoeur: { type: Date },
@@ -33,8 +35,19 @@ const UserSchema = new Schema({
     taille_en_m  : {type: String},
     nbsaison:{type:Number}, 
     approved:{type: Boolean},
-    absence: [{ type: mongoose.Schema.Types.ObjectId, ref: 'absence' }]
-    
+    absence: [{ type: mongoose.Schema.Types.ObjectId, ref: 'absence' }],
+    elimination:{type:String, enum:['nomine','elimine']},
+    eliminationDuree: {
+        type: Number,
+        default: 365,
+      },
+    eliminationReason: {
+        type: String, 
+      },
+    absencecount:{
+        type:Number,
+        default:0
+      }
     
 });
 
@@ -49,6 +62,27 @@ UserSchema.methods.toPublic = function () {
 
     return publicUserData;
 };
+
+//sauvgarde des absences 
+UserSchema.pre('save', async function(next) {
+   
+    if (this.isModified('estEnConge') && this.estEnConge === true && this.role === 'choriste') {
+      
+        this.AbsencestatusChanged = true;
+
+        
+        const newAbsence = new AbsenceRequest({ user: this._id, status: 'absent', absence: new Date() });
+
+        try {
+            
+            await newAbsence.save();
+        } catch (error) {
+           
+            console.error(error);
+        }
+    }
+    next();
+});
 
 const User = mongoose.model('User', UserSchema);
 

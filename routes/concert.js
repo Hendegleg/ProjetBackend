@@ -8,6 +8,7 @@ router.post('/', concertController.createConcert);
 router.get('/', concertController.getAllConcerts); 
 router.put('/:id', concertController.updateConcert); 
 router.delete('/:id', concertController.deleteConcert); 
+router.post('/:id/confirmerpresence', concertController.confirmerpresenceConcert);
 
 
 module.exports = router;

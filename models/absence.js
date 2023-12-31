@@ -12,6 +12,11 @@ const AbsenceRequestSchema = new Schema({
 
   approved: {type: Boolean,default:false},
   absence: [{ type: Date }], 
+
+  //dates: [{ type: Date  }],
+
+  //type: { type: String, enum: ['repetition','concert'], required: true }
+  approved: {type: Boolean,default:false}
 });
 
 

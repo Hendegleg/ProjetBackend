@@ -2,12 +2,9 @@ const cron = require('node-cron');
 const { CronJob } = require('cron');
 const nodemailer = require('nodemailer');
 const Repetition = require("../models/repetition");
-const User = require('../models/utilisateurs');
-const AbsenceRequest = require('../models/absence'); // Assurez-vous de fournir le chemin correct
-
-const mongoose = require ('mongoose');
 
 const fetchRepetitions = (req, res) => {
+  
   Repetition.find()
     .then((repetitions) => {
       res.status(200).json({
@@ -21,25 +18,33 @@ const fetchRepetitions = (req, res) => {
         message: "Échec de récupération des répétitions",
       });
     });
+}
+
+const addRepetition = async (req, res) => {
+  try {
+    const newRepetition = new Repetition(req.body);
+    await newRepetition.save();
+
+    // Génération du QR code
+    await QRCode.toFile(`C:\\Users\\tinne\\OneDrive\\Desktop\\ProjetBackend\\image QR\\qrcode-${newRepetition._id}.png`, `http://localhost:5000/api/repetitions/${newRepetition._id}/confirmerpresence`, {
+      color: {
+        dark: '#000000',
+        light: '#ffffff'
+      }
+    });
+
+    res.status(200).json({
+      repetition: newRepetition,
+      message: "Répétition ajoutée avec succès",
+    });
+  } catch (error) {
+    res.status(400).json({
+      error: error.message,
+      message: "Échec d'ajout de la répétition",
+    });
+  }
 };
 
-const addRepetition = (req, res) => {
-  const newRepetition = new Repetition(req.body);
-  newRepetition
-    .save()
-    .then(() => {
-      res.status(200).json({
-        repetition: newRepetition,
-        message: "Répétition ajoutée avec succès",
-      });
-    })
-    .catch((error) => {
-      res.status(400).json({
-        error: error.message,
-        message: "Échec d'ajout de la répétition",
-      });
-    });
-};
 
 const getRepetitionById = (req, res) => {
   Repetition.findById(req.params.id)
@@ -135,6 +140,31 @@ const generatePupitreList = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+const confirmerpresenceRepetition = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const repetition = await Repetition.findById(id);
+
+    if (!repetition) {
+      return res.status(404).json({ message: "Répétition non trouvée!" });
+    } else {
+      const { userid } = req.body;
+      const absence = await Absence.create({
+        user: userid,
+        status: "present",
+        repetition: id
+      });
+
+      if (!absence) {
+        return res.status(404).json({ message: "Présence échouée" });
+      } else {
+        return res.status(200).json({ message: "Présence enregistrée" });
+      }
+    }
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+}
 
 
 
@@ -213,8 +243,7 @@ cron.schedule('0 12 * * *', async () => {
   console.log('Tâche cron exécutée.');
 });
 
-
-
+//envoyerNotificationChoristes();
 
 
 module.exports = {
@@ -225,4 +254,5 @@ module.exports = {
   deleteRepetition: deleteRepetition,
   generatePupitreList: generatePupitreList,
   envoyerNotificationChoristes,
+  confirmerpresenceRepetition: confirmerpresenceRepetition,
 };

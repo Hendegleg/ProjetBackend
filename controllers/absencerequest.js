@@ -1,7 +1,63 @@
-const User = require('../models/utilisateurs');
 const AbsenceRequest = require('../models/absence');
 const Pupitre = require('../models/pupitre');
+const Repetition = require('../models/repetition');
 const Concert = require('../models/concert');
+const User = require('../models/utilisateurs');
+
+const informerAbsence = (req, res) => {
+  const { eventType, eventDate, reason } = req.body;
+  const userId = req.params.id;
+
+  let userObj;
+  let eventObj;
+
+  User.findById(userId)
+    .then((user) => {
+      if (!user) {
+        throw new Error('Utilisateur non trouvé');
+      }
+
+      userObj = user;
+
+      let eventModel;
+
+      if (eventType === 'repetition') {
+        eventModel = Repetition;
+      } else if (eventType === 'concert') {
+        eventModel = Concert;
+      } else {
+        throw new Error('Type d\'événement invalide');
+      }
+
+      return eventModel.findOne({ date: eventDate });
+    })
+    .then((event) => {
+      if (!event) {
+        throw new Error(`Aucun événement prévu pour la date spécifiée`);
+      }
+
+      eventObj = event;
+
+      const absenceRequest = new AbsenceRequest({
+        user: userObj._id,
+        nom: userObj.nom, 
+        status: 'absent',
+        reason: reason,
+        repetition: eventType === 'repetition' ? event._id : null,
+        concert: eventType === 'concert' ? event._id : null,
+        approved: false,
+      });
+
+      return absenceRequest.save();
+    })
+    .then((savedRequest) => {
+      return res.status(201).json({ success: true, message: 'Demande d\'absence créée avec succès', savedRequest });
+    })
+    .catch((error) => {
+      return res.status(500).json({ success: false, message: error.message });
+    });
+};
+
 
 const createAbsenceRequest = async (req, res) => {
   try {
@@ -15,13 +71,16 @@ const createAbsenceRequest = async (req, res) => {
     const absenceRequest = new AbsenceRequest({ user: userId, reason, dates, type });
     //sauvegarde f base
     await absenceRequest.save();
-    await User.findByIdAndUpdate(userId, { $push: { absence: savedAbsence._id }});
 
     res.status(201).json({ message: 'Demande d\'absence créée avec succès', absenceRequest });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
+
+
+
+
 
 const getAbsenceRequestsByUser = async (req, res) => {
   try {

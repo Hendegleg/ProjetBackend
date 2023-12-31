@@ -2,7 +2,6 @@ const express = require("express");
 const cron = require('node-cron');
 
 require('dotenv').config();
-
 const mongoose = require("mongoose");
 const auditionRoutes = require("./routes/audition");
 const repetitionRoutes = require("./routes/repetition");
@@ -11,22 +10,36 @@ const oeuvreRoutes= require ("./routes/oeuvre");
 const candidatRoutes=require ("./routes/candidat");
 const formulaireRoutes = require ("./routes/formulaire")
 const congeRoutes = require('./routes/conge');
+const saisonRoutes = require('./routes/saison.js');
+const concertsRoutes = require('./routes/concert.js');
+const qrcodeRoutes = require('./routes/qrcode');
+const userRoutes = require('./routes/utilisateur.js')
 const filtragecandidatRoutes= require('./routes/filtragecandidats.js')
 const authRoutes = require ('./routes/auth');
 const AbsenceRoutes = require ('./routes/absenceRequest')
 const tessitureRoutes = require ('./routes/tessiture')
-const saisonRoutes = require ('./routes/saison')
 const pupitreRoutes = require ('./routes/pupitre')
 const repetitioncontroller = require ('./controllers/repetition')
 cron.schedule('29 13 * * *', repetitioncontroller.envoyerNotificationChoristes);
-const concertRoutes=require('./routes/concert')
 const programmeRoutes=require('./routes/programme')
-const userRoutes=require('./routes/utilisateur')
 
+const intervenantRoutes = require ('./routes/intervenants')
+
+const eliminationRoutes = require ('./routes/elimination.js')
+const {io}=require("./socket.js");
+const { notifiercongechoriste }= require('./controllers/conge.js')
+cron.schedule('54 10 * * *', async () => {
+  const liste = await notifiercongechoriste();
+
+  if (liste) {
+  
+    io.emit("notif-6582068777dd44c527da3a08", { message: "Demandes de congé des choristes", liste });
+  }
+});
 
 mongoose
 .connect(
-     "mongodb://127.0.0.1:27017/database",
+     "mongodb://127.0.0.1:27017/DS",
    { /*useNewUrlParser: true, useUnifiedTopology: true*/}
 )
 .then(()=>console.log("connexion a mongoDB reussite"))
@@ -55,14 +68,19 @@ app.use("/api/oeuvres", oeuvreRoutes);
 app.use("/api/repetitions", repetitionRoutes);
 app.use('/api/gerer', gererRoutes);
 app.use('/api/conge', congeRoutes);
-app.use('/api/auth', authRoutes);
-app.use('/api/absence', AbsenceRoutes)
-app.use('/api/tessiture', tessitureRoutes);
+app.use('/api/absence',AbsenceRoutes)
+app.use('/api/tessiture',tessitureRoutes)
+
+//app.use('/confirmation', confirmationRoutes);
+//app.use('/qrcode', qrcodeRoutes);
+app.use('/api/auth',authRoutes)
+app.use('/api/concert', concertsRoutes);
 app.use('/api/saisons', saisonRoutes);
-app.use("/api/concerts",concertRoutes)
 app.use("/api/programme",programmeRoutes)
 app.use("/api/users",userRoutes)
 app.use("/api/pupitre",pupitreRoutes)
+app.use('/api/elimination',eliminationRoutes)
+app.use('/api/intervenant',intervenantRoutes)
 module.exports = app;
 
 

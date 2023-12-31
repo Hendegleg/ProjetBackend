@@ -6,7 +6,6 @@ const Verifmail = require('./verifmail');
 const candidatSchema = new Schema({
     nom: { type: String, required: true },
     prenom : { type: String, required: true },
-
     nom_jeune_fille: { type: String, required: true },
     sexe:{ type: String, required: true },
     nationalite : { type: String, },
@@ -14,7 +13,7 @@ const candidatSchema = new Schema({
     email : {type: String, required:true},
     telephone : { type: Number, required: true, unique: true},
     cinpassport :{ type: String, required: true },
-    date_naissance:{ type: Date, required: true },
+    date_naissance:{ type: Date},
     situationProfessionnelle: { type: String, required: true },
     connaissances :  { type: String, required: true },
     parraine : { type: String, required: true },
@@ -24,8 +23,11 @@ const candidatSchema = new Schema({
     estConfirme : {type: Boolean, default : false },
     signature : {type: Boolean, default : false },
     estEngage: {type: Boolean, default : false },
-    
-    token : {type: String}
+    estPresent: { type: Boolean, default: false },
+    decisioneventuelle :{ type: String,
+       enum:["retenu","en attente","refuse"],
+       default:"en attente"},
+    token : {type: String},
    
 });
 

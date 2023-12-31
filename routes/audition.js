@@ -5,6 +5,7 @@ const EvenementAudition= require('../models/evenementaudition');
 
 // Créer une nouvelle audition
 router.post('/', auditionController.createAudition);
+
 router.get('/', auditionController.getAudition);
 // Lire les informations d'une audition spécifique par son ID
 router.get('/:id', auditionController.getAuditionById);
@@ -21,7 +22,13 @@ router.delete('/:id', auditionController.deleteAudition);
 router.post('/generer-planning', auditionController.genererPlanification);
 
 
+// Route pour cree les  auditions pour les candidats
+//router.post('/creeAuditionsCandidats', auditionController.createAuditionsForCandidats);
+
+// Route to generate and send audition plans
+//router.post('/generateAndSendAuditionPlan', auditionController.generateAndSendAuditionPlan);
 
 router.post('/lancerEvenementAudition', auditionController.lancerEvenementAudition);
+
 
 module.exports = router;
