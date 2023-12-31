@@ -250,5 +250,6 @@ module.exports={
   getAbsenceRequestsByUser,
   createAbsence,
   getChoristesByRepetitionAndPupitre,
-  getChoristesByConcertAndPupitre
+  getChoristesByConcertAndPupitre,
+  informerAbsence
 }

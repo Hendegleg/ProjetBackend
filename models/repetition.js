@@ -8,12 +8,12 @@ const RepetitionSchema = new Schema({
     heureFin: { type: String, required: true }, 
     lieu: { type: String, required: true },
     participant: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }], 
-    nbr_repetition: { type: Number, required: true },
+    nbr_repetition: { type: Number },
     // pourcentagesPupitres: [{
     //     pupitre: { type: mongoose.Schema.Types.ObjectId, ref: 'Pupitre' },
     //     pourcentage: Number
     // }],
-    programme : {type: String}
+    programme : {type: String},
 });
 
 const Repetition = mongoose.model('Repetition', RepetitionSchema);
