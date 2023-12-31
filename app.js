@@ -4,6 +4,7 @@ const cron = require('node-cron');
 require('dotenv').config();
 const mongoose = require("mongoose");
 const {io}=require("./socket.js");
+const userRoutes =require("./routes/utilisateur");
 const auditionRoutes = require("./routes/audition");
 const repetitionRoutes = require("./routes/repetition");
 const gererRoutes = require("./routes/gerercandidat");
@@ -22,13 +23,16 @@ const pupitreRoutes = require ('./routes/pupitre')
 const repetitioncontroller = require ('./controllers/repetition');
 const { notifieradmin } = require("./controllers/candidat.js");
 cron.schedule('08 19 * * *', repetitioncontroller.envoyerNotificationChoristes);
-notifieradmin()
-cron.schedule('34 15 * * *',async () => {
+
+cron.schedule('13 22 * * *',async () => {
 const liste = await notifieradmin();
   if (liste){
     io.emit("notif-658aaa32e0212355b342b333", {message :"liste des candidatures", liste });
   }
 });
+
+
+
 
 
 mongoose
@@ -62,14 +66,11 @@ app.use("/api/oeuvres", oeuvreRoutes);
 app.use("/api/repetitions", repetitionRoutes);
 app.use('/api/gerer', gererRoutes);
 app.use('/api/conge', congeRoutes);
-
-
 //app.use('/confirmation', confirmationRoutes);
 app.use('/qrcode', qrcodeRoutes);
 app.use('/api/saisons', saisonRoutes);
 app.use('/api/pupitres', pupitreRoutes);
-
-
+app.use('/user', userRoutes);
 
 
 

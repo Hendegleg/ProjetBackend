@@ -8,8 +8,8 @@ const AbsenceRequestSchema = new Schema({
   repetition: { type: mongoose.Schema.Types.ObjectId, ref: 'repetition' },
   concert: { type: mongoose.Schema.Types.ObjectId, ref: 'concert'},
   approved: {type: Boolean,default:false}
+  // reason manuelle 
 });
 
 const AbsenceRequest = mongoose.model('AbsenceRequest', AbsenceRequestSchema);
-
 module.exports = AbsenceRequest;

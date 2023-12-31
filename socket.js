@@ -5,5 +5,5 @@ io.on('connection', (socket) => {
   console.log('a user connected');
 });
 
-server.listen(3000);
+server.listen(3010);
 module.exports.io = io;

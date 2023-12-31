@@ -76,8 +76,6 @@ const informerAbsence = (req, res) => {
     });
 };
 
-
-
 const getAbsenceRequestsByUser = async (req, res) => {
   try {
     const { userId } = req.params;
