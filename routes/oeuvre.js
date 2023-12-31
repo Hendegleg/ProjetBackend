@@ -1,12 +1,171 @@
 const express = require('express');
 const router = express.Router();
 const oeuvreController = require('../controllers/oeuvre');
+const auth = require('../middlewares/auth');
 
-// Routes pour les œuvres
-router.post('/', oeuvreController.createOeuvre);
-router.get('/', oeuvreController.getAllOeuvres);
-router.get('/:id', oeuvreController.getOeuvreById);
-router.put('/:id', oeuvreController.updateOeuvre);
-router.delete('/:id', oeuvreController.deleteOeuvre);
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     Oeuvre:
+ *       type: object
+ *       required:
+ *         - title
+ *         - artist
+ *       properties:
+ *         _id:
+ *           type: string
+ *           description: The auto-generated id of the oeuvre
+ *         title:
+ *           type: string
+ *           description: The oeuvre title
+ *         artist:
+ *           type: string
+ *           description: The artist of the oeuvre
+ *       example:
+ *         _id: 12345
+ *         title: La boheme
+ *         artist: Charles Aznavour
+ */
+
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     NewOeuvre:
+ *       type: object
+ *       required:
+ *         - title
+ *         - artist
+ *       properties:
+ *         title:
+ *           type: string
+ *           description: The oeuvre title
+ *         artist:
+ *           type: string
+ *           description: The artist of the oeuvre
+ *       example:
+ *         title: La boheme
+ *         artist: Charles Aznavour
+ */
+
+/**
+ * @swagger
+ * components:
+ *   responses:
+ *     StandardResponse:
+ *       200:
+ *         description: Success
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Oeuvre'
+ *       404:
+ *         description: Oeuvre not found
+ *       500:
+ *         description: Server error
+ */
+
+/**
+ * @swagger
+ * tags:
+ *   name: Oeuvres
+ *   description: API de gestion des oeuvres d'art
+ */
+
+/**
+ * @swagger
+ * /oeuvres:
+ *   get:
+ *     summary: List all oeuvres
+ *     tags: [Oeuvres]
+ *     security: []
+ *     responses:
+ *       $ref: '#/components/responses/StandardResponse'
+ */
+router.get('/', auth.authMiddleware, auth.isAdmin, oeuvreController.getAllOeuvres);
+
+/**
+ * @swagger
+ * /oeuvres:
+ *   post:
+ *     summary: Create a new oeuvre
+ *     tags: [Oeuvres]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/NewOeuvre'
+ *     responses:
+ *       $ref: '#/components/responses/StandardResponse'
+ */
+router.post('/', auth.authMiddleware, auth.isAdmin, oeuvreController.createOeuvre);
+
+/**
+ * @swagger
+ * /oeuvres/{id}:
+ *   get:
+ *     summary: Get an oeuvre by ID
+ *     tags: [Oeuvres]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The ID of the oeuvre
+ *     responses:
+ *       $ref: '#/components/responses/StandardResponse'
+ */
+router.get('/:id', auth.authMiddleware, auth.isAdmin, oeuvreController.getOeuvreById);
+
+/**
+ * @swagger
+ * /oeuvres/{id}:
+ *   put:
+ *     summary: Update an oeuvre by ID
+ *     tags: [Oeuvres]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The ID of the oeuvre
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/NewOeuvre'
+ *     responses:
+ *       $ref: '#/components/responses/StandardResponse'
+ */
+router.put('/:id', auth.authMiddleware, auth.isAdmin, oeuvreController.updateOeuvre);
+
+/**
+ * @swagger
+ * /oeuvres/{id}:
+ *   delete:
+ *     summary: Delete an oeuvre by ID
+ *     tags: [Oeuvres]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The ID of the oeuvre
+ *     responses:
+ *       $ref: '#/components/responses/StandardResponse'
+ */
+router.delete('/:id', auth.authMiddleware, auth.isAdmin, oeuvreController.deleteOeuvre);
 
 module.exports = router;

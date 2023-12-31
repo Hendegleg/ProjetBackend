@@ -24,10 +24,14 @@ const pupitreRoutes = require('./routes/pupitre.js')
 const eliminationRoutes = require ('./routes/elimination.js')
 const repetitioncontroller = require ('./controllers/repetition')
 const placementController = require('./routes/placement.js')
+const swaggerJsdoc = require("swagger-jsdoc");
+const swaggerUi = require('swagger-ui-express');
+
+
 const {io}=require("./socket.js");
 const { notifiercongechoriste }= require('./controllers/conge.js')
 cron.schedule('29 13 * * *', repetitioncontroller.envoyerNotificationChoristes);
-cron.schedule('31 13 * * *', async () => {
+cron.schedule('40 16 * * *', async () => {
   try {
     const liste = await notifiercongechoriste();
 
@@ -48,6 +52,7 @@ mongoose
 .catch((e) =>console.log("connexion a mongoDB echouée", e))
 
 
+
 const app = express();
 app.use(express.json());
 app.use((req, res, next) => {
@@ -59,7 +64,72 @@ app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, PATCH, OPTIONS");
   next();
 });
+const options = {
+  definition: {
+    components: {
+      responses: {
+        200: {
+          description: "Success",
+        },
+        400: {
+          description: "Bad request. You may need to verify your information.",
+        },
+        401: {
+          description: "Unauthorized request, you need additional privileges",
+        },
+        403: {
+          description:
+            "Forbidden request, you must login first. See /auth/login",
+        },
+        404: {
+          description: "Object not found",
+        },
+        422: {
+          description:
+            "Unprocessable entry error, the request is valid but the server refused to process it",
+        },
+        500: {
+          description: "Unexpected error, maybe try again later",
+        },
+      },
 
+      securitySchemes: {
+        bearerAuth: {
+          type: "http",
+          scheme: "bearer",
+          bearerFormat: "JWT",
+        },
+      },
+    },
+    security: [
+      {
+        bearerAuth: [],
+      },
+    ],
+
+    openapi: '3.0.0',
+    info: {
+      title: 'API SWAGGER',
+      version: '0.1.0',
+      description: 'Description',
+      contact: {
+        name: 'Ghofrane',
+        url: '',
+        email: 'wechcriaghofrane@gmail.com',
+      },
+    },
+    servers: [
+      {
+        url: 'http://localhost:5000/api',
+        description: 'Development server',
+      },
+    ],
+  },
+  apis: ['./routes/*.js'], 
+};
+
+const specs = swaggerJsdoc(options);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs, { explorer: true }));
 
 app.use('/api/filtragecandidats', filtragecandidatRoutes);
 app.use('/api/auditions', auditionRoutes);
