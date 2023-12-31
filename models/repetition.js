@@ -9,10 +9,18 @@ const RepetitionSchema = new Schema({
     lieu: { type: String, required: true },
     participant: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }], 
     nbr_repetition: { type: Number, required: true },
-    // pourcentagesPupitres: [{
-    //     pupitre: { type: mongoose.Schema.Types.ObjectId, ref: 'Pupitre' },
-    //     pourcentage: Number
-    // }],
+    pourcentagesPupitres: [
+        { 
+          pupitre: { type: Number }, 
+          selectedChoristes: [
+            {
+              _id: { type: Schema.Types.ObjectId, ref: 'User' },
+              nom: { type: String },
+              prenom: { type: String },
+            }
+          ]
+        }
+      ],
     programme : {type: String},
     concert :{ type: mongoose.Schema.Types.ObjectId, ref: 'Concert' }
 });

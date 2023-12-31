@@ -2,40 +2,53 @@ const Audition = require('../models/audition');
 const EvenementAudition = require('../models/evenementaudition');
 const Candidat = require('../models/candidat');
 const nodemailer = require('nodemailer')
+const moment = require('moment');
 
 const createAudition = async (req, res) => {
-    try {
-      const {
-        DateAudition,
-        nombre_séance,
-        dureeAudition,
-        candidat,
-        extraitChante,
-        tessiture,
-        evaluation,
-        decisioneventuelle,
-        remarque
-      } = req.body;
-      const nouvelleAudition = new Audition({
-        DateAudition,
-        nombre_séance,
-        dureeAudition,
-        candidat,
-        extraitChante,
-        tessiture,
-        evaluation,
-        decisioneventuelle,
-        remarque
-      });
-      const auditionEnregistree = await nouvelleAudition.save();
-      res.status(201).json(auditionEnregistree);
-    } catch (err) {
-      res.status(400).json({ message: err.message });
+  try {
+    const {
+      heure_debut,
+      heure_fin ,
+      date_audition,
+      nombre_séance,
+      dureeAudition,
+      candidat,
+      extraitChante,
+      tessiture,
+      evaluation,
+      decisioneventuelle,
+      remarque
+    } = req.body;
+
+    // Vérification des données requises
+    if (!DateAudition || !nombre_séance || !dureeAudition || !candidat) {
+      return res.status(400).json({ message: "Certains champs sont manquants pour créer une audition." });
     }
-  };
+
+    const nouvelleAudition = new Audition({
+      heure_debut,
+      heure_fin ,
+      date_audition,
+      nombre_séance,
+      dureeAudition,
+      candidat,
+      extraitChante,
+      tessiture,
+      evaluation,
+      decisioneventuelle,
+      remarque
+    });
+
+    const auditionEnregistree = await nouvelleAudition.save();
+    res.status(201).json(auditionEnregistree);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+};
 
   // get
 const getAuditionById = async (req, res) => {
+ const getAuditionById = async (req, res) => {
     try {
       const audition = await Audition.findById(req.params.id).populate('candidat');
       
@@ -61,6 +74,8 @@ const getAuditionById = async (req, res) => {
   // update
  
 const updateAudition = async (req, res) => {
+  // update
+  const updateAudition = async (req, res) => {
     try {
       const { id } = req.params;
       const audition = await Audition.findById(id);
@@ -78,6 +93,7 @@ const updateAudition = async (req, res) => {
 
   
 const deleteAudition = async (req, res) => {
+  const deleteAudition = async (req, res) => {
     try {
       const { id } = req.params;
       const audition = await Audition.findById(id);
@@ -94,6 +110,7 @@ const deleteAudition = async (req, res) => {
   };
 
 const lancerEvenementAudition = async (req, res) => {
+  const lancerEvenementAudition = async (req, res) => {
     try {
         const { Date_debut_Audition, nombre_séance, dureeAudition, Date_fin_Audition, lienFormulaire } = req.body;
 
@@ -303,6 +320,20 @@ const lancerEvenementAudition = async (req, res) => {
       console.error(`Erreur lors de l'envoi de l'e-mail à ${candidat.email}:`, error.message);
     }
   };
+  const generateAndSendAuditionPlan = async (req, res) => {
+    try {
+      // ... existing code to generate audition planning
+  
+      // Send emails and generate links for follow-up
+      await sendAuditionEmails(candidats);
+  
+      res.status(200).json({ success: true, data: planning });
+    } catch (error) {
+      console.error('Error generating audition plan:', error.message);
+      res.status(500).json({ success: false, error: error.message });
+    }
+  };
+  
   
   
   
@@ -315,8 +346,9 @@ const lancerEvenementAudition = async (req, res) => {
     genererPlanification,
     lancerEvenementAudition ,
     getAudition,
+    getAuditionById,
+    genererPlanification,
+    generateAndSendAuditionPlan,
+    
    
-  
-   // generateAndSendAuditionPlan,
-    getAudition,
   };

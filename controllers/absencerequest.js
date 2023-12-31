@@ -1,5 +1,6 @@
 const AbsenceRequest = require('../models/absence');
 const Pupitre = require('../models/pupitre');
+const Pupitre = require('../models/pupitre');
 const Repetition = require('../models/repetition');
 const Concert = require('../models/concert');
 const User = require('../models/utilisateurs');
@@ -57,8 +58,8 @@ const informerAbsence = (req, res) => {
       eventObj = event;
 
       const absenceRequest = new AbsenceRequest({
-        user: userObj._id, // Utilisation de l'ID de l'utilisateur
-        nom: userObj.nom, // Utilisation du champ 'nom' de l'utilisateur
+        user: userObj._id,
+        nom: userObj.nom, 
         status: 'absent',
         reason: reason,
         repetition: eventType === 'repetition' ? event._id : null,
@@ -77,16 +78,40 @@ const informerAbsence = (req, res) => {
 };
 
 const getAbsenceRequestsByUser = async (req, res) => {
-  try {
-    const { userId } = req.params;
 
-    const absenceRequests = await AbsenceRequest.find({ user: userId }).populate('user');
-    res.status(200).json(absenceRequests);
+const createAbsenceRequest = async (req, res) => {
+  try {
+    const { userId, reason, dates, type } = req.body;
+    
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: 'Utilisateur non trouvé' }); 
+    }
+
+    const absenceRequest = new AbsenceRequest({ user: userId, reason, dates, type });
+    //sauvegarde f base
+    await absenceRequest.save();
+
+    res.status(201).json({ message: 'Demande d\'absence créée avec succès', absenceRequest });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
+
+
+
+
+const getAbsenceRequestsByUser = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const absenceRequests = await AbsenceRequest.find({ User: userId }).populate('user');
+    res.status(200).json(absenceRequests);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
 const createAbsence = async (req, res) => {
   try {
     const { user, status, reason, repetition, concert, approved } = req.body;
@@ -110,7 +135,10 @@ const createAbsence = async (req, res) => {
 };
 
 
- const getChoristesByRepetitionAndPupitre = async (req, res) => {
+
+
+
+const getChoristesByRepetitionAndPupitre = async (req, res) => {
   try {
     const repetitionId = req.params.repetitionId;
     const tessiture = req.params.tessiture;

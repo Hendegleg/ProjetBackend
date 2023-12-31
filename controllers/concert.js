@@ -52,6 +52,7 @@ const sendEmailToPupitre = async (subject, content) => {
   }
 }
 const concertController = {
+  
 
 
   createConcert: async (req, res) => {
@@ -64,10 +65,9 @@ const concertController = {
     }); 
 
     try {
-      
       const { presence, date, lieu, heure, programme, planning, nom_concert} = req.body;
 
-         const existingConcert = await Concert.findOne({ date: date }); 
+      const existingConcert = await Concert.findOne({ date: date }); 
 
       if (existingConcert) {
         return res.status(400).json({ message: 'Un concert existe déjà à cette date.' });
