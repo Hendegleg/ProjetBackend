@@ -8,4 +8,3 @@ router.get('/:id/profile',userController.getProfile );
 
 
 module.exports = router;
-//eliminationController.getChoristesNominés,eliminationController.getChoristesÉliminés,

@@ -53,6 +53,7 @@ module.exports = {
   isChoriste: checkRole(['choriste']),
   ischefpupitre: checkRole(['chef de pupitre']),
   ismanagerChoeur: checkRole(['manager de choeur']),
+  ischefChoeur: checkRole(['chef de choeur']),
   isAdminOrManager: checkRole(['admin', 'manager de choeur']),
-  isAll: checkRole(['admin', 'manager de choeur', 'chef de pupitre', 'choriste']),
+  isAll: checkRole(['chef de choeur', 'manager de choeur', 'chef de pupitre', 'choriste']),
 };

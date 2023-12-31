@@ -20,6 +20,7 @@ const transporter = nodemailer.createTransport({
         pass: process.env.EMAIL_PASSWORD
     }
 });
+
 exports.getListeCandidatsParPupitre = async (req, res) => {
     try {
         const besoinPupitres = req.body|| {}
@@ -87,6 +88,7 @@ exports.confirmerPresence = (req, res) => {
             res.status(500).send('Erreur lors de la confirmation.');
         });
 };
+
 
 exports.envoyerEmailAcceptation = async (req, res) => {
     try {

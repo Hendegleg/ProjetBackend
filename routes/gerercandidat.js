@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 const gerercontroller = require('../controllers/gerercandidat');
 const Auth = require('../middlewares/auth')
-
 router.post('/acceptation', Auth.authMiddleware , Auth.isAdminOrManager, gerercontroller.envoyerEmailAcceptation);
 router.post('/mailconfirmation', Auth.authMiddleware , Auth.isAdminOrManager, gerercontroller.envoyerEmailConfirmation);
 router.post('/liste', Auth.authMiddleware , Auth.isAdmin, Auth.isAdminOrManager, gerercontroller.getListeCandidats);
