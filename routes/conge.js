@@ -3,7 +3,7 @@ const router = express.Router();
 const Auth=require('../middlewares/auth')
 const CongeController = require('../controllers/conge');
 const auth = require("../middlewares/auth")
-router.post('/declareLeave/:id',auth.isChoriste, CongeController.declareLeave);
+router.post('/declareLeave/:id',auth.authMiddleware ,auth.isChoriste, CongeController.declareLeave);
 router.get('/getleave', CongeController.notifiercongechoriste)
 /*router.post('/sendNotification', CongeController.sendNotification);*/
 //tache35

@@ -28,6 +28,7 @@ const candidatSchema = new Schema({
        enum:["retenu","en attente","refuse"],
        default:"en attente"},
     token : {type: String},
+    saison : {type : Number}
    
 });
 

@@ -17,7 +17,7 @@ const concertSchema = new Schema({
             requiresChoir: { type: Boolean, default: true }
         }
     ],
-    planning : { type:  Schema.Types.ObjectId, ref: 'repetition', },
+    planning : { type:  Schema.Types.ObjectId, ref: 'Repetition'},
     nom_concert : { type : String, require : true },
     placement : {type :Schema.Types.ObjectId, ref : 'Placement' },
     participant : [{type:Schema.Types.ObjectId, ref:'User'},]

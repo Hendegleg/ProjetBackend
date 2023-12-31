@@ -11,11 +11,12 @@ const transporter = nodemailer.createTransport({
   }
 });
 //H
-const envoyerNotificationCongeJob = new CronJob('30 08 21 * * *', async () => {
+const envoyerNotificationCongeJob = new CronJob('0 10 13 * * *', async () => {
   try {
     console.log('Tâche cron en cours d\'exécution pour l\'envoi de notifications de congé...');
 
     const usersWithLeaveChanged = await User.find({ demandeConge: true, statusChanged: true });
+    
 
     if (usersWithLeaveChanged.length > 0) {
       for (const user of usersWithLeaveChanged) {
@@ -80,26 +81,38 @@ const sendNotificationForLeaveRequest = async (req, res) => {
 
 const declareLeave = async (req, res) => {
   try {
-    const {startDate, endDate } = req.body;
+    const { startDate, endDate } = req.body;
     const userId = req.params.id;
-    const user = await User.findById(userId);
-    
-    if (!user) {
-      return res.status(404).json({ message: 'Utilisateur non trouvé' }); 
+
+    if (!startDate || !endDate) {
+      return res.status(400).json({ message: 'Veuillez fournir à la fois la date de début et la date de fin du congé.' });
     }
+
+    const user = await User.findById(userId).select('nom prenom conge dateDebutConge dateFinConge');
+
+    if (!user) {
+      return res.status(404).json({ message: 'Utilisateur non trouvé' });
+    }
+
     user.demandeConge = true;
-    user.conge = "enattente"
+    user.conge = 'enattente';
     user.dateDebutConge = startDate;
     user.dateFinConge = endDate;
-    
+
     await user.save();
     /*await sendNotificationForLeaveRequest(userId);*/
 
-    res.status(200).json({ message: 'Demande de congé enregistrée avec succès pour l\'utilisateur.', user });
+    const { nom, prenom, conge, dateDebutConge, dateFinConge } = user;
+    res.status(200).json({
+      message: 'Demande de congé enregistrée avec succès pour l\'utilisateur.',
+      user: { nom, prenom, conge, dateDebutConge, dateFinConge }
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
+
+
 
 const sendNotification = async (req, res) => {
   try {

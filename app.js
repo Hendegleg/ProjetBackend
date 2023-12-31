@@ -27,7 +27,7 @@ const placementController = require('./routes/placement.js')
 const {io}=require("./socket.js");
 const { notifiercongechoriste }= require('./controllers/conge.js')
 cron.schedule('29 13 * * *', repetitioncontroller.envoyerNotificationChoristes);
-cron.schedule('23 22 * * *', async () => {
+cron.schedule('31 13 * * *', async () => {
   try {
     const liste = await notifiercongechoriste();
 
