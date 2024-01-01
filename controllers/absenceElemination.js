@@ -2,6 +2,10 @@ const nodemailer = require('nodemailer');
 const User=require('../models/utilisateurs')
 const Absence = require('../models/absence');
 
+const { io } = require('../socket.js');
+const { CronJob } = require('cron');
+require('dotenv').config();
+
 const getAllAbsences = async () => {
     try {
       const absence = await Absence.find({approved}); 
@@ -163,6 +167,23 @@ const eliminationExcessiveAbsences = async (req, res) => {
 };
 
 
+//let choristesElimines = [];
+
+const notifieradminChoristeseliminés = async () => {
+  try {
+    const choristesÉliminés = await User.find({
+      elimination: 'elimine',
+      count: { $ne: 0 } // Recherchez count différent de zéro
+    }).select('_id email nom prenom elimination role');
+
+    return choristesÉliminés;
+  } catch (error) {
+    console.error(error);
+    throw new Error('Erreur lors de la récupération des choristes éliminés.');
+  }
+};
+
+
 
 
 
@@ -237,6 +258,39 @@ const eliminationDiscipline = async (req, res) => {
 };
 
 
+const notifierNominés = async () => {
+  try {
+    // Recherche des utilisateurs nominés
+    const nominés = await User.find({ elimination: 'nomine' }).select('_id email nom prenom elimination role');
+
+    if (nominés.length > 0) {
+      // Émettre des notifications vers les nominés via Socket.IO
+      io.emit("notif-nominés", { message: "Vous êtes susceptibles d'être éliminés" });
+    } else {
+      console.log("Aucun nominé trouvé.");
+    }
+  } catch (error) {
+    console.error("Erreur lors de la recherche des nominés:", error.message);
+  }
+};
+
+
+const notifierElimines = async () => {
+  try {
+    // Recherche des utilisateurs nominés
+    const nominés = await User.find({ elimination: 'elimine' }).select('_id email nom prenom elimination role');
+
+    if (nominés.length > 0) {
+      // Émettre des notifications vers les nominés via Socket.IO
+      io.emit("notif-elimines", { message: "Vous êtes éliminés" });
+    } else {
+      console.log("Aucun eliminé trouvé.");
+    }
+  } catch (error) {
+    console.error("Erreur lors de la recherche des nominés:", error.message);
+  }
+};
+
 
   module.exports = {
     getChoristedepasseseuil,
@@ -246,7 +300,10 @@ const eliminationDiscipline = async (req, res) => {
     getChoristesNominés,
     getChoristesÉliminés,
     eliminationDiscipline,
-    eliminationExcessiveAbsences
+    eliminationExcessiveAbsences,
+    notifieradminChoristeseliminés,
+    notifierNominés ,
+    notifierElimines
 
     
   };

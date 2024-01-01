@@ -47,7 +47,13 @@ const UserSchema = new Schema({
     absencecount:{
         type:Number,
         default:0
-      }
+      },
+      concertsValidated:{type:Number,
+    default:0},
+    repetitionsValidated:{
+        type:Number,
+        default:0
+    }
     
 });
 

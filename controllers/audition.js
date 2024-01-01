@@ -330,7 +330,7 @@ const createAudition = async (req, res) => {
     getAudition,
     getAuditionById,
     genererPlanification,
-    generateAndSendAuditionPlan,
-    createAuditionsForCandidats,
-    generateAndSendAuditionPlan,
+    //generateAndSendAuditionPlan,
+    //createAuditionsForCandidats,
+    
   };

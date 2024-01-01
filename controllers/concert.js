@@ -8,12 +8,12 @@ const concertController = {
   createConcert: async (req, res) => {
     const newConcert = await Concert.create(req.body);
 
-    await QRCode.toFile(`C:\\Users\\tinne\\OneDrive\\Desktop\\ProjetBackend\\image QR\\qrcode-${newConcert._id}.png`, `http://localhost:5000/api/concerts/concerts/${newConcert._id}/confirmerpresence`, {
-      color: {
-        dark: '#000000',
-        light: '#ffffff'
-      }
-    }); 
+    //await QRCode.toFile(`C:\\Users\\tinne\\OneDrive\\Desktop\\ProjetBackend\\image QR\\qrcode-${newConcert._id}.png`, `http://localhost:5000/api/concerts/concerts/${newConcert._id}/confirmerpresence`, {
+     // color: {
+       // dark: '#000000',
+       // light: '#ffffff'
+     // }
+   // }); 
 
     try {
       const { presence, date, lieu, heure, programme, planning, nom_concert} = req.body;
@@ -33,6 +33,9 @@ const concertController = {
       res.status(500).json({ success: false, error: error.message });
     }
   },
+
+
+  
 
   getAllConcerts: async (req, res) => {
     try {

@@ -1,6 +1,6 @@
 const express = require("express");
 const cron = require('node-cron');
-
+const socketIO = require('socket.io');
 require('dotenv').config();
 const mongoose = require("mongoose");
 const auditionRoutes = require("./routes/audition");
@@ -10,16 +10,25 @@ const oeuvreRoutes= require ("./routes/oeuvre");
 const candidatRoutes=require ("./routes/candidat");
 const formulaireRoutes = require ("./routes/formulaire")
 const congeRoutes = require('./routes/conge');
-
-const concertsRoutes= require('./routes/concert.js')
+const saisonRoutes = require('./routes/saison.js');
+const concertsRoutes = require('./routes/concert.js');
 const qrcodeRoutes = require('./routes/qrcode');
+const userRoutes = require('./routes/utilisateur.js')
 const filtragecandidatRoutes= require('./routes/filtragecandidats.js')
 const authRoutes = require ('./routes/auth');
 const AbsenceRoutes = require ('./routes/absenceRequest')
 const tessitureRoutes = require ('./routes/tessiture')
 const intervenantRoutes = require ('./routes/intervenants')
-const cron = require('node-cron');
-const {io}=require("./socket.js");
+const programmeRoutes= require('./routes/programme.js')
+const pupitreRoutes = require('./routes/pupitre.js')
+const eliminationRoutes = require ('./routes/elimination.js')
+
+
+const swaggerJsdoc = require("swagger-jsdoc");
+const swaggerUi = require('swagger-ui-express');
+
+
+
 const { notifiercongechoriste }= require('./controllers/conge.js')
 cron.schedule('54 10 * * *', async () => {
   const liste = await notifiercongechoriste();
@@ -29,10 +38,52 @@ cron.schedule('54 10 * * *', async () => {
     io.emit("notif-6582068777dd44c527da3a08", { message: "Demandes de congé des choristes", liste });
   }
 });
+const {io}=require("./socket.js");
+const { notifieradminChoristeseliminés }= require('./controllers/absenceElemination.js')
+cron.schedule('24 23 * * *', async () => {
+  try {
+    const liste = await notifieradminChoristeseliminés();
+
+    if (liste && liste.length > 0) {
+      io.emit("notif-658952ad8759379e4f8bbeac", { message: "Listes des choristes eliminés", liste });
+    } else {
+      console.log("Aucun choriste éliminé trouvé.");
+    }
+  } catch (error) {
+    console.error(error.message);
+  }
+});
+
+
+const { notifierNominés }= require('./controllers/absenceElemination.js')
+cron.schedule('55 23 * * *', async () => {
+  try {
+    const liste = await  notifierNominés();
+
+    if (liste && liste.length > 0) {
+      io.emit("notif-nominés", { message: "Listes des choristes nominés", liste });
+    } 
+  } catch (error) {
+    console.error(error.message);
+  }
+});
+
+const { notifierElimines }= require('./controllers/absenceElemination.js')
+cron.schedule('58 23 * * *', async () => {
+  try {
+    const liste = await  notifierElimines();
+
+    if (liste && liste.length > 0) {
+      io.emit("notifierElimines", { message: "Listes des choristes eliminés", liste });
+    } 
+  } catch (error) {
+    console.error(error.message);
+  }
+});
 
 mongoose
 .connect(
-     "mongodb://127.0.0.1:27017/DS",
+     "mongodb://127.0.0.1:27017/database",
    { /*useNewUrlParser: true, useUnifiedTopology: true*/}
 )
 .then(()=>console.log("connexion a mongoDB reussite"))
@@ -50,7 +101,72 @@ app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, PATCH, OPTIONS");
   next();
 });
+const options = {
+  definition: {
+    components: {
+      responses: {
+        200: {
+          description: "Success",
+        },
+        400: {
+          description: "Bad request. You may need to verify your information.",
+        },
+        401: {
+          description: "Unauthorized request, you need additional privileges",
+        },
+        403: {
+          description:
+            "Forbidden request, you must login first. See /auth/login",
+        },
+        404: {
+          description: "Object not found",
+        },
+        422: {
+          description:
+            "Unprocessable entry error, the request is valid but the server refused to process it",
+        },
+        500: {
+          description: "Unexpected error, maybe try again later",
+        },
+      },
 
+      securitySchemes: {
+        bearerAuth: {
+          type: "http",
+          scheme: "bearer",
+          bearerFormat: "JWT",
+        },
+      },
+    },
+    security: [
+      {
+        bearerAuth: [],
+      },
+    ],
+
+    openapi: '3.0.0',
+    info: {
+      title: 'API SWAGGER',
+      version: '0.1.0',
+      description: 'Description',
+      contact: {
+        name: 'Ghofrane',
+        url: '',
+        email: 'wechcriaghofrane@gmail.com',
+      },
+    },
+    servers: [
+      {
+        url: 'http://localhost:5000/api',
+        description: 'Development server',
+      },
+    ],
+  },
+  apis: ['./routes/*.js'], 
+};
+
+const specs = swaggerJsdoc(options);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs, { explorer: true }));
 
 app.use('/api/filtragecandidats', filtragecandidatRoutes);
 app.use('/api/auditions', auditionRoutes);
@@ -62,18 +178,20 @@ app.use('/api/gerer', gererRoutes);
 app.use('/api/conge', congeRoutes);
 app.use('/api/absence',AbsenceRoutes)
 app.use('/api/tessiture',tessitureRoutes)
-
-//app.use('/confirmation', confirmationRoutes);
-//app.use('/qrcode', qrcodeRoutes);
 app.use('/api/auth',authRoutes)
-app.use('/api/concert',concertsRoutes);
+app.use('/api/concert', concertsRoutes);
 app.use('/api/saisons', saisonRoutes);
-app.use("/api/concerts",concertRoutes)
 app.use("/api/programme",programmeRoutes)
 app.use("/api/users",userRoutes)
 app.use("/api/pupitre",pupitreRoutes)
 app.use('/api/elimination',eliminationRoutes)
+app.use('/api/intervenant',intervenantRoutes)
+
+
+
 module.exports = app;
+module.exports.io = io;
+
 
 
 

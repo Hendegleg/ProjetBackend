@@ -4,7 +4,7 @@ const Repetition = require('../models/repetition');
 const Concert = require('../models/concert');
 const User = require('../models/utilisateurs');
 
-exports.informerAbsence = (req, res) => {
+const informerAbsence = (req, res) => {
   const { eventType, eventDate, reason } = req.body;
   const userId = req.params.id;
 
@@ -175,6 +175,7 @@ module.exports={
   createAbsenceRequest,
   getAbsenceRequestsByUser,
   getChoristesByRepetitionAndPupitre,
-  createAbsence
+  createAbsence,
+  informerAbsence
 
 }

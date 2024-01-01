@@ -218,9 +218,61 @@ const notifiercongechoriste = async () => {
     return null;
   }
 };
+const modifyLeaveStatus = async (req, res) => {
+  try {
+    const { userId, approved } = req.body;
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ message: 'Utilisateur non trouvé' });
+    }
+
+    if (approved) {
+      
+      user.demandeConge = false; 
+      user.estEnConge = true; 
+
+      // Save the modified status
+      await user.save();
+
+      res.status(200).json({ message: 'Statut de congé modifié avec succès.' });
+    } else {
+      res.status(200).json({ message: 'Demande de congé non approuvée.' });
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+const LeaveNotifications = async (req, res) => {
+  try {
+    // Récupérer les utilisateurs en congé avec demande de congé en attente
+    const usersToNotify = await User.find({ conge: 'enattente', demandeConge: true });
+
+    const leaveNotifications = [];
+    // Parcourir les utilisateurs à notifier pour créer les notifications
+    for (const user of usersToNotify) {
+      const notification = new Notification({
+        userId: user._id,
+        message: 'Vous êtes en congé.'
+      });
+
+      await notification.save();
+      leaveNotifications.push(notification);
+    }
+
+    res.status(200).json({ message: 'Liste des congés', leaveNotifications });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+
 module.exports={
   sendNotificationForLeaveRequest,
   notifiercongechoriste,
   sendNotification,
   declareLeave,
+  LeaveNotifications,
+  modifyLeaveStatus
+
 }
