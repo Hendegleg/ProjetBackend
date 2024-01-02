@@ -47,7 +47,8 @@ const UserSchema = new Schema({
     absencecount:{
         type:Number,
         default:0
-      }
+      },
+      pupitre :{type: mongoose.Schema.Types.ObjectId, ref: 'Pupitre'}
     
 });
 

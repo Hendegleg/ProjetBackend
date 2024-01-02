@@ -1,4 +1,8 @@
 const User = require('../models/utilisateurs');
+const StatusHistory=require('../models/StatusHistory');
+const saison =require('../models/saison');
+const {getChoristesNominés,getChoristesÉliminés}=require('../controllers/absenceElemination')
+
 
 const getProfileAndStatusHistory = async (req, res) => {
   try {
@@ -214,15 +218,6 @@ const getAllUserActivityHistory = async (req, res) => {
   }
 };
 
-module.exports = {
-  getAllUserActivityHistory,
-  getUserActivityHistory ,
-  getProfileAndStatusHistory
-};
-
-const StatusHistory=require('../models/StatusHistory');
-const saison=require('../models/saison');
-const {getChoristesNominés,getChoristesÉliminés}=require('../controllers/absenceElemination')
 
 const getListeChoristes = async () => {
   try {
@@ -305,6 +300,9 @@ const getProfile = async (req, res) => {
 };
 
 module.exports = {
+  getAllUserActivityHistory,
+  getUserActivityHistory ,
+  getProfileAndStatusHistory,
   getProfile,
   getListeChoristes,
   voirProfilChoriste

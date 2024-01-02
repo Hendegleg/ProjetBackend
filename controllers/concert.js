@@ -137,9 +137,7 @@ const concertController = {
       res.status(500).json({ success: false, error: error.message });
     }
   },
-  
  
-   
   indiquerpresenceConcert: async (req, res) => {
       try {
         const { id } = req.params;

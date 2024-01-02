@@ -222,7 +222,7 @@ const createCandidat = async (req, res) => {
     }
 };
 
-exports.notifieradmin =async()=> {
+const notifieradmin =async()=> {
 const today10am = new Date();
   today10am.setHours(15, 0, 0, 0); 
 
@@ -245,7 +245,18 @@ const today10am = new Date();
   }
 };
 
-
+module.exports = {
+    notifieradmin,
+    createCandidat ,
+    verifyEmailToken,
+    addEmailCandidat,
+    sendEmail ,
+    create,
+    deleteCandidatById ,
+    updateCandidatById,
+    getCandidatById,
+    getAllCandidats,
+  };
 
 
 

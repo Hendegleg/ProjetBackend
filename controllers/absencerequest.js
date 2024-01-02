@@ -1,28 +1,9 @@
 const AbsenceRequest = require('../models/absence');
 const Pupitre = require('../models/pupitre');
-const Pupitre = require('../models/pupitre');
 const Repetition = require('../models/repetition');
 const Concert = require('../models/concert');
 const User = require('../models/utilisateurs');
 
-const createAbsenceRequest = async (req, res) => {
-  try {
-    const { userId, reason, dates, type } = req.body;
-    
-    const user = await User.findById(userId);
-    if (!user) {
-      return res.status(404).json({ message: 'Utilisateur non trouvé' }); 
-    }
-
-    const absenceRequest = new AbsenceRequest({ user: userId, reason, dates, type });
-    //sauvegarde f base
-    await absenceRequest.save();
-
-    res.status(201).json({ message: 'Demande d\'absence créée avec succès', absenceRequest });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
 const informerAbsence = (req, res) => {
   const { eventType, eventDate, reason } = req.body;
   const userId = req.params.id;
@@ -77,7 +58,6 @@ const informerAbsence = (req, res) => {
     });
 };
 
-const getAbsenceRequestsByUser = async (req, res) => {
 
 const createAbsenceRequest = async (req, res) => {
   try {
@@ -97,11 +77,6 @@ const createAbsenceRequest = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
-
-
-
-
-
 const getAbsenceRequestsByUser = async (req, res) => {
   try {
     const { userId } = req.params;
@@ -133,10 +108,6 @@ const createAbsence = async (req, res) => {
     res.status(500).json({ error: 'Erreur lors de la création de l\'absence request' });
   }
 };
-
-
-
-
 
 const getChoristesByRepetitionAndPupitre = async (req, res) => {
   try {
@@ -190,11 +161,12 @@ const getChoristesByRepetitionAndPupitre = async (req, res) => {
     res.status(500).json({ error: 'Erreur lors de la récupération des choristes par répétition' });
   }
 };
-module.exports = {
-  createAbsence,
+
+module.exports={
   createAbsenceRequest,
-  getAbsenceRequestsByUser ,
-  informerAbsence,
-  getChoristesByRepetitionAndPupitre, 
-  getChoristesByRepetitionAndPupitre
-};
+  getAbsenceRequestsByUser,
+  getChoristesByRepetitionAndPupitre,
+  createAbsence,
+  informerAbsence
+
+}

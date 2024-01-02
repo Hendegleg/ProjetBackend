@@ -9,5 +9,5 @@ router.get('/getleave', CongeController.notifiercongechoriste)
 //tache35
 router.get('/choristesanotifier',CongeController.LeaveNotifications)
 router.post('/modifyLeaveStatus', CongeController.modifyLeaveStatus)
-
+router.post('/notifmodifyLeaveStatus', CongeController.notifmodifyLeaveStatus)
 module.exports = router;

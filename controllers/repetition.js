@@ -422,9 +422,8 @@ module.exports = {
   updateRepetition: updateRepetition,
   deleteRepetition: deleteRepetition,
   generatePupitreList: generatePupitreList,
-  confirmerpresenceRepetition,
   envoyerNotificationChoristes,
   confirmerpresenceRepetition: confirmerpresenceRepetition,
-  addRepetitionn
+  addRepetitionn,
   consulterEtatAbsencesRepetitions,
 };

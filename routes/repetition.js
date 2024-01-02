@@ -12,12 +12,6 @@ router.delete("/deleterepetition/:id",auth.authMiddleware,auth.isAdmin, repetiti
 router.post('/generatePupitreList',auth.authMiddleware,auth.isAdmin, repetitioncontroller.generatePupitreList);
 
 router.get('/consulterEtatAbsencesRepetitions',  repetitioncontroller.consulterEtatAbsencesRepetitions);
-router.get("/", repetitioncontroller.fetchRepetitions);
-router.post("/", repetitioncontroller.addRepetition);
-router.get("/:id", repetitioncontroller.getRepetitionById);
-router.put("/updaterepetition/:id", repetitioncontroller.updateRepetition);
-router.delete("/deleterepetition/:id", repetitioncontroller.deleteRepetition);
-router.post('/generatePupitreList', repetitioncontroller.generatePupitreList);
 router.post('/:id/ajouterPresenceManuelle', repetitioncontroller.ajouterPresenceManuelleRepetition);
 router.post('/:id/confirmerpresence',  repetitioncontroller.confirmerpresenceRepetition);
 

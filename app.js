@@ -2,8 +2,8 @@ const express = require("express");
 const cron = require('node-cron');
 
 require('dotenv').config();
+
 const mongoose = require("mongoose");
-const {io}=require("./socket.js");
 const userRoutes =require("./routes/utilisateur");
 const auditionRoutes = require("./routes/audition");
 const repetitionRoutes = require("./routes/repetition");
@@ -15,10 +15,7 @@ const congeRoutes = require('./routes/conge');
 const saisonRoutes = require('./routes/saison.js');
 const concertsRoutes = require('./routes/concert.js');
 const qrcodeRoutes = require('./routes/qrcode');
-const userRoutes = require('./routes/utilisateur.js')
 const filtragecandidatRoutes= require('./routes/filtragecandidats.js')
-const concertsRoutes= require('./routes/concert.js')
-const qrcodeRoutes = require('./routes/qrcode');
 const authRoutes = require ('./routes/auth');
 const AbsenceRoutes = require ('./routes/absenceRequest')
 const tessitureRoutes = require ('./routes/tessiture')
@@ -30,7 +27,8 @@ const repetitioncontroller = require ('./controllers/repetition');
 const { notifieradmin } = require("./controllers/candidat.js");
 const placementController = require('./routes/placement.js')
 const {io}=require("./socket.js");
-const { notifiercongechoriste }= require('./controllers/conge.js')
+const { notifiercongechoriste }= require('./controllers/conge.js');
+const { NotifupdateTessiture } = require("./controllers/tessiture.js");
 cron.schedule('29 13 * * *', repetitioncontroller.envoyerNotificationChoristes);
 
 cron.schedule('13 22 * * *',async () => {
