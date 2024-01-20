@@ -20,9 +20,10 @@ const transporter = nodemailer.createTransport({
         pass: process.env.EMAIL_PASSWORD
     }
 });
-exports.getListeCandidatsParPupitre= async (req, res) => {
+
+exports.getListeCandidatsParPupitre = async (req, res) => {
     try {
-        const besoinPupitres = req.body; 
+        const besoinPupitres = req.body|| {}
 
         const candidatsParPupitre = {
             Soprano: { retenu: [], 'en attente': [], refuse: [] },
@@ -30,12 +31,16 @@ exports.getListeCandidatsParPupitre= async (req, res) => {
             Ténor: { retenu: [], 'en attente': [], refuse: [] },
             Basse: { retenu: [], 'en attente': [], refuse: [] }
         };
+        if (Object.keys(besoinPupitres).length === 0) {
+            return res.status(400).json({ error: 'Besoin des pupitres non spécifié dans la requête' });
+        }
 
-        const auditionsRetenues = await Audition.find({ decisioneventuelle: 'retenu' }).populate('candidat');
+        const auditionsRetenues = await Audition.find({ decisioneventuelle: { $in: ['retenu', 'en attente', 'refusé'] } }).populate('candidat');
 
         for (const audition of auditionsRetenues) {
             const candidat = audition.candidat;
             const tessiture = audition.tessiture;
+            const decision = audition.decisioneventuelle;
 
             const candidatData = {
                 id: candidat._id,
@@ -44,10 +49,14 @@ exports.getListeCandidatsParPupitre= async (req, res) => {
                 email: candidat.email,
             };
 
-            if (candidatsParPupitre[tessiture].retenu.length < besoinPupitres[tessiture]) {
-                candidatsParPupitre[tessiture].retenu.push(candidatData);
-            } else {
-                candidatsParPupitre[tessiture]['en attente'].push(candidatData);
+            if (candidatsParPupitre[tessiture]['retenu'].length < besoinPupitres[tessiture]) {
+                if (decision === 'retenu' && candidatsParPupitre[tessiture]['retenu'].length < besoinPupitres[tessiture]) {
+                    candidatsParPupitre[tessiture]['retenu'].push(candidatData);
+                } else if (decision === 'en attente' && candidatsParPupitre[tessiture]['en attente'].length < besoinPupitres[tessiture]) {
+                    candidatsParPupitre[tessiture]['en attente'].push(candidatData);
+                } else {
+                    candidatsParPupitre[tessiture]['refuse'].push(candidatData);
+                }
             }
         }
 
@@ -79,6 +88,7 @@ exports.confirmerPresence = (req, res) => {
             res.status(500).send('Erreur lors de la confirmation.');
         });
 };
+
 
 exports.envoyerEmailAcceptation = async (req, res) => {
     try {
@@ -143,7 +153,7 @@ const ajouterChoriste = async (candidat, tessiture) => {
                 email: candidat.email,
                 password: candidat.motDePasse,
                 role: 'choriste',
-                tessiture: tessiture, // Utilisation de la tessiture fournie
+                tessiture: tessiture, 
                 taille_en_m: candidat.taille_en_m,
             });
 
@@ -239,17 +249,29 @@ exports.confirmerEngagement = async (req, res) => {
 };
 
 
+let listeCandidatsParSaison = {}; // objet je peux l'utiliser après
+
 exports.getListeCandidats = async (req, res) => {
     try {
-        //const listeCandidats = await Candidat.find({});
-        const listeCandidats = await Candidat.find({}, 'nom prenom');
-        res.status(200).json(listeCandidats);
-        console.log("liste:", listeCandidats)
+        const saison = req.body.saison; 
+        
+        if (!saison) {
+            return res.status(400).json({ message: 'Numéro de saison manquant dans le corps de la requête' });
+        }
+
+        if (!listeCandidatsParSaison[saison]) {
+            listeCandidatsParSaison[saison] = await Candidat.find({ saison }, 'nom prenom');
+            console.log(listeCandidatsParSaison)
+        }
+
+        res.status(200).json(listeCandidatsParSaison[saison]);
+        console.log(`Liste des candidats pour la saison ${saison}:`, listeCandidatsParSaison[saison]);
     } catch (error) {
         console.error('Erreur lors de la récupération de la liste des candidats :', error);
         res.status(500).json({ message: 'Erreur lors de la récupération de la liste des candidats' });
     }
 };
+
 exports.getCandidatsRetenusParPupitre = async (req, res) => {
     try {
         const auditionsRetenues = await Audition.find({ decisioneventuelle: 'retenu' });
@@ -314,3 +336,4 @@ exports.getCandidatsRetenusParPupitre = async (req, res) => {
         return res.status(500).json({ error: 'Erreur lors de la récupération des candidats retenus par pupitre' });
     }
 };
+

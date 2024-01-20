@@ -187,4 +187,3 @@ router.get('/:id/profile',Auth.authMiddleware,Auth.isAdminOrChoriste ,userContro
 
 
 module.exports = router;
-//eliminationController.getChoristesNominés,eliminationController.getChoristesÉliminés,

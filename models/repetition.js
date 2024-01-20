@@ -3,7 +3,7 @@ const Schema = mongoose.Schema;
 
 const RepetitionSchema = new Schema({
     nom: { type: String, required: true },
-    date: { type: Date, required: true },
+    date: [{ type: Date, required: true }],
     heureDebut: { type: String, required: true }, 
     heureFin: { type: String, required: true }, 
     lieu: { type: String, required: true },
@@ -11,7 +11,7 @@ const RepetitionSchema = new Schema({
     nbr_repetition: { type: Number, required: true },
     pourcentagesPupitres: [
         { 
-          pupitre: { type: Number }, 
+          pupitre: { type: Schema.Types.ObjectId, ref: 'Pupitre' },
           selectedChoristes: [
             {
               _id: { type: Schema.Types.ObjectId, ref: 'User' },
@@ -21,7 +21,7 @@ const RepetitionSchema = new Schema({
           ]
         }
       ],
-    programme : {type: String},
+    programme : {type: Schema.Types.ObjectId, ref: 'Programme' },
     concert :{ type: mongoose.Schema.Types.ObjectId, ref: 'Concert' }
 });
 

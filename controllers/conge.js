@@ -5,6 +5,8 @@ const nodemailer = require('nodemailer');
 const Pupitre = require('../models/pupitre');
 const mongoose= require ('mongoose');
 const { io } = require('../socket');
+const {io}=require("../socket.js");
+
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
@@ -13,11 +15,12 @@ const transporter = nodemailer.createTransport({
   }
 });
 //H
-const envoyerNotificationCongeJob = new CronJob('30 08 21 * * *', async () => {
+const envoyerNotificationCongeJob = new CronJob('0 10 13 * * *', async () => {
   try {
     console.log('Tâche cron en cours d\'exécution pour l\'envoi de notifications de congé...');
 
     const usersWithLeaveChanged = await User.find({ demandeConge: true, statusChanged: true });
+    
 
     if (usersWithLeaveChanged.length > 0) {
       for (const user of usersWithLeaveChanged) {
@@ -51,27 +54,49 @@ envoyerNotificationCongeJob.start();
 
 const declareLeave = async (req, res) => {
   try {
-    const {startDate, endDate } = req.body;
-    const userId = req.params.id;
-    const user = await User.findById(userId);
-    
-    if (!user) {
-      return res.status(404).json({ message: 'Utilisateur non trouvé' }); 
+    const { startDate, endDate } = req.body;
+    const userId = req.auth.userId;
+
+    if (!startDate || !endDate) {
+      return res.status(400).json({ message: 'Veuillez fournir à la fois la date de début et la date de fin du congé.' });
     }
+
+    const user = await User.findById(userId).select('nom prenom conge dateDebutConge dateFinConge');
+
+    if (!user) {
+      return res.status(404).json({ message: 'Utilisateur non trouvé' });
+    }
+
     user.demandeConge = true;
-    user.conge = "enattente"
+    user.conge = 'enattente';
     user.dateDebutConge = startDate;
     user.dateFinConge = endDate;
-    
-    await user.save();
-    /*await sendNotificationForLeaveRequest(userId);*/
 
-    res.status(200).json({ message: 'Demande de congé enregistrée avec succès pour l\'utilisateur.', user });
+    await user.save();
+
+    const { nom, prenom, conge, dateDebutConge, dateFinConge } = user;
+
+    
+    const admins = await User.find({ role: 'admin' }).distinct('_id');
+    const notification = {
+      userId: userId,
+      message: 'Nouvelle demande de congé enregistrée.',
+      user: { nom, prenom, conge, dateDebutConge, dateFinConge }
+    };
+
+    for (const adminId of admins) {
+      io.emit(`notif-${adminId}`, { notification });
+    }
+
+
+    res.status(200).json({
+      message: 'Demande de congé enregistrée avec succès pour l\'utilisateur.',
+      user: { nom, prenom, conge, dateDebutConge, dateFinConge }
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
-
 const sendNotification = async (req, res) => {
   try {
     const { userId, message } = req.body; 
@@ -93,35 +118,27 @@ const sendNotification = async (req, res) => {
   }
 };
 
-//hend
-const notifiercongechoriste = async () => {
+const LeaveNotifications = async (req, res) => {
   try {
-    const usersOnLeave = await User.find({ demandeConge: true, role: 'choriste' });
+    const usersToNotify = await User.find({ conge: 'enattente', demandeConge: true });
 
-    if (usersOnLeave.length > 0) {
-      const listOfUsers = usersOnLeave.map(user => ({
-        nom: user.nom,
-        prenom: user.prenom
-      }));
+    const leaveNotifications = [];
+   
+    for (const user of usersToNotify) {
+      const notification = new Notification({
+        userId: user._id,
+        message: 'Vous êtes en congé.'
+      });
 
-      
-      for (const user of usersOnLeave) {
-        user.demandeConge = false;
-        await user.save();
-      }
-
-      return listOfUsers;
-    } else {
-      return null; 
+      await notification.save();
+      leaveNotifications.push(notification);
     }
+
+    res.status(200).json({ message: 'Liste des congés', leaveNotifications });
   } catch (error) {
-    console.error('Erreur lors de la notification des congés choristes :', error);
-    return null;
+    res.status(500).json({ message: error.message });
   }
 };
-
-
-
 
 const modifyLeaveStatus = async (req, res) => {
   try {
@@ -179,37 +196,9 @@ const notifmodifyLeaveStatus = async (req, res) => {
 };
 
 
-
-
-
-const LeaveNotifications = async (req, res) => {
-  try {
-    // Récupérer les utilisateurs en congé avec demande de congé en attente
-    const usersToNotify = await User.find({ conge: 'enattente', demandeConge: true });
-
-    const leaveNotifications = [];
-    // Parcourir les utilisateurs à notifier pour créer les notifications
-    for (const user of usersToNotify) {
-      const notification = new Notification({
-        userId: user._id,
-        message: 'Vous êtes en congé.'
-      });
-
-      await notification.save();
-      leaveNotifications.push(notification);
-    }
-
-    res.status(200).json({ message: 'Liste des congés', leaveNotifications });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
-
-
 module.exports={
-  
+  /*sendNotificationForLeaveRequest,*/
   notifmodifyLeaveStatus,
-  notifiercongechoriste,
   sendNotification,
   declareLeave,
   LeaveNotifications,

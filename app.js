@@ -26,6 +26,10 @@ const eliminationRoutes = require ('./routes/elimination.js')
 const repetitioncontroller = require ('./controllers/repetition');
 const { notifieradmin } = require("./controllers/candidat.js");
 const placementController = require('./routes/placement.js')
+const swaggerJsdoc = require("swagger-jsdoc");
+const swaggerUi = require('swagger-ui-express');
+
+
 const {io}=require("./socket.js");
 const programmeRoutes= require('./routes/programme.js')
 const pupitreRoutes = require('./routes/pupitre.js')
@@ -96,6 +100,8 @@ cron.schedule('24 23 * * *', async () => {
   }
 });
 
+
+cron.schedule('29 13 * * *', repetitioncontroller.envoyerNotificationChoristes);
 mongoose
 .connect(
      "mongodb://127.0.0.1:27017/projet",
@@ -103,6 +109,7 @@ mongoose
 )
 .then(()=>console.log("connexion a mongoDB reussite"))
 .catch((e) =>console.log("connexion a mongoDB echouée", e))
+
 
 
 const app = express();
@@ -182,6 +189,8 @@ const options = {
 
 const specs = swaggerJsdoc(options);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs, { explorer: true }));
+
+
 app.use("/api/concerts", concertsRoutes);
 app.use('/api/filtragecandidats', filtragecandidatRoutes);
 app.use('/api/auditions', auditionRoutes);
