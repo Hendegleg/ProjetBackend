@@ -77,7 +77,7 @@ const sendEmail = async (email, subject, text, attachments = []) => {
             secure: true, 
             auth: {
                 user: "wechcrialotfi@gmail.com", 
-                pass: "vqbs baba usst djrw", 
+                pass: "sgpt snms vtum ifph", 
             },
         });
 
@@ -126,7 +126,7 @@ const addEmailCandidat = async (req, res) => {
         if (emailSent) {
             return res.status(201).send({ message: "An Email has been sent to your account, please verify" });
         } else {
-            await Verifmail.findByIdAndRemove(candidat._id);
+            await Verifmail.findOneAndDelete({ _id: candidat._id });
             throw new Error("Error sending verification email");
         }
     } catch (error) {
