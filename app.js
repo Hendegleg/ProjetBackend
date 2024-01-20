@@ -1,7 +1,6 @@
 const express = require("express");
 const cron = require('node-cron');
 require('dotenv').config();
-const { specs, swaggerUi } = require('./swagger');
 const mongoose = require("mongoose");
 const userRoutes =require("./routes/utilisateur");
 const auditionRoutes = require("./routes/audition");
@@ -73,7 +72,7 @@ app.use((req, res, next) => {
 });
 
 
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
+
 app.use("/api/concerts", concertsRoutes);
 app.use('/api/filtragecandidats', filtragecandidatRoutes);
 app.use('/api/auditions', auditionRoutes);
