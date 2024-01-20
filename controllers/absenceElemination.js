@@ -236,10 +236,9 @@ const getChoristesÉliminés = async (req, res, next) => {
 
 
 //discipline
-
 const eliminationDiscipline = async (req, res) => {
-  const { userId, reason } = req.body; 
-  
+  const { userId, reason } = req.body;
+
   try {
     const user = await User.findById(userId);
     if (!user) {
@@ -249,6 +248,32 @@ const eliminationDiscipline = async (req, res) => {
     user.elimination = 'elimine';
     user.eliminationReason = `Raison disciplinaire: ${reason}`;
     await user.save();
+
+    // Send an email to the eliminated user
+    const transporter = nodemailer.createTransport({
+      host: "smtp.gmail.com", 
+      port: 465, 
+      secure: true, 
+      auth: {
+          user: "ttwejden@gmail.com", 
+          pass: "vxcn ynmf ovcp gwij", 
+      },
+    });
+
+    const mailOptions = {
+      from: 'ttwejden@gmail.com',
+      to: user.email,
+      subject: 'Notification d\'élimination pour raison disciplinaire',
+      text: `Bonjour ${user.prenom},\nVous avez été éliminé pour la raison suivante: ${user.eliminationReason}`,
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.error('Erreur lors de l\'envoi de l\'e-mail:', error);
+      } else {
+        console.log('E-mail envoyé:', info.response);
+      }
+    });
 
     return res.status(200).json({ success: true, message: 'Utilisateur éliminé pour raison disciplinaire.' });
   } catch (error) {

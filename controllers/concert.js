@@ -6,7 +6,7 @@ const Excel = require('exceljs');
 const concertController = {
 
   createConcert: async (req, res) => {
-    const newConcert = await Concert.create(req.body);
+   
 
     //await QRCode.toFile(`C:\\Users\\tinne\\OneDrive\\Desktop\\ProjetBackend\\image QR\\qrcode-${newConcert._id}.png`, `http://localhost:5000/api/concerts/concerts/${newConcert._id}/confirmerpresence`, {
      // color: {

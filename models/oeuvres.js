@@ -13,5 +13,5 @@ const OeuvresSchema = new Schema({
 });
 
 
-const Oeuvres = mongoose.model('oeuvres', OeuvresSchema);
+const Oeuvres = mongoose.model('Oeuvres', OeuvresSchema);
 module.exports = Oeuvres;

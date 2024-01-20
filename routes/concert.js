@@ -3,154 +3,214 @@ const router = express.Router();
 const concertController = require('../controllers/concert');
 const auth = require('../middlewares/auth');
 
-const uploadFile = require('../middlewares/uploadFiles');
+
 /**
  * @swagger
  * tags:
  *   name: Concerts
- *   description: Opérations sur les concerts
- * 
+ *   description: API operations related to concerts
+ */
+
+/**
+ * @swagger
+ * /concert:
+ *   post:
+ *     summary: Create a new concert
+ *     tags: [Concerts]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Concert'
+ *     responses:
+ *       201:
+ *         description: Concert created successfully
+ *       400:
+ *         description: Bad request - Invalid input data
+ *       401:
+ *         description: Unauthorized - Invalid token
+ *       500:
+ *         description: Internal server error
+ */
+
+/**
+ * @swagger
+ * /concert:
+ *   get:
+ *     summary: Get all concerts
+ *     tags: [Concerts]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Successful response
+ *         content:
+ *           application/json:
+ *             example:
+ *               success: true
+ *               concerts:
+ *                 - _id: "60a1f5f66b5f4b001d3478c5"
+ *                   presence: true
+ *                   date: "2022-05-16"
+ *                   lieu: "Concert Hall"
+ *                   heure: "19:00"
+ *                   affiche: "https://example.com/concert-poster.jpg"
+ *                   programme:
+ *                     - programme: "60a1f5f66b5f4b001d3478c6"
+ *                       requiresChoir: true
+ *                   planning: "60a1f5f66b5f4b001d3478c7"
+ *                   nom_concert: "Spring Concert"
+ *                   placement: "60a1f5f66b5f4b001d3478c8"
+ *                   participant: "60a1f5f66b5f4b001d3478c9"
+ *                 - _id: "60a1f5f66b5f4b001d3478ca"
+ *                   presence: false
+ *                   date: "2022-08-20"
+ *                   lieu: "Outdoor Venue"
+ *                   heure: "20:00"
+ *                   affiche: "https://example.com/summer-concert.jpg"
+ *                   programme:
+ *                     - programme: "60a1f5f66b5f4b001d3478cb"
+ *                       requiresChoir: false
+ *                   planning: "60a1f5f66b5f4b001d3478cc"
+ *                   nom_concert: "Summer Night Vibes"
+ *                   placement: "60a1f5f66b5f4b001d3478cd"
+ *                   participant: "60a1f5f66b5f4b001d3478ce"
+ */
+
+/**
+ * @swagger
+ * /concert/{id}:
+ *   put:
+ *     summary: Update a specific concert by ID
+ *     tags: [Concerts]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Concert ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Concert'
+ *     responses:
+ *       200:
+ *         description: Concert updated successfully
+ *       400:
+ *         description: Bad request - Invalid input data
+ *       401:
+ *         description: Unauthorized - Invalid token
+ *       404:
+ *         description: Concert not found
+ *       500:
+ *         description: Internal server error
+ */
+
+/**
+ * @swagger
+ * /concert/{id}:
+ *   delete:
+ *     summary: Delete a specific concert by ID
+ *     tags: [Concerts]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Concert ID
+ *     responses:
+ *       200:
+ *         description: Concert deleted successfully
+ *       401:
+ *         description: Unauthorized - Invalid token
+ *       404:
+ *         description: Concert not found
+ *       500:
+ *         description: Internal server error
+ */
+
+/**
+ * @swagger
+ * /concert/{id}/confirmerpresence:
+ *   post:
+ *     summary: Confirm presence for a specific concert by ID
+ *     tags: [Concerts]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Concert ID
+ *     responses:
+ *       200:
+ *         description: Presence confirmed successfully
+ *       401:
+ *         description: Unauthorized - Invalid token
+ *       404:
+ *         description: Concert not found
+ *       500:
+ *         description: Internal server error
+ */
+
+/**
+ * @swagger
  * components:
  *   schemas:
  *     Concert:
  *       type: object
  *       properties:
- *         _id:
- *           type: string
- *           description: Identifiant auto-généré du concert
  *         presence:
- *           type: string
- *           description: Présence au concert
+ *           type: boolean
  *         date:
  *           type: string
  *           format: date
- *           description: Date du concert
  *         lieu:
  *           type: string
- *           description: Lieu du concert
  *         heure:
  *           type: string
- *           description: Heure du concert
+ *           format: time
+ *         affiche:
+ *           type: string
  *         programme:
- *           type: string
- *           description: Programme du concert
- *         planning:
- *           type: string
- *           description: Planning du concert
- *         nom_concert:
- *           type: string
- *           description: Nom du concert
- *       example:
- *         _id: 12345
- *         presence: "present"
- *         date: "2024-01-01"
- *         lieu: "Nom du lieu"
- *         heure: "20:00"
- *         programme: "Description du programme"
- *         planning: "Planning détaillé"
- *         nom_concert: "Nom du concert"
- * 
- *   responses:
- *     ConcertResponse:
- *       200:
- *         description: Succès
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Concert'
- *       400:
- *         description: Requête invalide
- *       401:
- *         description: Non autorisé
- *       404:
- *         description: Concert non trouvé
- *       500:
- *         description: Erreur interne du serveur
- */
-
-/**
- * @swagger
- * /api/concerts:
- *   post:
- *     summary: Créer un nouveau concert
- *     tags: [Concerts]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/Concert'
- *     responses:
- *       $ref: '#/components/responses/ConcertResponse'
- * 
- *   get:
- *     summary: Récupérer tous les concerts
- *     tags: [Concerts]
- *     responses:
- *       $ref: '#/components/responses/ConcertResponse'
- */
-
-/**
- * @swagger
- * /api/concerts/{id}:
- *   put:
- *     summary: Mettre à jour un concert par ID
- *     tags: [Concerts]
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *         description: ID du concert à mettre à jour
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/Concert'
- *     responses:
- *       $ref: '#/components/responses/ConcertResponse'
- * 
- *   delete:
- *     summary: Supprimer un concert par ID
- *     tags: [Concerts]
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *         description: ID du concert à supprimer
- *     responses:
- *       $ref: '#/components/responses/ConcertResponse'
- */
-
-/**
- * @swagger
- * /api/concerts/{id}/confirmerpresence:
- *   post:
- *     summary: Confirmer la présence à un concert
- *     tags: [Concerts]
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *         description: ID du concert pour confirmer la présence
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
+ *           type: array
+ *           items:
  *             type: object
  *             properties:
- *               userid:
+ *               programme:
  *                 type: string
- *                 description: ID de l'utilisateur
- *     responses:
- *       $ref: '#/components/responses/ConcertResponse'
+ *               requiresChoir:
+ *                 type: boolean
+ *           required:
+ *             - programme
+ *         planning:
+ *           type: string
+ *         nom_concert:
+ *           type: string
+ *         placement:
+ *           type: string
+ *         participant:
+ *           type: string
+ *       required:
+ *         - date
+ *         - lieu
+ *         - heure
+ *         - programme
+ *         - planning
+ *         - nom_concert
  */
 
 // Routes pour gérer les concerts

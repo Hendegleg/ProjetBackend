@@ -10,6 +10,7 @@ const moment = require('moment');
 const createAudition = async (req, res) => {
   try {
     const {
+      DateAudition,
       heure_debut,
       heure_fin ,
       date_audition,
@@ -24,11 +25,12 @@ const createAudition = async (req, res) => {
     } = req.body;
 
     // Vérification des données requises
-    if (!DateAudition || !nombre_séance || !dureeAudition || !candidat) {
+    if (!DateAudition  ) {
       return res.status(400).json({ message: "Certains champs sont manquants pour créer une audition." });
     }
 
     const nouvelleAudition = new Audition({
+      DateAudition,
       heure_debut,
       heure_fin ,
       date_audition,

@@ -71,19 +71,55 @@ const programController = require('../controllers/programme');
  *       500:
  *         description: Erreur interne du serveur
  */
-
 /**
  * @swagger
- * /api/programmes:
+ * /programme/:
+ *   post:
+ *     summary: Add a new program
+ *     tags:
+ *       - Program
+ *     requestBody:
+ *       description: Program details to be added
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               nom_programme:
+ *                 type: string
+ *                 description: The name of the program
+ *               oeuvres:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                 description: An array of Oeuvres IDs associated with the program
+ *             required:
+ *               - nom_programme
+ *               - oeuvres
+ *     responses:
+ *       200:
+ *         description: Successful response
+ *       400:
+ *         description: Bad request - Invalid input data
+ *       401:
+ *         description: Unauthorized - Invalid token
+ *       403:
+ *         description: Forbidden - Insufficient permissions
+ *       500:
+ *         description: Internal server error
+ */
+
+router.post('/', programController.addProgram);
+/**
+ * @swagger
+ * /programme/byfile:
  *   post:
  *     summary: Créer un nouveau programme ou ajouter depuis un fichier Excel
  *     tags: [Programmes]
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/Programme'
  *         multipart/form-data:
  *           schema:
  *             type: object
@@ -101,8 +137,7 @@ const programController = require('../controllers/programme');
  *       500:
  *         description: Erreur interne du serveur
  */
-router.post('/', programController.addProgram);
-router.post('/byfile', uploadFiles , programController.addProgramFromExcel);
+router.post('/byfile', uploadFiles.uploadFile , programController.addProgramFromExcel);
 
 
 module.exports = router;
