@@ -2,36 +2,43 @@ const Pupitre = require("../models/pupitre");
 const User=require("../models/utilisateurs")
 
 const assignLeadersToPupitre = async (req, res) => {
-    const { chefsIds } = req.body;
-    const pupitreId = req.params.pupitreId;
+  const { chefsIds } = req.body;
+  const pupitreId = req.params.pupitreId;
+  const modifiedUsers = []; // Pour stocker les utilisateurs avec leurs rôles modifiés
 
-    try {
-        console.log(req.body);
-        const pupitre = await Pupitre.findById(pupitreId);
+  try {
+      console.log(req.body);
+      const pupitre = await Pupitre.findById(pupitreId);
 
-        if (!pupitre) {
-            return res.status(404).json({ error: 'Pupitre non trouvé' });
-        }
+      if (!pupitre) {
+          return res.status(404).json({ error: 'Pupitre non trouvé' });
+      }
 
-        
-        pupitre.chefs = chefsIds;
-        if (!Array.isArray(chefsIds)) {
-            return res.status(400).json({ error: 'leaderIds n\'est pas un tableau valide' });
-        } 
+      if (!Array.isArray(chefsIds) || chefsIds.length !== 2) {
+          return res.status(400).json({ error: 'Doit fournir exactement deux IDs de chefs' });
+      } 
 
-        for (const chefIds of chefsIds) {
-            const user = await User.findById(chefIds);
-            if (user) {
-                user.role = 'chef de pupitre'; // Mettre à jour le rôle
-                await user.save(); // Sauvegarder les modifications dans la base de données
-            }
-        }
-        await pupitre.save();
+      pupitre.chefs = chefsIds;
 
-        res.status(200).json({ message: 'les chefs assignés avec succes' });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
+      for (const chefIds of chefsIds) {
+          const user = await User.findById(chefIds);
+          if (user) {
+              user.role = 'chef de pupitre'; // Mettre à jour le rôle
+              await user.save(); // Sauvegarder les modifications dans la base de données
+              modifiedUsers.push({
+                  email: user.email,
+                  lastName: user.nom,
+                  firstName: user.prenom,
+                  role: user.role
+              });
+          }
+      }
+      await pupitre.save();
+
+      res.status(200).json({ message: 'les chefs assignés avec succès', modifiedUsers });
+  } catch (error) {
+      res.status(500).json({ error: error.message });
+  }
 };
 
 

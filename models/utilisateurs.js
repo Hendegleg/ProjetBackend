@@ -48,6 +48,13 @@ const UserSchema = new Schema({
         type:Number,
         default:0
       },
+     
+      concertsValidated:{type:Number,
+    default:0},
+    repetitionsValidated:{
+        type:Number,
+        default:0
+    },
       pupitre :{type: mongoose.Schema.Types.ObjectId, ref: 'Pupitre'}
     
 });

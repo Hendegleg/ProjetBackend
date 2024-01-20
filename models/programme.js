@@ -3,7 +3,7 @@ const Schema = mongoose.Schema;
 
 const programmeSchema = new Schema({
     nom_programme: { type: String, required: true },
-    oeuvres: [{ type: Schema.Types.ObjectId, ref: 'oeuvres' }]
+    oeuvres: [{ type: Schema.Types.ObjectId, ref: 'Oeuvres' }]
 });
 
 const Programme = mongoose.model('Programme', programmeSchema);

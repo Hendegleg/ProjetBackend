@@ -2,6 +2,10 @@ const nodemailer = require('nodemailer');
 const User=require('../models/utilisateurs')
 const Absence = require('../models/absence');
 
+const { io } = require('../socket.js');
+const { CronJob } = require('cron');
+require('dotenv').config();
+
 const getAllAbsences = async () => {
     try {
       const absence = await Absence.find({approved}); 
@@ -163,6 +167,23 @@ const eliminationExcessiveAbsences = async (req, res) => {
 };
 
 
+//let choristesElimines = [];
+
+const notifieradminChoristeseliminés = async () => {
+  try {
+    const choristesÉliminés = await User.find({
+      elimination: 'elimine',
+      count: { $ne: 0 } // Recherchez count différent de zéro
+    }).select('_id email nom prenom elimination role');
+
+    return choristesÉliminés;
+  } catch (error) {
+    console.error(error);
+    throw new Error('Erreur lors de la récupération des choristes éliminés.');
+  }
+};
+
+
 
 
 
@@ -215,10 +236,9 @@ const getChoristesÉliminés = async (req, res, next) => {
 
 
 //discipline
-
 const eliminationDiscipline = async (req, res) => {
-  const { userId, reason } = req.body; 
-  
+  const { userId, reason } = req.body;
+
   try {
     const user = await User.findById(userId);
     if (!user) {
@@ -229,6 +249,32 @@ const eliminationDiscipline = async (req, res) => {
     user.eliminationReason = `Raison disciplinaire: ${reason}`;
     await user.save();
 
+    // Send an email to the eliminated user
+    const transporter = nodemailer.createTransport({
+      host: "smtp.gmail.com", 
+      port: 465, 
+      secure: true, 
+      auth: {
+          user: "ttwejden@gmail.com", 
+          pass: "vxcn ynmf ovcp gwij", 
+      },
+    });
+
+    const mailOptions = {
+      from: 'ttwejden@gmail.com',
+      to: user.email,
+      subject: 'Notification d\'élimination pour raison disciplinaire',
+      text: `Bonjour ${user.prenom},\nVous avez été éliminé pour la raison suivante: ${user.eliminationReason}`,
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.error('Erreur lors de l\'envoi de l\'e-mail:', error);
+      } else {
+        console.log('E-mail envoyé:', info.response);
+      }
+    });
+
     return res.status(200).json({ success: true, message: 'Utilisateur éliminé pour raison disciplinaire.' });
   } catch (error) {
     console.error(error);
@@ -236,6 +282,39 @@ const eliminationDiscipline = async (req, res) => {
   }
 };
 
+
+const notifierNominés = async () => {
+  try {
+    // Recherche des utilisateurs nominés
+    const nominés = await User.find({ elimination: 'nomine' }).select('_id email nom prenom elimination role');
+
+    if (nominés.length > 0) {
+      // Émettre des notifications vers les nominés via Socket.IO
+      io.emit("notif-nominés", { message: "Vous êtes susceptibles d'être éliminés" });
+    } else {
+      console.log("Aucun nominé trouvé.");
+    }
+  } catch (error) {
+    console.error("Erreur lors de la recherche des nominés:", error.message);
+  }
+};
+
+
+const notifierElimines = async () => {
+  try {
+    // Recherche des utilisateurs nominés
+    const nominés = await User.find({ elimination: 'elimine' }).select('_id email nom prenom elimination role');
+
+    if (nominés.length > 0) {
+      // Émettre des notifications vers les nominés via Socket.IO
+      io.emit("notif-elimines", { message: "Vous êtes éliminés" });
+    } else {
+      console.log("Aucun eliminé trouvé.");
+    }
+  } catch (error) {
+    console.error("Erreur lors de la recherche des nominés:", error.message);
+  }
+};
 
 
   module.exports = {
@@ -246,7 +325,10 @@ const eliminationDiscipline = async (req, res) => {
     getChoristesNominés,
     getChoristesÉliminés,
     eliminationDiscipline,
-    eliminationExcessiveAbsences
+    eliminationExcessiveAbsences,
+    notifieradminChoristeseliminés,
+    notifierNominés ,
+    notifierElimines
 
     
   };

@@ -49,37 +49,6 @@ const envoyerNotificationCongeJob = new CronJob('30 08 21 * * *', async () => {
 envoyerNotificationCongeJob.start();
 
 
-/*
-const sendNotificationForLeaveRequest = async (req, res) => {
-  try {
-    const { userId } = req.body;
-
-    const user = await User.findById(userId);
-    if (!user) {
-      return res.status(404).json({ message: 'Utilisateur non trouvé' });
-    }
-
-    if (user.demandeConge === true) {
-      const notification = new Notification({
-        userId: user._id,
-        message: 'Notification pour la demande de congé.'
-      });
-      
-
-      await notification.save();
-      user.demandeConge= false; 
-      await user.save();
-
-      res.status(200).json({ message: 'Notification envoyée pour la demande de congé.' });
-    } else {
-      res.status(200).json({ message: 'Aucune notification envoyée pour la demande de congé.' });
-    }
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
-*/
-
 const declareLeave = async (req, res) => {
   try {
     const {startDate, endDate } = req.body;
@@ -210,6 +179,9 @@ const notifmodifyLeaveStatus = async (req, res) => {
 };
 
 
+
+
+
 const LeaveNotifications = async (req, res) => {
   try {
     // Récupérer les utilisateurs en congé avec demande de congé en attente
@@ -235,11 +207,12 @@ const LeaveNotifications = async (req, res) => {
 
 
 module.exports={
-  /*sendNotificationForLeaveRequest,*/
+  
   notifmodifyLeaveStatus,
   notifiercongechoriste,
   sendNotification,
   declareLeave,
   LeaveNotifications,
-  modifyLeaveStatus,
+  modifyLeaveStatus
+
 }
