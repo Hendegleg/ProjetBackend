@@ -7,7 +7,7 @@ const Pupitre = require('../models/pupitre');
 const Absence = require('../models/absence');
 const QRCode = require('qrcode');
 const User = require('../models/utilisateurs');
-const AbsenceRequest = require('../models/absence'); // Assurez-vous de fournir le chemin correct
+const AbsenceRequest = require('../models/absence');
 
 const mongoose = require('mongoose');
 
@@ -272,109 +272,140 @@ cron.schedule('0 12 * * *', async () => {
   console.log('Tâche cron exécutée.');
 });
 
-
 const consulterEtatAbsencesRepetitions = async (req, res) => {
   try {
-    const users = await User.find();
-    const { date, userId, sinceDate, period, programmeId } = req.query;
-
     const filter = {};
 
-    if (date) {
-      filter["date"] = parseDate(date);
+    if (req.query.dateprécise) {
+      filter.date = new Date(req.query.dateprécise);
     }
 
-    if (userId) {
-      // Assuming userIds is an array of ObjectIds
-      const userIds = users.map(user => user._id.toString()); // Convert user IDs to strings
-    
-      filter["participant"] = { $in: userIds };
-    
-      console.log(userIds); // Log the user IDs for debugging
-    }
-    
-    
-
-    if (sinceDate) {
-      filter["date"] = { $gte: parseDate(sinceDate) };
+    if (req.query.datedonnée) {
+      filter.date = { $gte: new Date(req.query.datedonnée) };
     }
 
-    if (period) {
-      filter["date"] = { $gte: parseDate(period.startDate), $lte: parseDate(period.endDate) };
+    if (req.query.périodedonnée) {
+      filter.date = { ...filter.date, $lte: new Date(req.query.périodedonnée) };
     }
 
-    if (programmeId) {
-      filter["programme"] = programmeId;
+    if (req.query.programme) {
+      filter.programme = req.query.programme;
     }
+   
 
-    const absencesRepetitions = await Repetition.find(filter)
-      .populate({
-        path: "concert",
-        model: "Concert",
-        populate: [
-          {
-            path: "programme",
-            model: "Oeuvre",
-          },
-        ],
-      })
-      .populate("participant")
-      .exec();
+    const repetitions = await Repetition.find(filter).populate('participant');
 
-    const formattedAbsences = await Promise.all(
-      absencesRepetitions.map(async (repetition) => {
-        const formattedDate = format(new Date(repetition.date), "dd/MM/yyyy");
+    const result = await Promise.all(repetitions.map(async (repetition) => {
+      const absentMembers = await Promise.all(repetition.participant
+        .map(async (participant) => {
+          const isAbsent = await hasAbsentRequestForRepetition(participant, repetition);
+          return isAbsent ? {
+            _id: participant._id.toString(),
+            nom: participant.nom,
+            prenom: participant.prenom,
+          } : null;
+        }));
 
-        const formattedConcert = {
-          nom: repetition.concert.nom,
-          programmeOeuvres: repetition.concert.programme.map((oeuvre) => ({
-            id: oeuvre._id,
-            nom: oeuvre.titre,
-            compositeur: oeuvre.compositeur,
-          })),
-        };
-
-        const countAbsences = repetition.participant.length;
-
-        const absences = await Promise.all(
-          repetition.participant.map(async (participant) => {
-            const absenceData = await AbsenceRequest.findOne({
-              user: participant._id,
-              repetition: repetition._id,
-              status: 'absent',
-            });
-
-            if (absenceData) {
-              return {
-                userId: participant._id,
-                nom: participant.nom,
-                prenom: participant.prenom,
-              };
-            }
-
-            return null;
-          })
-        );
-
-        return {
-          Id_repetition: repetition._id,
-          dateRepetition: formattedDate,
+      return {
+        repetition: {
+          _id: repetition._id.toString(),
           lieu: repetition.lieu,
-          concert: formattedConcert,
-          countAbsences,
-          absences: absences.filter((absence) => absence !== null),
-        };
-      })
-    );
+          date: repetition.date,
+          heureDebut: repetition.heureDebut,
+          heureFin: repetition.heureFin,
+        },
+        absentMembers: absentMembers.filter((absentMember) => absentMember !== null),
+      };
+    }));
 
-    res.status(200).json({
-      absencesRepetitions: formattedAbsences,
-    });
+    res.status(200).json(result);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Erreur lors de la consultation de l'état des absences aux répétitions" });
+    res.status(500).json({ error: "Internal Server Error" });
   }
 };
+
+const hasAbsentRequestForRepetition = async (participant, repetition) => {
+  const absenceData = await AbsenceRequest.findOne({
+    user: participant._id,
+    repetition: repetition._id,
+    status: 'absent',
+  });
+
+  return !!absenceData;
+};
+
+
+  // 2. Par Pupitre 
+  
+  
+  // const consulterEtatAbsencesRepetitionsparpupitre = async (req, res) => {
+  //   try {
+  //     let filter = {};
+  
+  //     // Apply filters if provided in the query parameters
+  //     if (req.query.specificDate) {
+  //       filter.DateRep = new Date(req.query.specificDate);
+  //     }
+  
+  //     if (req.query.startDate) {
+  //       filter.DateRep = { $gte: new Date(req.query.startDate) };
+  //     }
+  
+  //     if (req.query.endDate) {
+  //       filter.DateRep = { ...filter.DateRep, $lte: new Date(req.query.endDate) };
+  //     }
+  
+  //     if (req.query.programme) {
+  //       filter.programme = req.query.programme;
+  //     }
+  
+  //     const repetitions = await Repetition.find(filter).populate({
+  //       path: "membres.member",
+  //       model: "Membre",
+  //     });
+  
+  //     const result = repetitions.map((repetition) => {
+  //       const absentMembersByPupitre = {
+  //         soprano: [],
+  //         alto: [],
+  //         ténor: [],
+  //         basse: [],
+  //       };
+  
+  //       repetition.membres
+  //         .filter((member) => member.presence === false)
+  //         .forEach((member) => {
+  //           const pupitre = member.member.pupitre;
+  
+  //           absentMembersByPupitre[pupitre].push({
+  //             _id: member.member._id.toString(),
+  //             nom: member.member.nom,
+  //             prenom: member.member.prenom,
+  //           });
+  //         });
+  
+  //       const absentMembersObj = {
+  //         repetition: {
+  //           _id: repetition._id.toString(),
+  //           lieu: repetition.lieu,
+  //           date: repetition.DateRep,
+  //           heureDeb: repetition.HeureDeb,
+  //           heureFin: repetition.HeureFin,
+  //         },
+  //         absentMembersByPupitre,
+  //       };
+  
+  //       return absentMembersObj;
+  //     });
+  
+  //     res.status(200).json(result);
+  //   } catch (error) {
+  //     console.error(error);
+  //     res.status(500).json({ error: "Internal Server Error" });
+  //   }
+  // };
+  
 const ajouterPresenceManuelleRepetition = async (req, res) => {
   try {
     const { id } = req.params; 
@@ -411,7 +442,6 @@ const ajouterPresenceManuelleRepetition = async (req, res) => {
 };
 
 
-//envoyerNotificationChoristes();
 
 
 module.exports = {
@@ -426,4 +456,6 @@ module.exports = {
   confirmerpresenceRepetition: confirmerpresenceRepetition,
   addRepetitionn,
   consulterEtatAbsencesRepetitions,
+ 
+
 };

@@ -1,6 +1,10 @@
 const User = require('../models/utilisateurs');
 const StatusHistory=require('../models/StatusHistory');
-const saison =require('../models/saison');
+const Concert =require('../models/concert');
+const Repetition=require('../models/repetition')
+const Absence = require('../models/absence');
+const Saison =require('../models/saison');
+const Oeuvre =require('../models/oeuvres');
 const {getChoristesNominés,getChoristesÉliminés}=require('../controllers/absenceElemination')
 
 
@@ -50,174 +54,6 @@ const getProfileAndStatusHistory = async (req, res) => {
     res.status(500).json({ success: false, error: error.message });
   }
 }
-
-
-const getUserActivityHistory = async (req, res) => {
-  try {
-    const userId = req.auth.userId;
-    const user = await User.findById(userId);
-    const saisonId = req.query.saison;
-    const oeuvreId = req.query.oeuvre;
-
-    if (!user) {
-      return res.status(404).json({ error: "User not found" });
-    }
-
-    const totalRepetitions = user.Repetitions.length;
-    const totalConcerts = user.Concerts.length;
-
-    const repetitionsHistory = await Promise.all(
-      user.Repetitions.map(async (repetition) => {
-        const repetitionData = await Repetition.findById(repetition);
-        return {
-          date: repetitionData ? repetitionData.date : null,
-          lieu: repetitionData ? repetitionData.lieu : null,
-          programme: repetitionData ? repetitionData.programme : null,
-        };
-      })
-    );
-
-    const concerts = await Promise.all(
-      user.Concerts.map(async (concert) => {
-        const concertDetails = await Concert.findById(concert);
-        if (!concertDetails) {
-          return null;
-        }
-
-        if (saisonId && concertDetails.saison != saisonId) {
-          return null;
-        }
-
-        if (oeuvreId && !concertDetails.programme.includes(oeuvreId)) {
-          return null;
-        }
-
-        const oeuvres = await Promise.all(
-          concertDetails.programme.map(async (oeuvre) => {
-            const oeuvreData = await Oeuvre.findById(oeuvre);
-            return {
-              title: oeuvreData ? oeuvreData.titre : "Unknown Title",
-            };
-          })
-        );
-
-        const saisonData = await Saison.findById(concertDetails.saison);
-        const saisonName = saisonData ? saisonData.nom : "Unknown Season";
-
-        return {
-          nom: concertDetails.nom,
-          date: concertDetails.date,
-          lieu: concertDetails.lieu,
-          saison: saisonName,
-          ouevres,
-        };
-      })
-    );
-
-    const filteredConcerts = concerts.filter((concert) => concert !== null);
-
-    const activityHistory = {
-      totalRepetitions,
-      totalConcerts,
-      repetitionsHistory,
-      concerts: filteredConcerts,
-    };
-
-    res.json({ activityHistory });
-  } catch (error) {
-    console.error("Error fetching user activity history:", error);
-    res.status(500).json({ error: "Internal server error" });
-  }
-};
-
-const getAllUserActivityHistory = async (req, res) => {
-  try {
-    const userIdFilter = req.query.id;
-    const saisonId = req.query.saison;
-    const oeuvreId = req.query.oeuvre;
-
-    const users = userIdFilter
-      ? [await User.findById(userIdFilter)]
-      : await User.find();
-
-    const activityHistories = await Promise.all(
-      users.map(async (user) => {
-        if (!user) {
-          return null; // User not found
-        }
-
-        const totalRepetitions = user.Repetitions.length;
-        const totalConcerts = user.Concerts.length;
-
-        const repetitionsHistory = await Promise.all(
-          user.Repetitions.map(async (repetition) => {
-            const repetitionData = await Repetition.findById(repetition);
-            return {
-              date: repetitionData ? repetitionData.date : null,
-              lieu: repetitionData ? repetitionData.lieu : null,
-              programme: repetitionData ? repetitionData.programme : null,
-            };
-          })
-        );
-
-        const concerts = await Promise.all(
-          user.Concerts.map(async (concert) => {
-            const concertDetails = await Concert.findById(concert);
-            if (!concertDetails) {
-              return null;
-            }
-
-            if (saisonId && concertDetails.saison != saisonId) {
-              return null;
-            }
-
-            if (oeuvreId && !concertDetails.programme.includes(oeuvreId)) {
-              return null;
-            }
-
-            const oeuvres = await Promise.all(
-              concertDetails.programme.map(async (oeuvre) => {
-                const oeuvreData = await Oeuvre.findById(oeuvre);
-                return {
-                  title: oeuvreData ? oeuvreData.titre : "Unknown Title",
-                };
-              })
-            );
-
-            const saisonData = await Saison.findById(concertDetails.saison);
-            const saisonName = saisonData ? saisonData.nom : "Unknown Season";
-
-            return {
-              nom: concertDetails.nom,
-              date: concertDetails.date,
-              lieu: concertDetails.lieu,
-              saison: saisonName,
-              ouevres,
-            };
-          })
-        );
-
-        const filteredConcerts = concerts.filter((concert) => concert !== null);
-
-        return {
-          userId: user._id,
-          firstName: user.firstName, // Add firstName
-          lastName: user.lastName, // Add lastName
-          totalRepetitions,
-          totalConcerts,
-          repetitionsHistory,
-          concerts: filteredConcerts,
-        };
-      })
-    );
-
-    res.json({ activityHistories });
-  } catch (error) {
-    console.error("Error fetching user activity history:", error);
-    res.status(500).json({ error: "Internal server error" });
-  }
-};
-
 
 const getListeChoristes = async () => {
   try {
@@ -299,11 +135,129 @@ const getProfile = async (req, res) => {
   }
 };
 
+const generateStatistics = async (req, res) => {
+  try {
+  
+    const concerts = await Concert.find();
+
+    
+    const choristes = await User.find({ role: 'choriste' });
+
+    const statistiquesChoristes = [];
+
+    for (const choriste of choristes) {
+      let nbRepetitions = 0;
+      let nbPresenceRepetitions = 0;
+      let nbAbsenceRepetitions = 0;
+      let nbPresenceConcerts = 0;
+      let nbAbsenceConcerts = 0;
+      let nbConcerts = 0;
+
+      for (const concert of concerts) {
+        const confirmation = concert.confirmations.find(conf => conf.choriste.equals(choriste._id));
+
+        if (confirmation) {
+          nbConcerts++;
+
+          if (confirmation.confirmation) {
+            nbPresenceConcerts++;
+          } else {
+            nbAbsenceConcerts++;
+          }
+        }
+      }
+
+      const repetitionStatistiquesChoriste = await Repetition.aggregate([
+        {
+          $match: {
+            participant: choriste._id,
+          },
+        },
+        {
+          $group: {
+            _id: null,
+            nbRepetitions: { $sum: '$nbr_repetition' },
+            nbPresenceRepetitions: { $sum: 1 },
+          },
+        },
+      ]);
+
+      if (repetitionStatistiquesChoriste.length > 0) {
+        nbRepetitions = repetitionStatistiquesChoriste[0].nbRepetitions;
+        nbPresenceRepetitions = repetitionStatistiquesChoriste[0].nbPresenceRepetitions;
+        nbAbsenceRepetitions = nbRepetitions - nbPresenceRepetitions;
+      }
+
+      statistiquesChoristes.push({
+        idUtilisateur: choriste._id,
+        nomUtilisateur: `${choriste.prenom} ${choriste.nom}`,
+        nbRepetitions,
+        nbPresenceRepetitions,
+        nbAbsenceRepetitions,
+        nbPresenceConcerts,
+        nbAbsenceConcerts,
+        nbConcerts,
+      });
+    }
+    res.status(200).json({
+      statistiquesChoristes,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+
+const getChoristeActivityHistory = async (req, res) => {
+  const memberId = req.params.choristeId;
+  const oeuvreName = req.query.oeuvreName;
+
+  try {
+    const member = await User.findById(memberId);
+    if (!member) {
+      return res.status(404).json({ error: "Member not found" });
+    }
+
+    const concerts = await Concert.find({
+      "confirmations.choriste": memberId,
+      "confirmations.confirmation": true,
+    }).populate({
+      path: "programme._id",
+      model: Oeuvre,
+    });
+ console.log(concerts)
+    const filteredConcerts = oeuvreName
+      ? concerts.filter((concert) =>
+          concert.programme.some((item) => item._id.titre === oeuvreName)
+        )
+      : concerts;
+
+    const repetitions = await Repetition.find({
+      "participant": memberId,
+    });
+
+    const response = {
+      member_info: member,
+      number_of_repetition: repetitions.length,
+      number_of_concerts: filteredConcerts.length,
+      concerts: filteredConcerts,
+    };
+
+    res.json(response);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+
+
 module.exports = {
-  getAllUserActivityHistory,
-  getUserActivityHistory ,
   getProfileAndStatusHistory,
   getProfile,
   getListeChoristes,
-  voirProfilChoriste
+  voirProfilChoriste,
+  getChoristeActivityHistory,
+  generateStatistics
 };

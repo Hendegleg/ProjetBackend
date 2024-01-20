@@ -21,7 +21,7 @@ const AuditionSchema = new Schema({
     decisioneventuelle :{ type: String,
             enum:["retenu","en attente","refuse"] ,       
             default:"en attente"},
-    remarque : { type: String, required: true },
+    remarque : { type: String },
 });
 const Audition= mongoose.model('Audition', AuditionSchema);
 module.exports = Audition;

@@ -125,7 +125,6 @@ const sendNotification = async (req, res) => {
 };
 
 //hend
-
 const notifiercongechoriste = async () => {
   try {
     const usersOnLeave = await User.find({ demandeConge: true, role: 'choriste' });
@@ -152,6 +151,9 @@ const notifiercongechoriste = async () => {
   }
 };
 
+
+
+
 const modifyLeaveStatus = async (req, res) => {
   try {
     const { userId, approved } = req.body;
@@ -165,7 +167,7 @@ const modifyLeaveStatus = async (req, res) => {
       
       user.demandeConge = false; 
       user.estEnConge = true; 
- // Save the modified status
+
       await user.save();
 
       res.status(200).json({ message: 'Statut de congé modifié avec succès.' });
@@ -176,9 +178,6 @@ const modifyLeaveStatus = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
-
-
-
 const notifmodifyLeaveStatus = async (req, res) => {
   try {
     const { userId, approved } = req.body;
@@ -199,7 +198,7 @@ const notifmodifyLeaveStatus = async (req, res) => {
         return pupitre.chefs
       }).flat()
       chefspupitre.map((chef)=>{
-        io.emit(`notif-${chef.toString()}`, {message: `Statut de votre choriste ${user.nom+ " "+user.prenom} a ete modifié `})
+        io.emit(`notif-${chef.toString()}`, {message: `Statut de votre choriste ${user.nom+ " "+user.prenom} a ete modifié : en conge`})
       })
       res.status(200).json({ message: 'Statut de congé modifié avec succès.' });
     } else {

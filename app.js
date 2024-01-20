@@ -1,8 +1,7 @@
 const express = require("express");
 const cron = require('node-cron');
-
 require('dotenv').config();
-
+const { specs, swaggerUi } = require('./swagger');
 const mongoose = require("mongoose");
 const userRoutes =require("./routes/utilisateur");
 const auditionRoutes = require("./routes/audition");
@@ -17,7 +16,7 @@ const concertsRoutes = require('./routes/concert.js');
 const qrcodeRoutes = require('./routes/qrcode');
 const filtragecandidatRoutes= require('./routes/filtragecandidats.js')
 const authRoutes = require ('./routes/auth');
-const AbsenceRoutes = require ('./routes/absenceRequest')
+const AbsenceRoutes = require ('./routes/absenceRequest.js')
 const tessitureRoutes = require ('./routes/tessiture')
 const intervenantRoutes = require ('./routes/intervenants')
 const programmeRoutes= require('./routes/programme.js')
@@ -31,10 +30,10 @@ const { notifiercongechoriste }= require('./controllers/conge.js');
 const { NotifupdateTessiture } = require("./controllers/tessiture.js");
 cron.schedule('29 13 * * *', repetitioncontroller.envoyerNotificationChoristes);
 
-cron.schedule('13 22 * * *',async () => {
+cron.schedule('09 05 * * *',async () => {
 const liste = await notifieradmin();
   if (liste){
-    io.emit("notif-658aaa32e0212355b342b333", {message :"liste des candidatures", liste });
+    io.emit("notif-65a8472046fcf3fd1485d808", {message :"liste des candidatures", liste });
   }
 });
 
@@ -72,11 +71,10 @@ app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, PATCH, OPTIONS");
   next();
 });
+
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
 app.use("/api/concerts", concertsRoutes);
-
-
-
-
 app.use('/api/filtragecandidats', filtragecandidatRoutes);
 app.use('/api/auditions', auditionRoutes);
 app.use("/api/candidats", candidatRoutes);
@@ -99,7 +97,7 @@ app.use('/api/elimination',eliminationRoutes)
 app.use('/api/intervenant',intervenantRoutes)
 app.use('/api/placement', placementController)
 app.use('/api/pupitres', pupitreRoutes);
-app.use('/user', userRoutes);
+// app.use('/user', userRoutes);
 
 
 

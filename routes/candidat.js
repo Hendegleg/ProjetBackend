@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const candidatController = require('../controllers/candidat');
 
+
+router.post('/', candidatController.create);
 //getAll
  router.get('/', candidatController.getAllCandidats);
 //create without verif

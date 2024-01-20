@@ -1,4 +1,5 @@
 const Oeuvres = require('../models/oeuvres');
+const Concert =require('../models/concert');
 
 // Create
 const createOeuvre = async (req, res) => {
@@ -105,6 +106,34 @@ const deleteOeuvre = async (req, res) => {
       });
     }
 };
+const OeuvreStatistics = async (req, res) => {
+  try {
+    // Récupérer toutes les œuvres
+    const oeuvres = await Oeuvres.find();
+
+    const oeuvreStatistics = [];
+
+    // Pour chaque œuvre, compter le nombre de concerts dans lesquels elle a été interprétée
+    for (const oeuvre of oeuvres) {
+      const concerts = await Concert.find({ 'programme.programme.oeuvre': oeuvre._id });
+
+      oeuvreStatistics.push({
+        idOeuvre: oeuvre._id,
+        titre: oeuvre.titre,
+        compositeur: oeuvre.compositeurs, // Assurez-vous que le champ correct est utilisé
+        totalConcerts: concerts.length,
+      });
+    }
+
+    // Envoyer les statistiques en réponse
+    res.status(200).json({
+      statistiquesOeuvres: oeuvreStatistics,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
 
   module.exports = {
     createOeuvre,
@@ -112,4 +141,5 @@ const deleteOeuvre = async (req, res) => {
     getOeuvreById,
     updateOeuvre,
     deleteOeuvre,
+    OeuvreStatistics,
   };

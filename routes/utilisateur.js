@@ -5,8 +5,8 @@ const eliminationController=require('../controllers/absenceElemination')
 const Auth = require('../middlewares/auth');
 
 router.get('/:id/profile', userController.getProfileAndStatusHistory);
-router.get('/user-activity-history',  userController.getUserActivityHistory);
-router.get('/all-user-activity-history', userController.getAllUserActivityHistory);
+router.get('/statistics', userController.generateStatistics);
+router.get('/historiqueActiviteUser/:choristeId',Auth.authMiddleware,Auth.isAdminOrChoriste,userController.getChoristeActivityHistory);
 
 
 module.exports = router;
