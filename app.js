@@ -27,8 +27,14 @@ const repetitioncontroller = require ('./controllers/repetition');
 const { notifieradmin } = require("./controllers/candidat.js");
 const placementController = require('./routes/placement.js')
 const {io}=require("./socket.js");
-const { notifiercongechoriste }= require('./controllers/conge.js');
-const { NotifupdateTessiture } = require("./controllers/tessiture.js");
+const programmeRoutes= require('./routes/programme.js')
+const pupitreRoutes = require('./routes/pupitre.js')
+const eliminationRoutes = require ('./routes/elimination.js')
+const swaggerJsdoc = require("swagger-jsdoc");
+const swaggerUi = require('swagger-ui-express');
+const {io}=require("./socket.js");
+const { notifieradminChoristeseliminés }= require('./controllers/absenceElemination.js')
+
 cron.schedule('29 13 * * *', repetitioncontroller.envoyerNotificationChoristes);
 
 cron.schedule('09 05 * * *',async () => {
@@ -38,19 +44,6 @@ const liste = await notifieradmin();
   }
 });
 
-const programmeRoutes= require('./routes/programme.js')
-const pupitreRoutes = require('./routes/pupitre.js')
-const eliminationRoutes = require ('./routes/elimination.js')
-
-
-const swaggerJsdoc = require("swagger-jsdoc");
-const swaggerUi = require('swagger-ui-express');
-
-
-
-
-const {io}=require("./socket.js");
-const { notifieradminChoristeseliminés }= require('./controllers/absenceElemination.js')
 cron.schedule('24 23 * * *', async () => {
   try {
     const liste = await notifieradminChoristeseliminés();
@@ -64,8 +57,6 @@ cron.schedule('24 23 * * *', async () => {
     console.error(error.message);
   }
 });
-
-
 const { notifierNominés }= require('./controllers/absenceElemination.js')
 cron.schedule('55 23 * * *', async () => {
   try {
@@ -97,9 +88,11 @@ cron.schedule('24 23 * * *', async () => {
   try {
     const liste = await notifieradminChoristeseliminés();
 
-  if (liste) {
-  
-    io.emit("notif-6582068777dd44c527da3a08", { message: "Demandes de congé des choristes", liste });
+    if (liste) {
+      io.emit("notif-6582068777dd44c527da3a08", { message: "Demandes de congé des choristes", liste });
+    }
+  } catch (error) {
+    console.error("Erreur dans le planificateur cron:", error.message);
   }
 });
 
@@ -189,8 +182,6 @@ const options = {
 
 const specs = swaggerJsdoc(options);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs, { explorer: true }));
-
-
 app.use("/api/concerts", concertsRoutes);
 app.use('/api/filtragecandidats', filtragecandidatRoutes);
 app.use('/api/auditions', auditionRoutes);
@@ -215,13 +206,8 @@ app.use('/api/elimination',eliminationRoutes)
 app.use('/api/intervenant',intervenantRoutes)
 app.use('/api/placement', placementController)
 app.use('/api/pupitres', pupitreRoutes);
-// app.use('/user', userRoutes);
-
-
 
 app.use('/api/intervenant',intervenantRoutes)
-
-
 
 module.exports = app;
 module.exports.io = io;
