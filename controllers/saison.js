@@ -1,4 +1,4 @@
-const Saison = require('../models/saison'); // Assurez-vous d'avoir le bon chemin vers le modèle Saison
+const Saison = require('../models/saison'); 
 
 exports.createSaison = async (req, res) => {
     try {

@@ -5,53 +5,100 @@ const auth = require('../middlewares/auth');
 
 /**
  * @swagger
+ * tags:
+ *   name: Oeuvres
+ *   description: API de gestion des œuvres d'art
+ */
+
+/**
+ * @swagger
  * components:
  *   schemas:
  *     Oeuvre:
  *       type: object
- *       required:
- *         - title
- *         - artist
  *       properties:
  *         _id:
  *           type: string
  *           description: The auto-generated id of the oeuvre
- *         title:
+ *         titre:
  *           type: string
  *           description: The oeuvre title
- *         artist:
+ *         compositeurs:
  *           type: string
- *           description: The artist of the oeuvre
+ *           description: The composers of the oeuvre
+ *         arrangeurs:
+ *           type: string
+ *           description: The arrangers of the oeuvre
+ *         annee:
+ *           type: string
+ *           description: The year of the oeuvre
+ *         genre:
+ *           type: string
+ *           description: The genre of the oeuvre
+ *         paroles:
+ *           type: string
+ *           description: The lyrics of the oeuvre
+ *         partition:
+ *           type: string
+ *           description: The musical score or partition of the oeuvre
+ *         requiresChoir:
+ *           type: boolean
+ *           description: Indicates whether the oeuvre requires a choir
  *       example:
- *         _id: 12345
- *         title: La boheme
- *         artist: Charles Aznavour
- */
-
-/**
- * @swagger
- * components:
- *   schemas:
+ *         _id: "12345"
+ *         titre: "La boheme"
+ *         compositeurs: "Composer Name"
+ *         arrangeurs: "Arranger Name"
+ *         annee: "2022"
+ *         genre: "Classical"
+ *         paroles: "Lyrics of the song"
+ *         partition: "Link to the musical score"
+ *         requiresChoir: true
+ *
  *     NewOeuvre:
  *       type: object
  *       required:
- *         - title
- *         - artist
+ *         - titre
+ *         - compositeurs
+ *         - arrangeurs
+ *         - annee
+ *         - genre
+ *         - partition
  *       properties:
- *         title:
+ *         titre:
  *           type: string
  *           description: The oeuvre title
- *         artist:
+ *         compositeurs:
  *           type: string
- *           description: The artist of the oeuvre
+ *           description: The composers of the oeuvre
+ *         arrangeurs:
+ *           type: string
+ *           description: The arrangers of the oeuvre
+ *         annee:
+ *           type: string
+ *           description: The year of the oeuvre
+ *         genre:
+ *           type: string
+ *           description: The genre of the oeuvre
+ *         paroles:
+ *           type: string
+ *           description: The lyrics of the oeuvre
+ *         partition:
+ *           type: string
+ *           description: The musical score or partition of the oeuvre
+ *         requiresChoir:
+ *           type: boolean
+ *           description: Indicates whether the oeuvre requires a choir
  *       example:
- *         title: La boheme
- *         artist: Charles Aznavour
- */
-
-/**
- * @swagger
- * components:
+ *         titre: "La boheme"
+ *         compositeurs: "Composer Name"
+ *         arrangeurs: "Arranger Name"
+ *         annee: "2022"
+ *         genre: "Classical"
+ *         paroles: "Lyrics of the song"
+ *         partition: "Link to the musical score"
+ *         requiresChoir: true
+ *
  *   responses:
  *     StandardResponse:
  *       200:
@@ -68,20 +115,23 @@ const auth = require('../middlewares/auth');
 
 /**
  * @swagger
- * tags:
- *   name: Oeuvres
- *   description: API de gestion des œuvres d'art
- */
-
-/**
- * @swagger
  * /oeuvres:
  *   get:
  *     summary: List all oeuvres
  *     tags: [Oeuvres]
- *     security: []
+ *     security:
+ *       - bearerAuth: []
  *     responses:
- *       $ref: '#/components/responses/StandardResponse'
+ *       '200':
+ *         description: Success
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Oeuvre'
+ *       '404':
+ *         description: Oeuvre not found
+ *       '500':
+ *         description: Server error
  */
 router.get('/', auth.authMiddleware, auth.isAdmin, oeuvreController.getAllOeuvres);
 
@@ -100,7 +150,14 @@ router.get('/', auth.authMiddleware, auth.isAdmin, oeuvreController.getAllOeuvre
  *           schema:
  *             $ref: '#/components/schemas/NewOeuvre'
  *     responses:
- *       $ref: '#/components/responses/StandardResponse'
+ *       '200':
+ *         description: Success
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Oeuvre'
+ *       '500':
+ *         description: Server error
  */
 router.post('/', auth.authMiddleware, auth.isAdmin, oeuvreController.createOeuvre);
 
@@ -118,7 +175,16 @@ router.post('/', auth.authMiddleware, auth.isAdmin, oeuvreController.createOeuvr
  *         required: true
  *         description: The ID of the oeuvre
  *     responses:
- *       $ref: '#/components/responses/StandardResponse'
+ *       '200':
+ *         description: Success
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Oeuvre'
+ *       '404':
+ *         description: Oeuvre not found
+ *       '500':
+ *         description: Server error
  */
 router.get('/:id', auth.authMiddleware, auth.isAdmin, oeuvreController.getOeuvreById);
 
@@ -144,7 +210,16 @@ router.get('/:id', auth.authMiddleware, auth.isAdmin, oeuvreController.getOeuvre
  *           schema:
  *             $ref: '#/components/schemas/NewOeuvre'
  *     responses:
- *       $ref: '#/components/responses/StandardResponse'
+ *       '200':
+ *         description: Success
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Oeuvre'
+ *       '404':
+ *         description: Oeuvre not found
+ *       '500':
+ *         description: Server error
  */
 router.put('/:id', auth.authMiddleware, auth.isAdmin, oeuvreController.updateOeuvre);
 
@@ -164,7 +239,16 @@ router.put('/:id', auth.authMiddleware, auth.isAdmin, oeuvreController.updateOeu
  *         required: true
  *         description: The ID of the oeuvre
  *     responses:
- *       $ref: '#/components/responses/StandardResponse'
+ *       '200':
+ *         description: Success
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Oeuvre'
+ *       '404':
+ *         description: Oeuvre not found
+ *       '500':
+ *         description: Server error
  */
 router.delete('/:id', auth.authMiddleware, auth.isAdmin, oeuvreController.deleteOeuvre);
 

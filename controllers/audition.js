@@ -110,17 +110,14 @@ const createAudition = async (req, res) => {
     try {
         const { Date_debut_Audition, nombre_séance, dureeAudition, Date_fin_Audition, lienFormulaire } = req.body;
 
-        // Validate required fields
         if (!Date_debut_Audition || !nombre_séance || !dureeAudition || !Date_fin_Audition) {
             return res.status(400).json({ error: 'Please provide all required fields.' });
         }
 
-        // Validate if Date_fin_Audition is not before Date_debut_Audition
         if (new Date(Date_fin_Audition) < new Date(Date_debut_Audition)) {
             return res.status(400).json({ error: 'The end date cannot be before the start date.' });
         }
 
-        //  new EvenementAudition
         const newEvenementAudition = new EvenementAudition({
             Date_debut_Audition,
             nombre_séance,
@@ -131,7 +128,6 @@ const createAudition = async (req, res) => {
 
         await newEvenementAudition.save();
 
-        //  sending email
         const tousLesCandidats = await Candidat.find();
         if (tousLesCandidats.length === 0) {
           return res.status(404).json({ error: 'No candidates found in the database.' });

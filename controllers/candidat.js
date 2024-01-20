@@ -1,6 +1,7 @@
 
 const Candidat = require('../models/candidat');
 const jwt = require('jsonwebtoken');
+const nodemailer = require('nodemailer');
 
 const Verifmail = require("../models/verifmail");
 

@@ -156,8 +156,6 @@ const confirmerpresenceRepetition = async (req, res) => {
 
 
 
-
-
 const envoyerNotificationChoristes = async () => {
   try {
       const choristes = await User.find({
@@ -230,45 +228,6 @@ cron.schedule('0 12 * * *', async () => {
 
 
 
-// const updateRepetition = async (req, res) => {
-//   try {
-//     const repetition = await Repetition.findOneAndUpdate(
-//       { _id: req.params.id },
-//       req.body,
-//       { new: true }
-//     );
-
-//     if (!repetition) {
-//       return res.status(404).json({ message: "Répétition non trouvée" });
-//     } else {
-//       res.status(200).json({
-//         message: "Répétition modifiée avec succès",
-//         model: repetition,
-//       });
-
-//       try {
-//         const memberIds = repetition.participant;
-
-//         const members = await User.find({ _id: { $in: memberIds } });
-//         console.log(members);
-
-//         if (members) {
-//           members.forEach((member) => {
-//             io.emit('member', { message: 'Votre répétition a été mise à jour.' });
-
-//           });
-//         }
-//       } catch (error) {
-//         console.error("Erreur lors de l'envoi des notifications aux membres :", error);
-//       }
-//     }
-//   } catch (error) {
-//     res.status(400).json({ error: error.message });
-//   }
-// };
-// io.on('updateRepetition', (data) => {
-//   console.log('Notification received:', data.message);
-// });
 
 const updateRepetition = async (req, res) => {
   try {
