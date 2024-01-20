@@ -14,37 +14,28 @@ const congeRoutes = require('./routes/conge');
 const saisonRoutes = require('./routes/saison.js');
 const concertsRoutes = require('./routes/concert.js');
 const qrcodeRoutes = require('./routes/qrcode');
-const userRoutes = require('./routes/utilisateur.js')
 const filtragecandidatRoutes= require('./routes/filtragecandidats.js')
 const authRoutes = require ('./routes/auth');
 const AbsenceRoutes = require ('./routes/absenceRequest.js')
 const tessitureRoutes = require ('./routes/tessiture')
 const intervenantRoutes = require ('./routes/intervenants')
-const programmeRoutes= require('./routes/programme.js')
-const pupitreRoutes = require('./routes/pupitre.js')
-const eliminationRoutes = require ('./routes/elimination.js')
 const repetitioncontroller = require ('./controllers/repetition');
 const { notifieradmin } = require("./controllers/candidat.js");
 const placementController = require('./routes/placement.js')
-const swaggerJsdoc = require("swagger-jsdoc");
 const swaggerUi = require('swagger-ui-express');
-
-
-const {io}=require("./socket.js");
 const programmeRoutes= require('./routes/programme.js')
 const pupitreRoutes = require('./routes/pupitre.js')
 const eliminationRoutes = require ('./routes/elimination.js')
 const swaggerJsdoc = require("swagger-jsdoc");
-const swaggerUi = require('swagger-ui-express');
-const {io}=require("./socket.js");
+const {io}=require("./socket");
 const { notifieradminChoristeseliminés }= require('./controllers/absenceElemination.js')
 
 cron.schedule('29 13 * * *', repetitioncontroller.envoyerNotificationChoristes);
 
-cron.schedule('09 05 * * *',async () => {
+cron.schedule('36 20 * * *',async () => {
 const liste = await notifieradmin();
   if (liste){
-    io.emit("notif-65a8472046fcf3fd1485d808", {message :"liste des candidatures", liste });
+    io.emit("notif-65ac17bcc0492f634a17d2c7", {message :"liste des candidatures", liste });
   }
 });
 
@@ -86,8 +77,7 @@ cron.schedule('58 23 * * *', async () => {
     console.error(error.message);
   }
 });
-const {io}=require("./socket.js");
-const { notifieradminChoristeseliminés }= require('./controllers/absenceElemination.js')
+
 cron.schedule('24 23 * * *', async () => {
   try {
     const liste = await notifieradminChoristeseliminés();

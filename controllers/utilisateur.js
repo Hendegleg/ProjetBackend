@@ -246,5 +246,5 @@ module.exports = {
   getListeChoristes,
   voirProfilChoriste,
   getChoristeActivityHistory,
-  generateStatistics
+  generateStatistics,
 };

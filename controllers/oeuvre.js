@@ -106,6 +106,7 @@ const deleteOeuvre = async (req, res) => {
       });
     }
 };
+
 const OeuvreStatistics = async (req, res) => {
   try {
     // Récupérer toutes les œuvres

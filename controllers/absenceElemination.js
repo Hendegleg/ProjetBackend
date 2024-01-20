@@ -1,7 +1,6 @@
 const nodemailer = require('nodemailer');
 const User=require('../models/utilisateurs')
 const Absence = require('../models/absence');
-
 const { io } = require('../socket.js');
 const { CronJob } = require('cron');
 require('dotenv').config();
@@ -53,11 +52,7 @@ const getAllAbsences = async () => {
       console.error('Erreur lors de la gestion des choristes par élimination pour absences excessives :', error.message);
       res.status(500).json({ error: 'Erreur lors de la gestion des choristes par élimination pour absences excessives' });
     }
-  };
-
-
-
-  
+  }; 
   const envoyermailnominé = async (email, subject, message) => {
           
     const transporter = nodemailer.createTransport({
@@ -182,20 +177,6 @@ const notifieradminChoristeseliminés = async () => {
     throw new Error('Erreur lors de la récupération des choristes éliminés.');
   }
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 //liste nominés
 

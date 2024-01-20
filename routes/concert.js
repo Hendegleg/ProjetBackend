@@ -218,11 +218,129 @@ router.post('/', auth.authMiddleware, auth.isAdmin, concertController.createConc
 router.get('/',auth.authMiddleware, auth.isAdmin, concertController.getAllConcerts); 
 router.put('/:id', auth.authMiddleware, auth.isAdmin,concertController.updateConcert); 
 router.delete('/:id', auth.authMiddleware, auth.isAdmin, concertController.deleteConcert); 
-router.post('/:id/confirmerpresence', auth.authMiddleware, auth.isAdmin, concertController.confirmerpresenceConcert);
+router.post('/:id/confirmerpresence', auth.authMiddleware, auth.isChoriste, concertController.confirmerpresenceConcert);
 
-router.get('/:id/confirmedChoristes', concertController.getConfirmedChoristesForConcert);
-router.post('/:id/ajouterpresence', concertController.ajouterPresenceManuelle);
-router.post('/:id/indiquerconfirmation', concertController.indiquerpresenceConcert);
-router.get('/concerts/statistics', concertController.getConcertStatistics);
+router.get('/:id/confirmedChoristes', auth.authMiddleware, auth.isAdmin, concertController.getConfirmedChoristesForConcert);
+/**
+ * @swagger
+ * /concert/{id}/confirmedChoristes:
+ *   get:
+ *     summary: Get confirmed choristes for a specific concert by ID
+ *     tags: [Concerts]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Concert ID
+ *     responses:
+ *       200:
+ *         description: Successful response
+ *         content:
+ *           application/json:
+ *             example:
+ *               success: true
+ *               confirmedChoristes: [ "choriste1", "choriste2" ]
+ *       401:
+ *         description: Unauthorized - Invalid token
+ *       404:
+ *         description: Concert not found
+ *       500:
+ *         description: Internal server error
+ */
+router.post('/:id/ajouterpresence', auth.authMiddleware, auth.isAdminOrChoriste,concertController.ajouterPresenceManuelle);
+/**
+ * @swagger
+ * /concert/{id}/ajouterpresence:
+ *   post:
+ *     summary: Manually add presence for a specific concert by ID
+ *     tags: [Concerts]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Concert ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               choristeId:
+ *                 type: string
+ *             required:
+ *               - choristeId
+ *     responses:
+ *       201:
+ *         description: Presence added successfully
+ *       401:
+ *         description: Unauthorized - Invalid token
+ *       404:
+ *         description: Concert not found
+ *       500:
+ *         description: Internal server error
+ */
+router.post('/:id/indiquerconfirmation', auth.authMiddleware, auth.isChoriste, concertController.indiquerpresenceConcert);
+/**
+ * @swagger
+ * /concert/{id}/indiquerconfirmation:
+ *   post:
+ *     summary: Indicate presence confirmation for a specific concert by ID
+ *     tags: [Concerts]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Concert ID
+ *     responses:
+ *       200:
+ *         description: Presence confirmation indicated successfully
+ *       401:
+ *         description: Unauthorized - Invalid token
+ *       404:
+ *         description: Concert not found
+ *       500:
+ *         description: Internal server error
+ */
+
+router.get('/concerts/statistics', auth.authMiddleware, auth.isAdmin, concertController.getConcertStatistics);
+
+/**
+ * @swagger
+ * /concerts/statistics:
+ *   get:
+ *     summary: Get statistics for all concerts
+ *     tags: [Concerts]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Successful response
+ *         content:
+ *           application/json:
+ *             example:
+ *               success: true
+ *               statistics: {
+ *                 totalConcerts: 10,
+ *                 totalConfirmedConcerts: 5,
+ *                 totalUnconfirmedConcerts: 5
+ *               }
+ *       401:
+ *         description: Unauthorized - Invalid token
+ *       500:
+ *         description: Internal server error
+ */
 
 module.exports = router;

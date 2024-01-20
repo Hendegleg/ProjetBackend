@@ -178,12 +178,40 @@ const Auth = require('../middlewares/auth');
  *         - date
  */
 
-
-
 router.post('/ajouterStatus',Auth.authMiddleware,Auth.isAdminOrChoriste , statusHistoryController.addStatusChange);
 router.get('/:id',Auth.authMiddleware,Auth.isAdmin , statusHistoryController.getStatusHistoryForUser);
 
 router.get('/:id/profile',Auth.authMiddleware,Auth.isAdminOrChoriste ,userController.getProfile );
 
+router.get('/statistics',Auth.authMiddleware,Auth.isAdmin , userController.generateStatistics);
+/**
+ * @swagger
+ * /users/statistics:
+ *   get:
+ *     summary: Generate user statistics
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       '200':
+ *         description: Successful response
+ *         content:
+ *           application/json:
+ *             example:
+ *               success: true
+ *               statistics:
+ *                 totalUsers: 100
+ *                 activeUsers: 80
+ *                 inactiveUsers: 20
+ *                 choristeUsers: 60
+ *                 adminUsers: 10
+ *               message: "User statistics generated successfully"
+ *       '401':
+ *         description: Unauthorized - Invalid token
+ *       '403':
+ *         description: Forbidden - Insufficient permissions
+ *       '500':
+ *         description: Internal server error
+ */
 
 module.exports = router;

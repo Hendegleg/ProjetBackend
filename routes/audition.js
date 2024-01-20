@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const auditionController = require('../controllers/audition');
 const EvenementAudition= require('../models/evenementaudition');
+const auth = require("../middlewares/auth");
 
 /**
  * @swagger
@@ -202,22 +203,46 @@ router.get('/:id', auditionController.getAuditionById);
 
 router.patch('/:id', auditionController.updateAudition);
 router.delete('/:id', auditionController.deleteAudition);
-
-
-
-
-
-// Route pour générer le planning d'auditions
-router.post('/generer-planning', auditionController.genererPlanification);
-
-
-// Route pour cree les  auditions pour les candidats
-//router.post('/creeAuditionsCandidats', auditionController.createAuditionsForCandidats);
-
-// Route to generate and send audition plans
-//router.post('/generateAndSendAuditionPlan', auditionController.generateAndSendAuditionPlan);
-
 router.post('/lancerEvenementAudition', auditionController.lancerEvenementAudition);
+
+
+
+router.post('/generer-planning', auth.authMiddleware, auth.isAdmin, auditionController.genererPlanification);
+/**
+ * @swagger
+ * /auditions/generer-planning:
+ *   post:
+ *     summary: Generate audition schedule
+ *     tags: [Auditions]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Schedule generated successfully
+ *       401:
+ *         description: Unauthorized - Invalid token
+ *       500:
+ *         description: Internal server error
+ */
+
+router.post('/genererplanabsence', auth.authMiddleware, auth.isAdmin, auditionController.genererPlanificationabsence);
+
+/**
+ * @swagger
+ * /auditions/genererplanabsence:
+ *   post:
+ *     summary: Generate absence schedule for auditions
+ *     tags: [Auditions]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Absence schedule generated successfully
+ *       401:
+ *         description: Unauthorized - Invalid token
+ *       500:
+ *         description: Internal server error
+ */
 
 
 module.exports = router;

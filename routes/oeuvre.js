@@ -167,5 +167,33 @@ router.put('/:id', auth.authMiddleware, auth.isAdmin, oeuvreController.updateOeu
  *       $ref: '#/components/responses/StandardResponse'
  */
 router.delete('/:id', auth.authMiddleware, auth.isAdmin, oeuvreController.deleteOeuvre);
+/**
+ * @swagger
+ * /oeuvres/statistics:
+ *   get:
+ *     summary: Get statistics for oeuvres
+ *     tags: [Oeuvres]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Successful response
+ *         content:
+ *           application/json:
+ *             example:
+ *               success: true
+ *               statistics:
+ *                 totalOeuvres: 20
+ *                 mostFrequentArtist: "Leonardo da Vinci"
+ *                 averageOeuvresPerArtist: 5
+ *                 earliestCreationDate: "1503-08-21"
+ *                 latestCreationDate: "1519-05-02"
+ *       401:
+ *         description: Unauthorized - Invalid token
+ *       500:
+ *         description: Internal server error
+ */
 
+
+router.get('/statistics',auth.authMiddleware,auth.isAdmin , oeuvreController.OeuvreStatistics);
 module.exports = router;

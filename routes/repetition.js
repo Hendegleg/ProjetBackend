@@ -384,6 +384,73 @@ router.delete("/deleterepetition/:id", auth.authMiddleware, auth.isAdmin, repeti
  */
 router.post('/generatePupitreList', auth.authMiddleware, auth.isAdmin, repetitionController.generatePupitreList);
 
-router.post('/:id/confirmerpresence', repetitionController.confirmerpresenceRepetition);
+router.post('/:id/confirmerpresence', auth.authMiddleware, auth.isChoriste,repetitionController.confirmerpresenceRepetition);
+/**
+ * @swagger
+ * /repetitions/{id}/confirmerpresence:
+ *   post:
+ *     summary: Confirmer la présence à une répétition
+ *     tags: [Répétitions]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID de la répétition à laquelle confirmer la présence
+ *     responses:
+ *       '200':
+ *         description: Succès - Confirmation de présence enregistrée
+ *         content:
+ *           application/json:
+ *             example:
+ *               success: true
+ *               message: "Confirmation de présence enregistrée avec succès"
+ *       '400':
+ *         description: Requête incorrecte
+ *         content:
+ *           application/json:
+ *             example:
+ *               error: "Description de l'erreur"
+ *               message: "Échec de confirmation de présence"
+ *       '401':
+ *         description: Unauthorized - Invalid token
+ *       '500':
+ *         description: Erreur interne du serveur
+ */
+
+router.get('/consulterEtatAbsencesRepetitions', auth.authMiddleware, auth.isAdmin,repetitionController.consulterEtatAbsencesRepetitions);
+/**
+ * @swagger
+ * /repetitions/consulterEtatAbsencesRepetitions:
+ *   get:
+ *     summary: Consulter l'état des absences aux répétitions
+ *     tags: [Répétitions]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       '200':
+ *         description: Succès - Récupération de l'état des absences
+ *         content:
+ *           application/json:
+ *             example:
+ *               success: true
+ *               etatAbsences: [
+ *                 {
+ *                   repetitionId: "60cf7123b8c5e851b00cd6a1",
+ *                   dateRepetition: "2024-01-01",
+ *                   participantsAbsents: ["60cf7123b8c5e851b00cd3a1", "60cf7123b8c5e851b00cd3a2"],
+ *                   pourcentageParticipantsAbsents: 40
+ *                 },
+ *                 // ... (other repetitions)
+ *               ]
+ *               message: "Succès - Récupération de l'état des absences"
+ *       '401':
+ *         description: Unauthorized - Invalid token
+ *       '500':
+ *         description: Erreur interne du serveur
+ */
 
 module.exports = router;

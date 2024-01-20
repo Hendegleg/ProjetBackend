@@ -175,8 +175,6 @@ const concertController = {
       }
     },
 
-
-
   getConfirmedChoristesForConcert: async (req, res) => {
       try {
         const { id } = req.params;
@@ -223,7 +221,85 @@ const concertController = {
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }
-}
+},
+getConcertStatistics: async (req, res) => {
+  try {
+    // Obtenez tous les concerts
+    const concerts = await Concert.find();
+
+    // Obtenez la liste des répétitions liées à tous les concerts
+    const repetitions = await Repetition.find({ concert: { $in: concerts.map(c => c._id) } });
+
+    // Calculer les statistiques pour chaque concert
+    const concertStatistics = [];
+    for (const concert of concerts) {
+      const concertStats = {
+        concert: {
+          _id: concert._id,
+          nom: concert.nom,
+          date: concert.date,
+          heure: concert.heure,
+          saison: concert.saison,
+          lieu: concert.lieu,
+          programme: concert.programme,
+        },
+        nbabsenceConcert: 0,
+        nbpresenceConcert: 0,
+        nbrepetitions: [],
+        nbpresenceRepetitions: 0,
+        nbabsenceRepetitions: 0,
+      };
+
+      // Calculer les statistiques de présence/absence pour chaque choriste
+      for (const confirmation of concert.confirmations) {
+        if (confirmation.confirmation) {
+          concertStats.presenceConcert++;
+        } else {
+          concertStats.absenceConcert++;
+        }
+      }
+
+      // Calculer les statistiques de présence/absence pour chaque répétition
+      for (const repetition of repetitions) {
+        const repetitionStats = {
+          repetition: {
+            date: repetition.date,
+            lieu: repetition.lieu,
+          },
+          absence: 0,
+          presence: 0,
+        };
+
+        for (const participantId of repetition.participant) {
+          const confirmation = concert.confirmations.find(conf => conf.choriste.equals(participantId));
+
+          if (confirmation) {
+            if (confirmation.confirmation) {
+              repetitionStats.presence++;
+            } else {
+              repetitionStats.absence++;
+            }
+          }
+        }
+
+        concertStats.repetitions.push(repetitionStats);
+        concertStats.presenceRepetitions += repetitionStats.presence;
+        concertStats.absenceRepetitions += repetitionStats.absence;
+      }
+
+      concertStatistics.push(concertStats);
+    }
+
+    // Envoyer les statistiques en réponse
+    res.status(200).json({
+      statistiquesConcerts: concertStatistics,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+},
+
   };
 
 module.exports = concertController;

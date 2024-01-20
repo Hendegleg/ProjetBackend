@@ -48,9 +48,6 @@ router.post('/declareLeave', auth.authMiddleware, auth.isChoriste, CongeControll
 
 router.get('/choristesanotifier',Auth.authMiddleware,Auth.isAdmin, CongeController.LeaveNotifications);
 
-
-
-
 /**
  * @swagger
  * /modifyLeaveStatus:

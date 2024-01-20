@@ -5,7 +5,7 @@ const nodemailer = require('nodemailer');
 const Pupitre = require('../models/pupitre');
 const mongoose= require ('mongoose');
 const { io } = require('../socket');
-const {io}=require("../socket.js");
+
 
 const transporter = nodemailer.createTransport({
   service: 'gmail',
