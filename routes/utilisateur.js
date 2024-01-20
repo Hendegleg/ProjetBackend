@@ -178,12 +178,6 @@ const Auth = require('../middlewares/auth');
  *         - date
  */
 
-router.post('/ajouterStatus',Auth.authMiddleware,Auth.isAdminOrChoriste , statusHistoryController.addStatusChange);
-router.get('/:id',Auth.authMiddleware,Auth.isAdmin , statusHistoryController.getStatusHistoryForUser);
-
-router.get('/:id/profile',Auth.authMiddleware,Auth.isAdminOrChoriste ,userController.getProfile );
-
-router.get('/statistics',Auth.authMiddleware,Auth.isAdmin , userController.generateStatistics);
 /**
  * @swagger
  * /users/statistics:
@@ -213,5 +207,13 @@ router.get('/statistics',Auth.authMiddleware,Auth.isAdmin , userController.gener
  *       '500':
  *         description: Internal server error
  */
+router.get('/statistics',Auth.authMiddleware,Auth.isAdmin , userController.generateStatistics);
+router.post('/ajouterStatus',Auth.authMiddleware,Auth.isAdminOrChoriste , statusHistoryController.addStatusChange);
+router.get('/:id',Auth.authMiddleware,Auth.isAdmin , statusHistoryController.getStatusHistoryForUser);
+
+router.get('/:id/profile',Auth.authMiddleware,Auth.isAdminOrChoriste ,userController.getProfile );
+
+
+
 
 module.exports = router;

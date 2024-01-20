@@ -214,6 +214,23 @@ router.post('/generer-planning', auth.authMiddleware, auth.isAdmin, auditionCont
  *   post:
  *     summary: Generate audition schedule
  *     tags: [Auditions]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               tessiture:
+ *                 type: string
+ *                 description: The tessiture field for the audition
+ *               extraitChante:
+ *                 type: string
+ *                 description: The extraitChante field for the audition
+ *             required:
+ *               - tessiture
+ *               - extraitChante
+ *               
  *     security:
  *       - bearerAuth: []
  *     responses:
@@ -225,14 +242,22 @@ router.post('/generer-planning', auth.authMiddleware, auth.isAdmin, auditionCont
  *         description: Internal server error
  */
 
-router.post('/genererplanabsence', auth.authMiddleware, auth.isAdmin, auditionController.genererPlanificationabsence);
 
+router.post('/genererplanabsence', auth.authMiddleware, auth.isAdmin, auditionController.genererPlanificationabsence);
 /**
  * @swagger
  * /auditions/genererplanabsence:
  *   post:
  *     summary: Generate absence schedule for auditions
  *     tags: [Auditions]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               // Define your request body properties here
  *     security:
  *       - bearerAuth: []
  *     responses:
@@ -243,6 +268,7 @@ router.post('/genererplanabsence', auth.authMiddleware, auth.isAdmin, auditionCo
  *       500:
  *         description: Internal server error
  */
+
 
 
 module.exports = router;

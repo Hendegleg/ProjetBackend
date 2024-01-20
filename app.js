@@ -100,8 +100,6 @@ mongoose
 .then(()=>console.log("connexion a mongoDB reussite"))
 .catch((e) =>console.log("connexion a mongoDB echouée", e))
 
-
-
 const app = express();
 app.use(express.json());
 app.use((req, res, next) => {

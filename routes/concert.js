@@ -2,14 +2,38 @@ const express = require('express');
 const router = express.Router();
 const concertController = require('../controllers/concert');
 const auth = require('../middlewares/auth');
-
-
+/**
+ * @swagger
+ * /concert/concerts/statistics:
+ *   get:
+ *     summary: Get statistics for all concerts
+ *     tags: [Concerts]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Successful response
+ *         content:
+ *           application/json:
+ *             example:
+ *               success: true
+ *               statistics: {
+ *                 totalConcerts: 10,
+ *                 totalConfirmedConcerts: 5,
+ *                 totalUnconfirmedConcerts: 5
+ *               }
+ *       401:
+ *         description: Unauthorized - Invalid token
+ *       500:
+ *         description: Internal server error
+ */
 /**
  * @swagger
  * tags:
  *   name: Concerts
  *   description: API operations related to concerts
  */
+router.get('/concerts/statistics', auth.authMiddleware, auth.isAdmin, concertController.getConcertStatistics);
 
 /**
  * @swagger
@@ -315,32 +339,6 @@ router.post('/:id/indiquerconfirmation', auth.authMiddleware, auth.isChoriste, c
  *         description: Internal server error
  */
 
-router.get('/concerts/statistics', auth.authMiddleware, auth.isAdmin, concertController.getConcertStatistics);
 
-/**
- * @swagger
- * /concerts/statistics:
- *   get:
- *     summary: Get statistics for all concerts
- *     tags: [Concerts]
- *     security:
- *       - bearerAuth: []
- *     responses:
- *       200:
- *         description: Successful response
- *         content:
- *           application/json:
- *             example:
- *               success: true
- *               statistics: {
- *                 totalConcerts: 10,
- *                 totalConfirmedConcerts: 5,
- *                 totalUnconfirmedConcerts: 5
- *               }
- *       401:
- *         description: Unauthorized - Invalid token
- *       500:
- *         description: Internal server error
- */
 
 module.exports = router;

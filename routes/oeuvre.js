@@ -3,6 +3,7 @@ const router = express.Router();
 const oeuvreController = require('../controllers/oeuvre');
 const auth = require('../middlewares/auth');
 
+router.get('/statistics',auth.authMiddleware,auth.isAdmin , oeuvreController.OeuvreStatistics);
 /**
  * @swagger
  * components:
@@ -195,5 +196,5 @@ router.delete('/:id', auth.authMiddleware, auth.isAdmin, oeuvreController.delete
  */
 
 
-router.get('/statistics',auth.authMiddleware,auth.isAdmin , oeuvreController.OeuvreStatistics);
+
 module.exports = router;
