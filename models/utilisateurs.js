@@ -47,7 +47,15 @@ const UserSchema = new Schema({
     absencecount:{
         type:Number,
         default:0
-      }
+      },
+     
+      concertsValidated:{type:Number,
+    default:0},
+    repetitionsValidated:{
+        type:Number,
+        default:0
+    },
+      pupitre :{type: mongoose.Schema.Types.ObjectId, ref: 'Pupitre'}
     
 });
 
@@ -62,6 +70,25 @@ UserSchema.methods.toPublic = function () {
 
     return publicUserData;
 };
+UserSchema.statics.getChefDePupitreEmail = async function () {
+    try {
+        const utilisateur = await this.findOne({ role: 'chef de pupitre' });
+        return utilisateur ? utilisateur.email : null;
+    } catch (error) {
+        console.error('Erreur lors de la récupération de l\'adresse e-mail du chef de pupitre:', error.message);
+        return null;
+    }
+};
+UserSchema.statics.getChoristeEmail = async function () {
+    try {
+        const utilisateur = await this.findOne({ role: 'choriste' });
+        return utilisateur ? utilisateur.email : null;
+    } catch (error) {
+        console.error('Erreur lors de la récupération de l\'adresse e-mail du choriste:', error.message);
+        return null;
+    }
+};
+
 
 //sauvgarde des absences 
 UserSchema.pre('save', async function(next) {

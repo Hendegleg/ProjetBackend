@@ -7,7 +7,6 @@ const concertSchema = new Schema({
         type: Boolean,
     },
     date: { type: Date, required: true },
-
     lieu: { type: String, required: true },
     heure: { type: Date, required: true },
     affiche: { type: String },
@@ -17,11 +16,16 @@ const concertSchema = new Schema({
             requiresChoir: { type: Boolean, default: true }
         }
     ],
-    planning : { type:  Schema.Types.ObjectId, ref: 'repetition', required: true },
+    planning : { type:  Schema.Types.ObjectId, ref: 'Repetition'},
     nom_concert : { type : String, require : true },
     placement : {type :Schema.Types.ObjectId, ref : 'Placement' },
-    participant : {type:Schema.Types.ObjectId,ref:'User'},
-   
+    confirmations: [
+        {
+            choriste: { type: Schema.Types.ObjectId, ref: 'User' },
+            confirmation: { type: Boolean, default: false },
+        },
+    ],
+
 });
 
 

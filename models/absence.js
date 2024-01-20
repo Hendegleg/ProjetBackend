@@ -17,10 +17,10 @@ const AbsenceRequestSchema = new Schema({
 
   //type: { type: String, enum: ['repetition','concert'], required: true }
   approved: {type: Boolean,default:false}
+  // reason manuelle 
 });
 
 
 
 const AbsenceRequest = mongoose.model('AbsenceRequest', AbsenceRequestSchema);
-
 module.exports = AbsenceRequest;

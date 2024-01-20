@@ -2,7 +2,6 @@ const jwt = require('jsonwebtoken');
 const User = require ("../controllers/auth")
 const luser = require ("../models/utilisateurs")
 
-
 const authMiddleware = async (req, res, next) => {
   try {
     const token = req.headers.authorization?.split(' ')[1];
@@ -10,7 +9,6 @@ const authMiddleware = async (req, res, next) => {
     if (!token) {
       return res.status(401).json({ error: "Token non fourni" });
     }
-
     const decodedToken = jwt.verify(token, 'RANDOM_TOKEN_SECRET');
     const userId = decodedToken.userId;
 
@@ -50,10 +48,13 @@ const checkRole = (allowedRoles) => {
 
 module.exports = {
   authMiddleware,
+  isAdminOrChoriste: checkRole(['admin','choriste']),
   isAdmin: checkRole(['admin']),
   isChoriste: checkRole(['choriste']),
   ischefpupitre: checkRole(['chef de pupitre']),
   ismanagerChoeur: checkRole(['manager de choeur']),
+  ischefChoeur: checkRole(['chef de choeur']),
   isAdminOrManager: checkRole(['admin', 'manager de choeur']),
-  isAll: checkRole(['admin', 'manager de choeur', 'chef de pupitre', 'choriste']),
+  isAll: checkRole(['chef de choeur', 'manager de choeur', 'chef de pupitre', 'choriste']),
+  
 };

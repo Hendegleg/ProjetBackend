@@ -6,6 +6,7 @@ const Audition = require('../models/audition');
 const User = require('../models/utilisateurs');
 const bcrypt = require('bcrypt');
 const uuid = require('uuid');
+const Pupitre = require ('../models/pupitre');
 function generateUniqueToken() {
     return uuid.v4(); 
 }
@@ -19,55 +20,53 @@ const transporter = nodemailer.createTransport({
         pass: process.env.EMAIL_PASSWORD
     }
 });
+
 exports.getListeCandidatsParPupitre = async (req, res) => {
     try {
-      const besoinPupitres = req.body;
-  
-      const auditions = await Audition.find().populate('candidat');
-      const candidatsParPupitre = {
-        Soprano: { retenu: [], 'en attente': [], refuse: [] },
-        Alto: { retenu: [], 'en attente': [], refuse: [] },
-        Ténor: { retenu: [], 'en attente': [], refuse: [] },
-        Basse: { retenu: [], 'en attente': [], refuse: [] }
-      };
-  
-      for (const audition of auditions) {
-        if (audition.candidat) {
-          const candidat = audition.candidat;
-  
-          const candidatData = {
-            nom: candidat.nom,
-            prenom: candidat.prenom,
-            decisioneventuelle: audition.decisioneventuelle
-          };
-  
-          switch (audition.tessiture) {
-            case 'Soprano':
-              candidatsParPupitre.Soprano[candidatData.decisioneventuelle].push(candidatData);
-              break;
-            case 'Alto':
-              candidatsParPupitre.Alto[candidatData.decisioneventuelle].push(candidatData);
-              break;
-            case 'Ténor':
-              candidatsParPupitre.Ténor[candidatData.decisioneventuelle].push(candidatData);
-              break;
-            case 'Basse':
-              candidatsParPupitre.Basse[candidatData.decisioneventuelle].push(candidatData);
-              break;
-            default:
-              break;
-          }
+        const besoinPupitres = req.body|| {}
+
+        const candidatsParPupitre = {
+            Soprano: { retenu: [], 'en attente': [], refuse: [] },
+            Alto: { retenu: [], 'en attente': [], refuse: [] },
+            Ténor: { retenu: [], 'en attente': [], refuse: [] },
+            Basse: { retenu: [], 'en attente': [], refuse: [] }
+        };
+        if (Object.keys(besoinPupitres).length === 0) {
+            return res.status(400).json({ error: 'Besoin des pupitres non spécifié dans la requête' });
         }
-      }
-  
-      return res.status(200).json(candidatsParPupitre);
-  
+
+        const auditionsRetenues = await Audition.find({ decisioneventuelle: { $in: ['retenu', 'en attente', 'refusé'] } }).populate('candidat');
+
+        for (const audition of auditionsRetenues) {
+            const candidat = audition.candidat;
+            const tessiture = audition.tessiture;
+            const decision = audition.decisioneventuelle;
+
+            const candidatData = {
+                id: candidat._id,
+                nom: candidat.nom,
+                prenom: candidat.prenom,
+                email: candidat.email,
+            };
+
+            if (candidatsParPupitre[tessiture]['retenu'].length < besoinPupitres[tessiture]) {
+                if (decision === 'retenu' && candidatsParPupitre[tessiture]['retenu'].length < besoinPupitres[tessiture]) {
+                    candidatsParPupitre[tessiture]['retenu'].push(candidatData);
+                } else if (decision === 'en attente' && candidatsParPupitre[tessiture]['en attente'].length < besoinPupitres[tessiture]) {
+                    candidatsParPupitre[tessiture]['en attente'].push(candidatData);
+                } else {
+                    candidatsParPupitre[tessiture]['refuse'].push(candidatData);
+                }
+            }
+        }
+
+        return res.status(200).json(candidatsParPupitre);
     } catch (error) {
-      console.error('Erreur lors de la récupération des candidats par pupitre :', error);
-      return res.status(500).json({ error: 'Erreur lors de la récupération des candidats par pupitre' });
+        console.error('Erreur lors de la récupération des candidats retenus par pupitre :', error);
+        return res.status(500).json({ error: 'Erreur lors de la récupération des candidats retenus par pupitre' });
     }
-  };
-  
+};
+
 
 exports.confirmerPresence = (req, res) => {
     const { token } = req.query;
@@ -89,6 +88,7 @@ exports.confirmerPresence = (req, res) => {
             res.status(500).send('Erreur lors de la confirmation.');
         });
 };
+
 
 exports.envoyerEmailAcceptation = async (req, res) => {
     try {
@@ -153,7 +153,7 @@ const ajouterChoriste = async (candidat, tessiture) => {
                 email: candidat.email,
                 password: candidat.motDePasse,
                 role: 'choriste',
-                tessiture: tessiture, // Utilisation de la tessiture fournie
+                tessiture: tessiture, 
                 taille_en_m: candidat.taille_en_m,
             });
 
@@ -249,16 +249,29 @@ exports.confirmerEngagement = async (req, res) => {
 };
 
 
+let listeCandidatsParSaison = {}; // objet je peux l'utiliser après
+
 exports.getListeCandidats = async (req, res) => {
     try {
-        const listeCandidats = await Candidat.find({});
-        res.status(200).json(listeCandidats);
-        console.log("liste:", listeCandidats)
+        const saison = req.body.saison; 
+        
+        if (!saison) {
+            return res.status(400).json({ message: 'Numéro de saison manquant dans le corps de la requête' });
+        }
+
+        if (!listeCandidatsParSaison[saison]) {
+            listeCandidatsParSaison[saison] = await Candidat.find({ saison }, 'nom prenom');
+            console.log(listeCandidatsParSaison)
+        }
+
+        res.status(200).json(listeCandidatsParSaison[saison]);
+        console.log(`Liste des candidats pour la saison ${saison}:`, listeCandidatsParSaison[saison]);
     } catch (error) {
         console.error('Erreur lors de la récupération de la liste des candidats :', error);
         res.status(500).json({ message: 'Erreur lors de la récupération de la liste des candidats' });
     }
 };
+
 exports.getCandidatsRetenusParPupitre = async (req, res) => {
     try {
         const auditionsRetenues = await Audition.find({ decisioneventuelle: 'retenu' });
@@ -272,46 +285,49 @@ exports.getCandidatsRetenusParPupitre = async (req, res) => {
 
         await Promise.all(auditionsRetenues.map(async (audition) => {
             const candidat = await Candidat.findById(audition.candidat);
+            let numPupitre = null;
+
             switch (audition.tessiture) {
                 case 'Soprano':
-                    candidatsParPupitre.Soprano.push({
-                        id: candidat._id,
-                        nom: candidat.nom,
-                        prenom: candidat.prenom,
-                        email: candidat.email,
-                        
-                    });
+                    numPupitre = 1;
                     break;
                 case 'Alto':
-                    candidatsParPupitre.Alto.push({
-                        id: candidat._id,
-                        nom: candidat.nom,
-                        prenom: candidat.prenom,
-                        email: candidat.email,
-                        
-                    });
+                    numPupitre = 2;
                     break;
                 case 'Ténor':
-                    candidatsParPupitre.Ténor.push({
-                        id: candidat._id,
-                        nom: candidat.nom,
-                        prenom: candidat.prenom,
-                        email: candidat.email,
-                       
-                    });
+                    numPupitre = 3;
                     break;
                 case 'Basse':
-                    candidatsParPupitre.Basse.push({
-                        id: candidat._id,
-                        nom: candidat.nom,
-                        prenom: candidat.prenom,
-                        email: candidat.email,
-                       
-                    });
+                    numPupitre = 4;
                     break;
                 default:
                     break;
             }
+
+            let existingPupitre = await Pupitre.findOne({ num_pupitre: numPupitre, tessiture: audition.tessiture });
+
+            if (existingPupitre) {
+                if (!existingPupitre.choristes.includes(candidat._id)) {
+                    existingPupitre.choristes.push(candidat._id);
+                    await existingPupitre.save();
+                }
+            } else {
+                const newPupitreInstance = new Pupitre({
+                    num_pupitre: numPupitre,
+                    tessiture: audition.tessiture,
+                    besoin: 1,
+                    choristes: [candidat._id]
+                });
+
+                await newPupitreInstance.save();
+            }
+
+            candidatsParPupitre[audition.tessiture].push({
+                id: candidat._id,
+                nom: candidat.nom,
+                prenom: candidat.prenom,
+                email: candidat.email,
+            });
         }));
 
         return res.status(200).json(candidatsParPupitre);
@@ -320,3 +336,4 @@ exports.getCandidatsRetenusParPupitre = async (req, res) => {
         return res.status(500).json({ error: 'Erreur lors de la récupération des candidats retenus par pupitre' });
     }
 };
+

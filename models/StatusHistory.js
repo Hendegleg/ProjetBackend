@@ -2,18 +2,14 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const StatusHistorySchema = new Schema({
-    status: {
-        type: String,
-        required: true
-      },
-      nbsaison: {
-        type: Number,
-        required: true
-      },
+  
+    utilisateur: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, 
+    ancienStatus: { type: String}, 
+    nouveauStatus: { type: String},
+    nbsaison:{type:Number} ,
+    date: { type: Date, default: Date.now },
     
-    }, { timestamps: true });
-    
-
+  });
     
 
     const StatusHistory = mongoose.model('StatusHistory', StatusHistorySchema);

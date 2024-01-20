@@ -18,8 +18,13 @@ const getCandidats = async (req, res) => {
     }
   
     if (req.query.telephone) {
-      filter.telephone = { $regex: req.query.telephone, $options: "i" };
+      if (!isNaN(req.query.telephone)) {
+        filter.telephone = { $eq: req.query.telephone };
+      } else {
+        filter.telephone = { $regex: req.query.telephone, $options: "i" };
+      }
     }
+    
     if (req.query.email) {
       filter.email = { $regex: req.query.email, $options: "i" };
     }
@@ -59,6 +64,7 @@ const getCandidats = async (req, res) => {
     res.status(500).json({ success: false, message: "Erreur serveur" });
   }
 };
+
 module.exports ={
   getCandidats
 }

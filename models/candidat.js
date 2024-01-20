@@ -4,6 +4,7 @@ const Verifmail = require('./verifmail');
 
 
 const candidatSchema = new Schema({
+
     nom: { type: String, required: true },
     prenom : { type: String, required: true },
     nom_jeune_fille: { type: String, required: true },
@@ -28,8 +29,12 @@ const candidatSchema = new Schema({
        enum:["retenu","en attente","refuse"],
        default:"en attente"},
     token : {type: String},
+    saison : {type : Number}
    
-});
+}, {
+    timestamps:true 
+}
+);
 
 
 const Candidat = mongoose.model('Candidat', candidatSchema);

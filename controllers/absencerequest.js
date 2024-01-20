@@ -6,7 +6,10 @@ const User = require('../models/utilisateurs');
 
 const informerAbsence = (req, res) => {
   const { eventType, eventDate, reason } = req.body;
-  const userId = req.params.id;
+  const userId = req.auth.userId;
+  if (!eventType || !eventDate || !reason) {
+    return res.status(400).json({ success: false, message: 'Les données requises sont manquantes dans le corps de la requête' });
+  }
 
   let userObj;
   let eventObj;
@@ -77,11 +80,6 @@ const createAbsenceRequest = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
-
-
-
-
-
 const getAbsenceRequestsByUser = async (req, res) => {
   try {
     const { userId } = req.params;
@@ -113,10 +111,6 @@ const createAbsence = async (req, res) => {
     res.status(500).json({ error: 'Erreur lors de la création de l\'absence request' });
   }
 };
-
-
-
-
 
 const getChoristesByRepetitionAndPupitre = async (req, res) => {
   try {
