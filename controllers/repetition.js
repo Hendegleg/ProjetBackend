@@ -182,7 +182,7 @@ const envoyerNotificationChoristes = async () => {
                   service: 'gmail',
                   auth: {
                       user: 'wechcrialotfi@gmail.com',
-                      pass: 'vqbs baba usst djrw',
+                      pass: 'sgpt snms vtum ifph',
                   },
               });
 

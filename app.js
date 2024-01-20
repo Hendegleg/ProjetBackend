@@ -22,7 +22,7 @@ const AbsenceRoutes = require ('./routes/absenceRequest')
 const tessitureRoutes = require ('./routes/tessiture')
 const pupitreRoutes = require ('./routes/pupitre')
 const repetitioncontroller = require ('./controllers/repetition')
-cron.schedule('50 11 * * *', repetitioncontroller.envoyerNotificationChoristes);
+cron.schedule('22 20 * * *', repetitioncontroller.envoyerNotificationChoristes);
 const programmeRoutes=require('./routes/programme')
 
 const intervenantRoutes = require ('./routes/intervenants')
