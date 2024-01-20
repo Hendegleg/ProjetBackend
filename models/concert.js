@@ -11,7 +11,7 @@ const concertSchema = new Schema({
     lieu: { type: String, required: true },
     heure: { type: Date, required: true },
     affiche: { type: String },
-    programme: [
+   programme: [
         {
             programme: { type: Schema.Types.ObjectId, ref: 'Programme' },
             requiresChoir: { type: Boolean, default: true }

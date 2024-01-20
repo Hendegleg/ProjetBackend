@@ -29,20 +29,8 @@ const swaggerUi = require('swagger-ui-express');
 
 
 const {io}=require("./socket.js");
-const { notifiercongechoriste }= require('./controllers/conge.js')
+
 cron.schedule('29 13 * * *', repetitioncontroller.envoyerNotificationChoristes);
-cron.schedule('40 16 * * *', async () => {
-  try {
-    const liste = await notifiercongechoriste();
-
-    if (liste) {
-      io.emit("notif-6582068777dd44c527da3a08", { message: "Demandes de congé des choristes", liste });
-    }
-  } catch (error) {
-    console.error('Erreur lors de la planification de la tâche cron :', error);
-  }
-});
-
 mongoose
 .connect(
      "mongodb://127.0.0.1:27017/DS",

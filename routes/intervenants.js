@@ -5,139 +5,147 @@ const auth = require('../middlewares/auth');
 
 /**
  * @swagger
- * tags:
- *   name: Utilisateurs
- *   description: Opérations sur les utilisateurs
- * 
  * components:
  *   schemas:
  *     User:
  *       type: object
  *       properties:
- *         _id:
- *           type: string
- *           description: The auto-generated id of the user
  *         nom:
  *           type: string
- *           description: The user's last name
  *         prenom:
  *           type: string
- *           description: The user's first name
  *         email:
  *           type: string
- *           description: The user's email address
- *       example:
- *         _id: 12345
- *         nom: Doe
- *         prenom: John
- *         email: john@example.com
- * 
- *   responses:
- *     UserResponse:
+ *         password:
+ *           type: string
+ *         role:
+ *           type: string
+ *       required:
+ *         - nom
+ *         - prenom
+ *         - email
+ *         - password
+ *         - role
+ */
+/**
+ * @swagger
+ * /intervenant:
+ *   post:
+ *     summary: Créer un nouvel intervenant
+ *     tags: [Intervenant]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/User' 
+ *     responses:
+ *       201:
+ *         description: Intervenant créé avec succès
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/User' 
+ */
+router.post('/', auth.authMiddleware, auth.isAdmin, UserController.createUser);
+/**
+ * @swagger
+ * /intervenant:
+ *   get:
+ *     summary: Obtenir la liste de tous les intervenants
+ *     tags: [Intervenant]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
  *       200:
  *         description: Success
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/User'
- *       404:
- *         description: User not found
- *       500:
- *         description: Server error
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/User' 
  */
-
-/**
- * @swagger
- * /api/users:
- *   post:
- *     summary: Créer un nouvel utilisateur
- *     tags: [Utilisateurs]
- *     security:
- *       - bearerAuth: []
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/User'
- *     responses:
- *       '201':
- *         description: Utilisateur créé avec succès
- *       '400':
- *         description: Requête incorrecte
- *       '401':
- *         description: Non autorisé
- *       '500':
- *         description: Erreur interne du serveur
- * 
- *   get:
- *     summary: Récupérer tous les utilisateurs
- *     tags: [Utilisateurs]
- *     security:
- *       - bearerAuth: []
- *     responses:
- *       $ref: '#/components/responses/UserResponse'
- */
-
-/**
- * @swagger
- * /api/users/{userId}:
- *   get:
- *     summary: Récupérer un utilisateur par ID
- *     tags: [Utilisateurs]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: userId
- *         required: true
- *         schema:
- *           type: string
- *         description: ID de l'utilisateur à récupérer
- *     responses:
- *       $ref: '#/components/responses/UserResponse'
- * 
- *   put:
- *     summary: Mettre à jour un utilisateur par ID
- *     tags: [Utilisateurs]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: userId
- *         required: true
- *         schema:
- *           type: string
- *         description: ID de l'utilisateur à mettre à jour
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/User'
- *     responses:
- *       $ref: '#/components/responses/UserResponse'
- * 
- *   delete:
- *     summary: Supprimer un utilisateur par ID
- *     tags: [Utilisateurs]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: userId
- *         required: true
- *         schema:
- *           type: string
- *         description: ID de l'utilisateur à supprimer
- *     responses:
- *       $ref: '#/components/responses/UserResponse'
- */
-
-router.post('/', auth.authMiddleware, auth.isAdmin, UserController.createUser);
 router.get('/', auth.authMiddleware, auth.isAdmin, UserController.getAllUsers);
+/**
+ * @swagger
+ * /intervenant/{userId}:
+ *   get:
+ *     summary: Obtenir un intervenant par son ID
+ *     tags: [Intervenant]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID de l'intervenant à obtenir
+ *     responses:
+ *       200:
+ *         description: Success
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/User' 
+ */
+
 router.get('/:userId', auth.authMiddleware, auth.isAdmin, UserController.getUserById);
+/**
+ * @swagger
+ * /intervenant/{userId}:
+ *   put:
+ *     summary: Mettre à jour un intervenant par son ID
+ *     tags: [Intervenant]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID de l'intervenant à mettre à jour
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/User' 
+ *     responses:
+ *       200:
+ *         description: Intervenant mis à jour avec succès
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/User' 
+ */
+
 router.put('/:userId', auth.authMiddleware, auth.isAdmin, UserController.updateUser);
+/**
+ * @swagger
+ * /intervenant/{userId}:
+ *   delete:
+ *     summary: Supprimer un intervenant par son ID
+ *     tags: [Intervenant]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID de l'intervenant à supprimer
+ *     responses:
+ *       200:
+ *         description: Intervenant supprimé avec succès
+ */
+
+
 router.delete('/:userId', auth.authMiddleware, auth.isAdmin, UserController.deleteUser);
 
 module.exports = router;

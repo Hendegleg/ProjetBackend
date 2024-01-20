@@ -153,7 +153,7 @@ const ajouterChoriste = async (candidat, tessiture) => {
                 email: candidat.email,
                 password: candidat.motDePasse,
                 role: 'choriste',
-                tessiture: tessiture, // Utilisation de la tessiture fournie
+                tessiture: tessiture, 
                 taille_en_m: candidat.taille_en_m,
             });
 
@@ -336,3 +336,4 @@ exports.getCandidatsRetenusParPupitre = async (req, res) => {
         return res.status(500).json({ error: 'Erreur lors de la récupération des candidats retenus par pupitre' });
     }
 };
+

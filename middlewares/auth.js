@@ -9,7 +9,6 @@ const authMiddleware = async (req, res, next) => {
     if (!token) {
       return res.status(401).json({ error: "Token non fourni" });
     }
-
     const decodedToken = jwt.verify(token, 'RANDOM_TOKEN_SECRET');
     const userId = decodedToken.userId;
 
@@ -55,4 +54,5 @@ module.exports = {
   ischefChoeur: checkRole(['chef de choeur']),
   isAdminOrManager: checkRole(['admin', 'manager de choeur']),
   isAll: checkRole(['chef de choeur', 'manager de choeur', 'chef de pupitre', 'choriste']),
+  
 };
