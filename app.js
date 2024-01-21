@@ -27,15 +27,11 @@ cron.schedule('22 20 * * *', repetitioncontroller.envoyerNotificationChoristes);
 const programmeRoutes=require('./routes/programme')
 
 const intervenantRoutes = require ('./routes/intervenants')
-const repetitioncontroller = require ('./controllers/repetition');
 const { notifieradmin } = require("./controllers/candidat.js");
 const placementController = require('./routes/placement.js')
-const swaggerUi = require('swagger-ui-express');
-const programmeRoutes= require('./routes/programme.js')
-const pupitreRoutes = require('./routes/pupitre.js')
+
 
 const eliminationRoutes = require ('./routes/elimination.js')
-const swaggerJsdoc = require("swagger-jsdoc");
 const {io}=require("./socket");
 const { notifieradminChoristeseliminés }= require('./controllers/absenceElemination.js')
 

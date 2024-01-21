@@ -94,27 +94,46 @@ const getRepetitionById = (req, res) => {
 };
 
 
-const updateRepetition = (req, res) => {
-  Repetition.findByIdAndUpdate(req.params.id, req.body, { new: true })
-    .then((repetition) => {
-      if (!repetition) {
-        res.status(404).json({
-          message: 'Répétition non trouvée',
-        });
-      } else {
-        res.status(200).json({
-          repetition: repetition,
-          message: 'Répétition mise à jour avec succès',
-        });
-      }
-    })
-    .catch((error) => {
-      res.status(400).json({
-        error: error.message,
-        message: "Échec de la mise à jour de la répétition",
+
+const updateRepetition = async (req, res) => {
+  try {
+    const repetition = await Repetition.findOneAndUpdate(
+      { _id: req.params.id },
+      req.body,
+      { new: true }
+    );
+
+    if (!repetition) {
+      return res.status(404).json({ message: "Répétition non trouvée" });
+    } else {
+      res.status(200).json({
+        message: "Répétition modifiée avec succès",
+        model: repetition,
       });
-    });
+
+      try {
+        const memberIds = repetition.participant;
+
+        const members = await User.find({ _id: { $in: memberIds } });
+        console.log(members);
+
+        if (members) {
+          members.forEach((member) => {
+            io.emit('member', { userId: member._id, message: 'Votre répétition a été mise à jour.', updatedRepetition: repetition });
+          });
+        }
+      } catch (error) {
+        console.error("Erreur lors de l'envoi des notifications aux membres :", error);
+      }
+    }
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
 };
+io.on('updateRepetition', (data) => {
+  console.log('Notification received:', data.message);
+});
+
 
 const deleteRepetition = (req, res) => {
   const repetitionId = req.params.id;

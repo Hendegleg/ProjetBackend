@@ -4,7 +4,7 @@ const Pupitre = require("../models/pupitre")
 const mongoose= require('mongoose')
 
 
-exports.updateTessiture = (req, res) => {
+const updateTessiture = (req, res) => {
   const { nouvelleTessiture } = req.body;
   const userId = req.params.id; 
 
@@ -41,7 +41,7 @@ exports.updateTessiture = (req, res) => {
 
 
 
-exports.NotifupdateTessiture = (req, res) => {
+const NotifupdateTessiture = (req, res) => {
   const { nouvelleTessiture } = req.body;
   const userId = req.params.id; 
 User.findById(userId)
@@ -88,5 +88,10 @@ User.findById(userId)
       });
     });
 };
+
+module.exports = {
+  updateTessiture,
+  NotifupdateTessiture
+}
 
   
