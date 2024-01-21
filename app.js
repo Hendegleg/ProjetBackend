@@ -218,7 +218,13 @@ app.use('/api/placement', placementController)
 app.use('/api/pupitres', pupitreRoutes);
 app.use('/api/reset', dbresetController);
 app.use('/api/intervenant',intervenantRoutes)
+app.use(cors(
+  {
 
+      methods: ["POST", "GET","DELETE","PUT","PATCH"],
+      credentials: true
+  }
+));
 module.exports = app;
 module.exports.io = io;
 
