@@ -45,7 +45,7 @@ router.get('/choristesanotifier',Auth.authMiddleware,Auth.isAdmin, CongeControll
 
 /**
  * @swagger
- * /conge/modifyLeaveStatus:
+ * /conge/notifmodifyLeaveStatus:
  *   post:
  *     summary: Modify leave status for a chorister
  *     tags:
