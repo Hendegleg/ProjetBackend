@@ -117,6 +117,9 @@ app.use(cors(
   }
 ));
 app.use(express.json());
+app.get("/", (req, res) => {
+    res.json("hello to our project ");
+})
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader(
