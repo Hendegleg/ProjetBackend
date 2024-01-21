@@ -23,7 +23,6 @@ const absenceElemination =require('../controllers/absenceElemination')
  *               userId:
  *                 type: string
  *                 description: The ID of the user to discipline.
- *               // Add any other properties needed for discipline.
  *             required:
  *               - userId
  *     responses:
