@@ -29,7 +29,7 @@ const programmeRoutes=require('./routes/programme')
 const intervenantRoutes = require ('./routes/intervenants')
 const { notifieradmin } = require("./controllers/candidat.js");
 const placementController = require('./routes/placement.js')
-
+const dbresetController = require('./routes/resetdb')
 
 const eliminationRoutes = require ('./routes/elimination.js')
 const {io}=require("./socket");
@@ -102,7 +102,7 @@ cron.schedule('24 23 * * *', async () => {
 cron.schedule('29 13 * * *', repetitioncontroller.envoyerNotificationChoristes);
 mongoose
 .connect(
-     "mongodb://127.0.0.1:27017/database",
+     "mongodb+srv://hendlegleg:hend12345@cluster0.fswjx.mongodb.net/?retryWrites=true&w=majority",
    { /*useNewUrlParser: true, useUnifiedTopology: true*/}
 )
 .then(()=>console.log("connexion a mongoDB reussite"))
@@ -216,7 +216,7 @@ app.use('/api/elimination',eliminationRoutes)
 app.use('/api/intervenant',intervenantRoutes)
 app.use('/api/placement', placementController)
 app.use('/api/pupitres', pupitreRoutes);
-
+app.use('/api/reset', dbresetController);
 app.use('/api/intervenant',intervenantRoutes)
 
 module.exports = app;
