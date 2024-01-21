@@ -154,13 +154,11 @@ const Auth = require('../middlewares/auth');
  *     User:
  *       type: object
  *       properties:
- *         // Define properties for the User object
  *       required:
  *         - nom
  *         - prenom
  *         - email
  *         - password
- *         // Add other required properties
  */
 
 /**
@@ -170,7 +168,6 @@ const Auth = require('../middlewares/auth');
  *     StatusHistory:
  *       type: object
  *       properties:
- *         // Define properties for the Status History object
  *       required:
  *         - utilisateur
  *         - ancienStatus
