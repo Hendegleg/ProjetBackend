@@ -102,7 +102,7 @@ cron.schedule('24 23 * * *', async () => {
 cron.schedule('29 13 * * *', repetitioncontroller.envoyerNotificationChoristes);
 mongoose
 .connect(
-     "mongodb+srv://hendlegleg:hend12345@cluster0.fswjx.mongodb.net/?retryWrites=true&w=majority",
+     "mongodb+srv://hendlegleg:hend12345@cluster0.fswjx.mongodb.net/database",
    { /*useNewUrlParser: true, useUnifiedTopology: true*/}
 )
 .then(()=>console.log("connexion a mongoDB reussite"))
