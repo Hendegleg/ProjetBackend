@@ -220,7 +220,7 @@ app.use('/api/reset', dbresetController);
 app.use('/api/intervenant',intervenantRoutes)
 app.use(cors(
   {
-
+      origin: ["https://projet-backend-api.vercel.app/"],
       methods: ["POST", "GET","DELETE","PUT","PATCH"],
       credentials: true
   }
