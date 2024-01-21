@@ -2,6 +2,38 @@ const express = require('express');
 const router = express.Router();
 const repetitionController = require('../controllers/repetition');
 const auth = require('../middlewares/auth');
+
+/**
+ * @swagger
+ * /repetitions/consulterEtatAbsencesRepetitions:
+ *   get:
+ *     summary: Consulter l'état des absences aux répétitions
+ *     tags: [Répétitions]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       '200':
+ *         description: Succès - Récupération de l'état des absences
+ *         content:
+ *           application/json:
+ *             example:
+ *               success: true
+ *               etatAbsences: [
+ *                 {
+ *                   repetitionId: "60cf7123b8c5e851b00cd6a1",
+ *                   dateRepetition: "2024-01-01",
+ *                   participantsAbsents: ["60cf7123b8c5e851b00cd3a1", "60cf7123b8c5e851b00cd3a2"],
+ *                   pourcentageParticipantsAbsents: 40
+ *                 },
+ *                 // ... (other repetitions)
+ *               ]
+ *               message: "Succès - Récupération de l'état des absences"
+ *       '401':
+ *         description: Unauthorized - Invalid token
+ *       '500':
+ *         description: Erreur interne du serveur
+ */
+router.get('/consulterEtatAbsencesRepetitions', auth.authMiddleware, auth.isAdmin,repetitionController.consulterEtatAbsencesRepetitions);
 /**
  * @swagger
  * components:
@@ -421,36 +453,5 @@ router.post('/:id/confirmerpresence', auth.authMiddleware, auth.isChoriste,repet
  *         description: Erreur interne du serveur
  */
 
-router.get('/consulterEtatAbsencesRepetitions', auth.authMiddleware, auth.isAdmin,repetitionController.consulterEtatAbsencesRepetitions);
-/**
- * @swagger
- * /repetitions/consulterEtatAbsencesRepetitions:
- *   get:
- *     summary: Consulter l'état des absences aux répétitions
- *     tags: [Répétitions]
- *     security:
- *       - bearerAuth: []
- *     responses:
- *       '200':
- *         description: Succès - Récupération de l'état des absences
- *         content:
- *           application/json:
- *             example:
- *               success: true
- *               etatAbsences: [
- *                 {
- *                   repetitionId: "60cf7123b8c5e851b00cd6a1",
- *                   dateRepetition: "2024-01-01",
- *                   participantsAbsents: ["60cf7123b8c5e851b00cd3a1", "60cf7123b8c5e851b00cd3a2"],
- *                   pourcentageParticipantsAbsents: 40
- *                 },
- *                 // ... (other repetitions)
- *               ]
- *               message: "Succès - Récupération de l'état des absences"
- *       '401':
- *         description: Unauthorized - Invalid token
- *       '500':
- *         description: Erreur interne du serveur
- */
 
 module.exports = router;
