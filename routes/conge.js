@@ -41,11 +41,6 @@ const auth = require("../middlewares/auth");
  *         description: Erreur interne du serveur
  */
 router.post('/declareLeave', auth.authMiddleware, auth.isChoriste, CongeController.declareLeave);
-
-
-
-
-
 router.get('/choristesanotifier',Auth.authMiddleware,Auth.isAdmin, CongeController.LeaveNotifications);
 
 /**
@@ -99,6 +94,6 @@ router.get('/choristesanotifier',Auth.authMiddleware,Auth.isAdmin, CongeControll
  *       bearerFormat: JWT
  */
 
-router.post('/modifyLeaveStatus', Auth.authMiddleware,Auth.isAdmin,CongeController.modifyLeaveStatus);
+router.post('/notifmodifyLeaveStatus',CongeController.notifmodifyLeaveStatus);
 
 module.exports = router;

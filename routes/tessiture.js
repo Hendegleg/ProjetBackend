@@ -50,7 +50,7 @@ const auth = require("../middlewares/auth")
  *       '500':
  *         description: Erreur interne du serveur
  */
-router.put("/:userId", auth.authMiddleware, auth.isAdmin, tessiturecontroller.updateTessiture);
+router.put("/:id", auth.authMiddleware, auth.isAdmin,tessiturecontroller.updateTessiture);
 
-
+router.put("/notif/:id", tessiturecontroller.NotifupdateTessiture);
 module.exports = router
