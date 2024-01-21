@@ -295,138 +295,65 @@ cron.schedule('0 12 * * *', async () => {
 });
 
 const consulterEtatAbsencesRepetitions = async (req, res) => {
-  try {
-    const filter = {};
+    try {
+        const filter = {};
 
-    if (req.query.dateprécise) {
-      filter.date = new Date(req.query.dateprécise);
-    }
+        if (req.query.dateprécise) {
+            filter.date = new Date(req.query.dateprécise); 
+        }
 
-    if (req.query.datedonnée) {
-      filter.date = { $gte: new Date(req.query.datedonnée) };
-    }
+        if (req.query.dateDebut) {
+            filter.date = { $gte: new Date(req.query.dateDebut) };
+        }
 
-    if (req.query.périodedonnée) {
-      filter.date = { ...filter.date, $lte: new Date(req.query.périodedonnée) };
-    }
+        if (req.query.dateFin) {
+            filter.date = { $lte: new Date(req.query.dateFin) };
+        }
 
-    if (req.query.programme) {
-      filter.programme = req.query.programme;
-    }
-   
+        const repetitions = await Repetition.find(filter).populate('participant');
 
-    const repetitions = await Repetition.find(filter).populate('participant');
+        const result = await Promise.all(repetitions.map(async (repetition) => {
+            const absentMembers = await Promise.all(repetition.participant.map(async (participant) => {
+                const isAbsent = await hasAbsentRequestForRepetition(participant, repetition);
+                return isAbsent ? {
+                    _id: participant._id.toString(),
+                    nom: participant.nom,
+                    prenom: participant.prenom,
+                } : null;
+            }));
 
-    const result = await Promise.all(repetitions.map(async (repetition) => {
-      const absentMembers = await Promise.all(repetition.participant
-        .map(async (participant) => {
-          const isAbsent = await hasAbsentRequestForRepetition(participant, repetition);
-          return isAbsent ? {
-            _id: participant._id.toString(),
-            nom: participant.nom,
-            prenom: participant.prenom,
-          } : null;
+            return {
+                repetition: {
+                    _id: repetition._id.toString(),
+                    lieu: repetition.lieu,
+                    date: repetition.date,
+                    heureDebut: repetition.heureDebut,
+                    heureFin: repetition.heureFin,
+                },
+                absentMembers: absentMembers.filter((absentMember) => absentMember !== null),
+            };
         }));
 
-      return {
-        repetition: {
-          _id: repetition._id.toString(),
-          lieu: repetition.lieu,
-          date: repetition.date,
-          heureDebut: repetition.heureDebut,
-          heureFin: repetition.heureFin,
-        },
-        absentMembers: absentMembers.filter((absentMember) => absentMember !== null),
-      };
-    }));
-
-    res.status(200).json(result);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Internal Server Error" });
-  }
+        res.status(200).json(result);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
 };
+
 
 const hasAbsentRequestForRepetition = async (participant, repetition) => {
-  const absenceData = await AbsenceRequest.findOne({
-    user: participant._id,
-    repetition: repetition._id,
-    status: 'absent',
-  });
+    const absenceData = await AbsenceRequest.findOne({
+        user: participant._id,
+        repetition: repetition._id,
+        status: 'absent',
+    });
 
-  return !!absenceData;
+    return !!absenceData;
 };
 
 
-  // 2. Par Pupitre 
-  
-  
-  // const consulterEtatAbsencesRepetitionsparpupitre = async (req, res) => {
-  //   try {
-  //     let filter = {};
-  
-  //     // Apply filters if provided in the query parameters
-  //     if (req.query.specificDate) {
-  //       filter.DateRep = new Date(req.query.specificDate);
-  //     }
-  
-  //     if (req.query.startDate) {
-  //       filter.DateRep = { $gte: new Date(req.query.startDate) };
-  //     }
-  
-  //     if (req.query.endDate) {
-  //       filter.DateRep = { ...filter.DateRep, $lte: new Date(req.query.endDate) };
-  //     }
-  
-  //     if (req.query.programme) {
-  //       filter.programme = req.query.programme;
-  //     }
-  
-  //     const repetitions = await Repetition.find(filter).populate({
-  //       path: "membres.member",
-  //       model: "Membre",
-  //     });
-  
-  //     const result = repetitions.map((repetition) => {
-  //       const absentMembersByPupitre = {
-  //         soprano: [],
-  //         alto: [],
-  //         ténor: [],
-  //         basse: [],
-  //       };
-  
-  //       repetition.membres
-  //         .filter((member) => member.presence === false)
-  //         .forEach((member) => {
-  //           const pupitre = member.member.pupitre;
-  
-  //           absentMembersByPupitre[pupitre].push({
-  //             _id: member.member._id.toString(),
-  //             nom: member.member.nom,
-  //             prenom: member.member.prenom,
-  //           });
-  //         });
-  
-  //       const absentMembersObj = {
-  //         repetition: {
-  //           _id: repetition._id.toString(),
-  //           lieu: repetition.lieu,
-  //           date: repetition.DateRep,
-  //           heureDeb: repetition.HeureDeb,
-  //           heureFin: repetition.HeureFin,
-  //         },
-  //         absentMembersByPupitre,
-  //       };
-  
-  //       return absentMembersObj;
-  //     });
-  
-  //     res.status(200).json(result);
-  //   } catch (error) {
-  //     console.error(error);
-  //     res.status(500).json({ error: "Internal Server Error" });
-  //   }
-  // };
+
   
 const ajouterPresenceManuelleRepetition = async (req, res) => {
   try {
