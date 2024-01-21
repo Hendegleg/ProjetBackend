@@ -2,7 +2,7 @@ const express = require("express");
 const cron = require('node-cron');
 const swaggerJsdoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
-
+const cors = require("cors");
 const socketIO = require('socket.io');
 require('dotenv').config();
 const mongoose = require("mongoose");
@@ -109,6 +109,13 @@ mongoose
 .catch((e) =>console.log("connexion a mongoDB echouée", e))
 
 const app = express();
+app.use(cors(
+  {
+      origin: ["https://projet-backend-api.vercel.app/"],
+      methods: ["POST", "GET","DELETE","PUT","PATCH"],
+      credentials: true
+  }
+));
 app.use(express.json());
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -218,13 +225,7 @@ app.use('/api/placement', placementController)
 app.use('/api/pupitres', pupitreRoutes);
 app.use('/api/reset', dbresetController);
 app.use('/api/intervenant',intervenantRoutes)
-app.use(cors(
-  {
-      origin: ["https://projet-backend-api.vercel.app/"],
-      methods: ["POST", "GET","DELETE","PUT","PATCH"],
-      credentials: true
-  }
-));
+
 module.exports = app;
 module.exports.io = io;
 
